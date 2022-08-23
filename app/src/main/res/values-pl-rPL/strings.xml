@@ -3,4 +3,6 @@
     <string name="app_name">Stuboard</string>
     <string name="home">Home</string>
     <string name="search">Szukaj</string>
+    <string name="search_for_events">Szukaj wydarzeń</string>
+
 </resources>

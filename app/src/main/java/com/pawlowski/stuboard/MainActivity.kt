@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,7 +72,7 @@ fun NavigationGraph(navController: NavHostController)
     {
         composable(route = BottomNavItems.Home.route)
         {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
         composable(route = BottomNavItems.Search.route)
         {
