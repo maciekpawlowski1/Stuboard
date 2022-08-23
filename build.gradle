@@ -6,6 +6,7 @@ buildscript {
         lifecycle_version = '2.4.1'
         room_version = '2.4.2'
         retrofit_version = '2.9.0'
+        appCenterSdkVersion = '4.3.1'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

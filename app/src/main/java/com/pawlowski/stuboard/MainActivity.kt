@@ -10,6 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,6 +31,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        try {
+            val apiKey: String = System.getenv("APP_CENTER_KEY")?:getString(R.string.appCenterKey)
+            AppCenter.start(application, apiKey, Analytics::class.java, Crashes::class.java)
+        }
+        catch (e: Exception)
+        {}
+
     }
 }
 
