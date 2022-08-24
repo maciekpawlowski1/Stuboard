@@ -1,17 +1,20 @@
 package com.pawlowski.stuboard.ui.navigation_items
+import android.Manifest
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,9 +24,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
@@ -34,41 +43,52 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 fun HomeScreen(navController: NavController?, preview: Boolean = false)
 {
     Surface {
-        Column {
-            Map(preview)
-            Surface(modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()) {
-                Column {
-                    SearchCardButton(15.dp)
+        LazyColumn {
+            item {
+                Map(preview)
+            }
+
+            item {
+                SearchCardButton(15.dp)
+                {
+                    navController?.navigate(BottomNavItems.Search.route)
                     {
-                        navController?.navigate(BottomNavItems.Search.route)
-                        {
-                            navController.graph.startDestinationRoute?.let { screen_route ->
-                                popUpTo(screen_route) {
-                                    saveState = true
-                                }
+                        navController.graph.startDestinationRoute?.let { screen_route ->
+                            popUpTo(screen_route) {
+                                saveState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-
-                    CategoriesRow()
-
-                    LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Najwcześniej", label2 = "Więcej") {
-
-                    }
-
-                    EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews)
-
-                    LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Online", label2 = "Więcej") {
-
-                    }
-
-                    EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
                 }
             }
+
+            item {
+                CategoriesRow()
+            }
+
+            item {
+                LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Najwcześniej", label2 = "Więcej") {
+
+                }
+                EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews)
+            }
+
+            item {
+                LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Online", label2 = "Więcej") {
+
+                }
+
+                EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
+            }
+
+            item {
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp))
+            }
+
         }
     }
 
@@ -168,15 +188,47 @@ fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardCli
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Map(preview: Boolean = false)
 {
     if(!preview)
     {
-        GoogleMap(modifier = Modifier
-            .fillMaxWidth()
-            .height(170.dp),
-            cameraPositionState = rememberCameraPositionState()
+        val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
+        val hasPermission = locationPermissionState.hasPermission
+
+        if(!hasPermission && !locationPermissionState.permissionRequested)
+        {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            DisposableEffect(key1 = lifecycleOwner, effect = {
+                val eventObserver = LifecycleEventObserver { _, event ->
+                    when (event) {
+                        Lifecycle.Event.ON_START -> {
+                            locationPermissionState.launchPermissionRequest()
+                        }
+                        else -> {}
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(eventObserver)
+
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(eventObserver)
+                }
+            })
+        }
+        val cameraPositionState = rememberCameraPositionState()
+
+
+
+        val mapProperties by remember(hasPermission) { mutableStateOf(MapProperties(isMyLocationEnabled = hasPermission)) }
+        val uiSettings by remember(hasPermission) { mutableStateOf(MapUiSettings(myLocationButtonEnabled = hasPermission)) }
+        GoogleMap(
+            properties = mapProperties,
+            uiSettings = uiSettings,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(170.dp),
+            cameraPositionState = cameraPositionState
         )
     }
     else
@@ -223,7 +275,9 @@ fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues, 
                 textAlign = TextAlign.Center
             )
             
-            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxHeight().padding(bottom = 5.dp)) {
+            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier
+                .fillMaxHeight()
+                .padding(bottom = 5.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = eventItemForPreview.place,
                         modifier= Modifier.padding(start = 5.dp, end = 5.dp),
