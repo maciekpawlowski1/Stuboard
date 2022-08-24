@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.ui.navigation_items
+package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related
 
 import com.pawlowski.stuboard.R
 

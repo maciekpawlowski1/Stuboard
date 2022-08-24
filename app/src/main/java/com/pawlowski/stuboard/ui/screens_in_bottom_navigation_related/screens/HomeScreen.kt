@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.ui.navigation_items
+package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,6 +27,8 @@ import coil.compose.AsyncImage
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.BottomNavItems
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
@@ -35,7 +37,7 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
 {
     val mapCameraPositionState = rememberCameraPositionState()
     Surface {
-        LazyColumn(userScrollEnabled = !mapCameraPositionState.isMoving
+        LazyColumn(userScrollEnabled = !mapCameraPositionState.isMoving //TODO: Delete this and disable scrolling in map
         ) {
             item {
                 MyGoogleMap(cameraPositionState = mapCameraPositionState, preview = preview, markers = PreviewUtils.defaultMarkers, moveCameraToMarkersBound = true)

@@ -22,9 +22,9 @@ import androidx.navigation.compose.rememberNavController
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
-import com.pawlowski.stuboard.ui.navigation_items.BottomNavItems
-import com.pawlowski.stuboard.ui.navigation_items.HomeScreen
-import com.pawlowski.stuboard.ui.navigation_items.SearchScreen
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.BottomNavItems
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.HomeScreen
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.SearchScreen
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import dagger.hilt.android.AndroidEntryPoint
 
