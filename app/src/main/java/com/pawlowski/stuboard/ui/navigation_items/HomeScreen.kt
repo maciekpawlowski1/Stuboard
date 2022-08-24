@@ -1,5 +1,4 @@
 package com.pawlowski.stuboard.ui.navigation_items
-import android.Manifest
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -9,12 +8,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,15 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
@@ -42,10 +33,15 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 @Composable
 fun HomeScreen(navController: NavController?, preview: Boolean = false)
 {
+    val mapCameraPositionState = rememberCameraPositionState()
     Surface {
-        LazyColumn {
+        LazyColumn(userScrollEnabled = !mapCameraPositionState.isMoving
+        ) {
             item {
-                Map(preview)
+                MyGoogleMap(cameraPositionState = mapCameraPositionState, preview = preview, markers = PreviewUtils.defaultMarkers, moveCameraToMarkersBound = true)
+                {
+                    //TODO: Navigate to Map Screen
+                }
             }
 
             item {
@@ -93,6 +89,7 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
     }
 
 }
+
 
 @Composable
 fun SearchCardButton(horizontalPadding: Dp, onClick: () -> Unit)
@@ -188,61 +185,7 @@ fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardCli
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun Map(preview: Boolean = false)
-{
-    if(!preview)
-    {
-        val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
-        val hasPermission = locationPermissionState.hasPermission
 
-        if(!hasPermission && !locationPermissionState.permissionRequested)
-        {
-            val lifecycleOwner = LocalLifecycleOwner.current
-            DisposableEffect(key1 = lifecycleOwner, effect = {
-                val eventObserver = LifecycleEventObserver { _, event ->
-                    when (event) {
-                        Lifecycle.Event.ON_START -> {
-                            locationPermissionState.launchPermissionRequest()
-                        }
-                        else -> {}
-                    }
-                }
-                lifecycleOwner.lifecycle.addObserver(eventObserver)
-
-                onDispose {
-                    lifecycleOwner.lifecycle.removeObserver(eventObserver)
-                }
-            })
-        }
-        val cameraPositionState = rememberCameraPositionState()
-
-
-
-        val mapProperties by remember(hasPermission) { mutableStateOf(MapProperties(isMyLocationEnabled = hasPermission)) }
-        val uiSettings by remember(hasPermission) { mutableStateOf(MapUiSettings(myLocationButtonEnabled = hasPermission)) }
-        GoogleMap(
-            properties = mapProperties,
-            uiSettings = uiSettings,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(170.dp),
-            cameraPositionState = cameraPositionState
-        )
-    }
-    else
-    {
-        Surface(modifier = Modifier
-            .fillMaxWidth()
-            .height(170.dp),
-            color = Color.Gray
-        ) {
-
-        }
-    }
-
-}
 
 @Composable
 fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues, onCardClick: () -> Unit)

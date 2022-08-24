@@ -1,6 +1,9 @@
 package com.pawlowski.stuboard.ui.utils
 
+import com.google.android.gms.maps.model.LatLng
+import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import com.pawlowski.stuboard.ui.models.EventMarker
 
 object PreviewUtils {
     val defaultEventPreviews = listOf(
@@ -15,5 +18,11 @@ object PreviewUtils {
         EventItemForPreview(tittle = "Neural networks workshop", place = "Online",
             dateDisplayString = "8 października 17:00", isFree = true,
             imageUrl = "https://images.unsplash.com/photo-1604869515882-4d10fa4b0492?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"),
+    )
+
+    val defaultMarkers = listOf(
+        EventMarker(LatLng(50.0601, 19.9438), R.drawable.concert_marker_icon, "Juwenalia Krakowskie 2022"),
+        EventMarker(LatLng(50.0621, 19.9394), R.drawable.naukowe_marker_icon, "Warsztaty Tworzenia Aplikacji Mobilnych"),
+        EventMarker(LatLng(50.0722, 19.9461), R.drawable.concert_selected_marker_icon, "Koncert Wielkanocny"),
     )
 }
