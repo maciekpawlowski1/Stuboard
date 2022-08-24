@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -116,7 +117,7 @@ fun SearchCardButton(horizontalPadding: Dp, onClick: () -> Unit)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(modifier = Modifier.padding(horizontal = 15.dp), painter = painterResource(id = R.drawable.search_icon), contentDescription = "")
-            Text(text = stringResource(id = R.string.search_for_events), fontWeight = FontWeight.Normal, color = LighterMidGrey, style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.search_for_events), fontWeight = FontWeight.Normal, color = LighterMidGrey, fontFamily = montserratFont)
         }
     }
 }
@@ -148,7 +149,12 @@ fun LabelsRow(padding: PaddingValues, label1: String, label2: String, onLabel2Cl
 {
     Row(modifier = Modifier.padding(padding)) {
         Box(modifier = Modifier.weight(1f)) {
-            Text(text = label1, fontWeight = FontWeight.Medium, modifier = Modifier.padding(5.dp))
+            Text(text = label1,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(5.dp),
+                fontFamily = montserratFont,
+                fontSize = 14.sp,
+            )
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
             Text(
@@ -158,8 +164,10 @@ fun LabelsRow(padding: PaddingValues, label1: String, label2: String, onLabel2Cl
                     }
                     .padding(5.dp),
                 fontWeight = FontWeight.Medium,
+                fontFamily = montserratFont,
                 textDecoration = TextDecoration.Underline,
-                color = Green
+                color = Green,
+                fontSize = 14.sp
                 )
         }
     }
@@ -179,8 +187,10 @@ fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardCli
         Box {
             Image(painter = painterResource(id = imageId), contentScale = ContentScale.FillBounds, contentDescription = "")
             Text(text = tittle, color = Color.White,
-                modifier = Modifier.align(Alignment.BottomCenter),
-                fontWeight = FontWeight.SemiBold
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp),
+                fontWeight = FontWeight.Bold,
+                fontFamily = montserratFont,
+                fontSize = 14.sp
             )
         }
 

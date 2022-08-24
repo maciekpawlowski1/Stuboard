@@ -25,4 +25,8 @@ object PreviewUtils {
         EventMarker(LatLng(50.0621, 19.9394), R.drawable.naukowe_marker_icon, "Warsztaty Tworzenia Aplikacji Mobilnych"),
         EventMarker(LatLng(50.0722, 19.9461), R.drawable.concert_selected_marker_icon, "Koncert Wielkanocny"),
     )
+
+    val defaultFilters = listOf(
+        "Kraków", "Ten tydzień", "Naukowe", "Koncerty", "Na zewnątrz"
+    )
 }
