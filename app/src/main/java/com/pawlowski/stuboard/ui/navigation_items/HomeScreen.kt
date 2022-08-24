@@ -15,15 +15,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.theme.*
+import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
 @Composable
 fun HomeScreen(navController: NavController?, preview: Boolean = false)
@@ -54,6 +59,14 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
                     LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Najwcześniej", label2 = "Więcej") {
 
                     }
+
+                    EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews)
+
+                    LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = "Online", label2 = "Więcej") {
+
+                    }
+
+                    EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
                 }
             }
         }
@@ -120,9 +133,11 @@ fun LabelsRow(padding: PaddingValues, label1: String, label2: String, onLabel2Cl
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
             Text(
-                text = label2, modifier = Modifier.clickable {
-                     onLabel2Click.invoke()
-                }.padding(5.dp),
+                text = label2, modifier = Modifier
+                    .clickable {
+                        onLabel2Click.invoke()
+                    }
+                    .padding(5.dp),
                 fontWeight = FontWeight.Medium,
                 textDecoration = TextDecoration.Underline,
                 color = Green
@@ -175,6 +190,71 @@ fun Map(preview: Boolean = false)
         }
     }
 
+}
+
+@Composable
+fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues, onCardClick: () -> Unit)
+{
+    Card(
+        modifier = Modifier
+            .padding(padding)
+            .width(166.dp)
+            .height(177.dp)
+            .clickable { onCardClick.invoke() }
+        ,
+        elevation = 5.dp
+    ) {
+        Column(modifier = Modifier.padding(top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                modifier = Modifier
+                    .padding(bottom = 7.dp)
+                    .width(150.dp)
+                    .height(100.dp),
+                model = eventItemForPreview.imageUrl,
+                contentDescription = "",
+                contentScale = ContentScale.FillBounds
+            )
+            
+            Text(text = eventItemForPreview.tittle,
+                modifier= Modifier.padding(horizontal = 5.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+            
+            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxHeight().padding(bottom = 5.dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = eventItemForPreview.place,
+                        modifier= Modifier.padding(start = 5.dp, end = 5.dp),
+                        fontWeight = FontWeight.Light,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center)
+                    Text(text = eventItemForPreview.dateDisplayString,
+                        modifier= Modifier.padding(start = 5.dp, end = 5.dp),
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center)
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun EventsRow(eventItemsForPreview: List<EventItemForPreview>)
+{
+    LazyRow()
+    {
+        items(eventItemsForPreview)
+        {
+            EventCard(eventItemForPreview = it, PaddingValues(start = 10.dp))
+            {
+
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
