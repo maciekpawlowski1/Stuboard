@@ -3,7 +3,9 @@ package com.pawlowski.stuboard.ui.utils
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.models.EventMarker
+import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
 
 object PreviewUtils {
     val defaultEventPreviews = listOf(
@@ -28,5 +30,17 @@ object PreviewUtils {
 
     val defaultFilters = listOf(
         "Kraków", "Ten tydzień", "Naukowe", "Koncerty", "Na zewnątrz"
+    )
+
+    val defaultFullEvent = EventItemWithDetails(
+        tittle = "Neural networks workshop with Will Smith and Google AI Engineer Allan Walker",
+        dateDisplay = "środa, 5 czerwca 2022",
+        hourDisplay = "18:00 - 21:00 CEST",
+        place = "Wydarzenie odbywa się online",
+        categoriesDrawablesId = listOf(),
+        price = 0.0f,
+        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tempus urna at turpis condimentum lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis condimentum ac, vestibulum eu nisl.\u2028Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tempus urna at turpis condimentum lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis condimentum ac, vestibulum eu nisl",
+        imageUrl = "https://images.unsplash.com/photo-1604869515882-4d10fa4b0492?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+        organisation = OrganisationItemForPreview(tittle = "Akademia Górniczo-Hutnicza w Krakowie", "https://mecc20.pl/wp-content/uploads/2020/01/Logo-AGH-1.jpg")
     )
 }
