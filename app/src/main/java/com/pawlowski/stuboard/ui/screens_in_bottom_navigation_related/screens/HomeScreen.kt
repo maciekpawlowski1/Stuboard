@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -23,18 +22,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
-import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.BottomNavItems
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
 @Composable
-fun HomeScreen(navController: NavController?, preview: Boolean = false)
+fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {},preview: Boolean = false)
 {
     val mapCameraPositionState = rememberCameraPositionState()
     Surface {
@@ -50,16 +47,7 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
             item {
                 SearchCardButton(15.dp)
                 {
-                    navController?.navigate(BottomNavItems.Search.route)
-                    {
-                        navController.graph.startDestinationRoute?.let { screen_route ->
-                            popUpTo(screen_route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    onNavigateToSearchScreen.invoke()
                 }
             }
 
@@ -72,6 +60,9 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
 
                 }
                 EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews)
+                { eventId ->
+                    onNavigateToEventDetailScreen.invoke(eventId)
+                }
             }
 
             item {
@@ -80,6 +71,9 @@ fun HomeScreen(navController: NavController?, preview: Boolean = false)
                 }
 
                 EventsRow(eventItemsForPreview = PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
+                { eventId ->
+                    onNavigateToEventDetailScreen.invoke(eventId)
+                }
             }
 
             item {
@@ -129,7 +123,7 @@ fun CategoriesRow()
     val categoryItems = listOf(
         CategoryItem(R.drawable.concerts_category_image, "Koncerty"),
         CategoryItem(R.drawable.learning_category_image, "Naukowe"),
-        CategoryItem(R.drawable.spors_category_image, "Sportowe"),
+        CategoryItem(R.drawable.sports_category_image, "Sportowe"),
     )
     LazyRow()
     {
@@ -252,7 +246,7 @@ fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues, 
 }
 
 @Composable
-fun EventsRow(eventItemsForPreview: List<EventItemForPreview>)
+fun EventsRow(eventItemsForPreview: List<EventItemForPreview>, onEventCardClick: (eventId: Int) -> Unit)
 {
     LazyRow()
     {
@@ -260,7 +254,7 @@ fun EventsRow(eventItemsForPreview: List<EventItemForPreview>)
         {
             EventCard(eventItemForPreview = it, PaddingValues(start = 10.dp))
             {
-
+                onEventCardClick.invoke(it.eventId)
             }
         }
     }
@@ -270,6 +264,6 @@ fun EventsRow(eventItemsForPreview: List<EventItemForPreview>)
 @Composable
 fun HomeScreenPreview() {
     StuboardTheme {
-        HomeScreen(navController = null, preview = true)
+        HomeScreen(preview = true)
     }
 }

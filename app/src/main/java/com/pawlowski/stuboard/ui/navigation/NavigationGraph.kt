@@ -1,0 +1,55 @@
+package com.pawlowski.stuboard.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.pawlowski.stuboard.ui.EventDetailsScreen
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.HomeScreen
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.SearchScreen
+
+@Composable
+fun NavigationGraph(navController: NavHostController)
+{
+    NavHost(navController = navController, startDestination = NavRoutes.HOME)
+    {
+        composable(route = NavRoutes.HOME)
+        {
+            HomeScreen(onNavigateToSearchScreen = {
+                navController.navigate(NavRoutes.SEARCH)
+                {
+                    navController.graph.startDestinationRoute?.let { screen_route ->
+                        popUpTo(screen_route) {
+                            saveState = true
+                        }
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+                onNavigateToEventDetailScreen = { eventId ->
+                    navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
+                }
+            )
+        }
+        composable(route = NavRoutes.SEARCH)
+        {
+            SearchScreen(onNavigateToEventDetailsScreen = { eventId ->
+                navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
+            })
+
+        }
+
+        composable(route = NavRoutes.EVENT_DETAILS.fullRoute,
+            arguments = listOf(
+                navArgument("eventId") { NavType.StringType }
+            )
+        )
+        {
+            EventDetailsScreen(it.arguments!!.getInt("eventId"))
+        }
+
+    }
+}

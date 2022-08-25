@@ -9,15 +9,21 @@ import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
 
 object PreviewUtils {
     val defaultEventPreviews = listOf(
-        EventItemForPreview(tittle = "Juwenalia Krakowskie 2022", place = "Kraków, Rostafińskiego 38",
+        EventItemForPreview(
+            eventId = 1,
+            tittle = "Juwenalia Krakowskie 2022", place = "Kraków, Rostafińskiego 38",
             dateDisplayString = "28 września - 30 września", isFree = false,
             imageUrl = "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"),
 
-        EventItemForPreview(tittle = "Warsztaty Bazy Danych AGH MySQL", place = "Online",
+        EventItemForPreview(
+            eventId = 2,
+            tittle = "Warsztaty Bazy Danych AGH MySQL", place = "Online",
             dateDisplayString = "8 października 17:00", isFree = true,
             imageUrl = "https://images.unsplash.com/photo-1633412802994-5c058f151b66?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"),
 
-        EventItemForPreview(tittle = "Neural networks workshop", place = "Online",
+        EventItemForPreview(
+            eventId = 3,
+            tittle = "Neural networks workshop", place = "Online",
             dateDisplayString = "8 października 17:00", isFree = true,
             imageUrl = "https://images.unsplash.com/photo-1604869515882-4d10fa4b0492?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"),
     )
@@ -37,7 +43,7 @@ object PreviewUtils {
         dateDisplay = "środa, 5 czerwca 2022",
         hourDisplay = "18:00 - 21:00 CEST",
         place = "Wydarzenie odbywa się online",
-        categoriesDrawablesId = listOf(),
+        categoriesDrawablesId = listOf(R.drawable.sports_category_icon),
         price = 0.0f,
         description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tempus urna at turpis condimentum lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis condimentum ac, vestibulum eu nisl.\u2028Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tempus urna at turpis condimentum lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis condimentum ac, vestibulum eu nisl",
         imageUrl = "https://images.unsplash.com/photo-1604869515882-4d10fa4b0492?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",

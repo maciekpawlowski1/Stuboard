@@ -8,9 +8,11 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -32,7 +34,7 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SearchScreen()
+fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit)
 {
     Surface(modifier = Modifier.fillMaxHeight()) {
         Column {
@@ -70,7 +72,7 @@ fun SearchScreen()
                 items(PreviewUtils.defaultEventPreviews)
                 {
                     EventCard(eventItemForPreview = it, padding = PaddingValues(vertical = 10.dp, horizontal = 6.dp)) {
-
+                        onNavigateToEventDetailsScreen.invoke(it.eventId)
                     }
                 }
             }
@@ -199,6 +201,6 @@ fun FilterLabelBox(text: String, padding: PaddingValues)
 @Composable
 fun SearchScreenPreview() {
     StuboardTheme {
-        SearchScreen()
+        SearchScreen {}
     }
 }

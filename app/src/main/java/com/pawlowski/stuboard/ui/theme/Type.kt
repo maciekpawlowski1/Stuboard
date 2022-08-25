@@ -30,6 +30,10 @@ val montserratFont = FontFamily(
     Font(R.font.montserrat_thin, weight = FontWeight.Thin, style = FontStyle.Italic),
 )
 
+val jostFontNormalWeight = FontFamily(
+    Font(R.font.jost_regular, style = FontStyle.Normal)
+)
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     body1 = TextStyle(
