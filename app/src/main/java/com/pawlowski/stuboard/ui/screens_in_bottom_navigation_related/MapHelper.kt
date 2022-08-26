@@ -22,7 +22,16 @@ import com.pawlowski.stuboard.ui.models.EventMarker
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MyGoogleMap(cameraPositionState: CameraPositionState = rememberCameraPositionState(), preview: Boolean = false, markers: List<EventMarker>, height: Dp = 170.dp, locationButtonsEnabledWithAskingPermission: Boolean = false, moveCameraToMarkersBound: Boolean = false, onMarkerClick: (EventMarker) -> Unit = {}, onMapClick: () -> Unit = {})
+fun MyGoogleMap(
+    modifier: Modifier = Modifier,
+    cameraPositionState: CameraPositionState = rememberCameraPositionState(),
+    preview: Boolean = false,
+    markers: List<EventMarker>,
+    locationButtonsEnabledWithAskingPermission: Boolean = false,
+    moveCameraToMarkersBound: Boolean = false,
+    onMarkerClick: (EventMarker) -> Unit = {},
+    onMapClick: () -> Unit = {}
+)
 {
     if(!preview)
     {
@@ -55,7 +64,10 @@ fun MyGoogleMap(cameraPositionState: CameraPositionState = rememberCameraPositio
         else
             false
 
-        LaunchedEffect(key1 = moveCameraToMarkersBound, key2= markers,block = {
+        val markersPositions = remember(markers) {
+            markers.map { it.position }
+        }
+        LaunchedEffect(key1 = moveCameraToMarkersBound, key2= markersPositions,block = {
             if(moveCameraToMarkersBound && markers.isNotEmpty()){
                 val builder = LatLngBounds.Builder()
                 markers.forEach {
@@ -75,9 +87,7 @@ fun MyGoogleMap(cameraPositionState: CameraPositionState = rememberCameraPositio
         GoogleMap(
             properties = mapProperties,
             uiSettings = uiSettings,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(height),
+            modifier = modifier,
             cameraPositionState = cameraPositionState,
             onMapClick = { onMapClick.invoke() } //TODO: check doesn't it ignore Marker onClick
         )
@@ -100,9 +110,7 @@ fun MyGoogleMap(cameraPositionState: CameraPositionState = rememberCameraPositio
     }
     else
     {
-        Surface(modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
+        Surface(modifier = modifier,
             color = Color.Gray
         ) {
 

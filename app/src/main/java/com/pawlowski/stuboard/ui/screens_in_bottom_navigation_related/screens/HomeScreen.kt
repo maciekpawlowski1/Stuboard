@@ -31,16 +31,22 @@ import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
 @Composable
-fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {},preview: Boolean = false)
+fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {}, onNavigateToMapScreen : () -> Unit = {},preview: Boolean = false)
 {
     val mapCameraPositionState = rememberCameraPositionState()
     Surface {
         LazyColumn(userScrollEnabled = !mapCameraPositionState.isMoving //TODO: Delete this and disable scrolling in map
         ) {
             item {
-                MyGoogleMap(cameraPositionState = mapCameraPositionState, preview = preview, markers = PreviewUtils.defaultMarkers, moveCameraToMarkersBound = true)
+                MyGoogleMap(
+                    modifier = Modifier.height(170.dp).fillMaxWidth(),
+                    cameraPositionState = mapCameraPositionState,
+                    preview = preview,
+                    markers = PreviewUtils.defaultMarkers,
+                    moveCameraToMarkersBound = true
+                )
                 {
-                    //TODO: Navigate to Map Screen
+                    onNavigateToMapScreen.invoke()
                 }
             }
 

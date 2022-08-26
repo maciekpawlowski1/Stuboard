@@ -13,6 +13,7 @@ object NavRoutes
     const val HOME = "Home"
     const val SEARCH = "Search"
     val EVENT_DETAILS = BasicRoute("EventDetails/{eventId}", "EventDetails")
+    const val MAP = "Map"
 }
 
 data class BasicRoute(val fullRoute: String, val basicRoute: String)
