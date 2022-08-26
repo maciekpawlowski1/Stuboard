@@ -5,5 +5,6 @@ import com.google.android.gms.maps.model.LatLng
 data class EventMarker(
     val position: LatLng,
     val iconId: Int,
-    val eventTittle: String
+    val eventTittle: String,
+    val eventId: Int
 )

@@ -1,16 +1,12 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related
 
 import android.Manifest
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -29,6 +25,8 @@ fun MyGoogleMap(
     markers: List<EventMarker>,
     locationButtonsEnabledWithAskingPermission: Boolean = false,
     moveCameraToMarkersBound: Boolean = false,
+    zoomButtonsEnabled: Boolean = true,
+    disableAllGestures: Boolean = false,
     onMarkerClick: (EventMarker) -> Unit = {},
     onMapClick: () -> Unit = {}
 )
@@ -64,26 +62,14 @@ fun MyGoogleMap(
         else
             false
 
-        val markersPositions = remember(markers) {
-            markers.map { it.position }
-        }
-        LaunchedEffect(key1 = moveCameraToMarkersBound, key2= markersPositions,block = {
-            if(moveCameraToMarkersBound && markers.isNotEmpty()){
-                val builder = LatLngBounds.Builder()
-                markers.forEach {
-                    builder.include(it.position)
-                }
-                cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
-            }
 
-        })
 
 
 
 
 
         val mapProperties by remember(showLocationButtons) { mutableStateOf(MapProperties(isMyLocationEnabled = showLocationButtons)) }
-        val uiSettings by remember(showLocationButtons) { mutableStateOf(MapUiSettings(myLocationButtonEnabled = showLocationButtons)) }
+        val uiSettings by remember(showLocationButtons) { mutableStateOf(MapUiSettings(myLocationButtonEnabled = showLocationButtons, zoomControlsEnabled = zoomButtonsEnabled, scrollGesturesEnabled = !disableAllGestures, zoomGesturesEnabled = !disableAllGestures, rotationGesturesEnabled = !disableAllGestures)) }
         GoogleMap(
             properties = mapProperties,
             uiSettings = uiSettings,
@@ -105,6 +91,26 @@ fun MyGoogleMap(
                     true
                 }
             }
+
+        }
+
+
+
+        val markersPositions = remember(markers) {
+            markers.map { it.position }
+        }
+        //TODO: Check why sometimes it completes, sometimes stops
+        LaunchedEffect(key1 = moveCameraToMarkersBound, key2= markersPositions) {
+            if(moveCameraToMarkersBound && markers.isNotEmpty()){
+                val builder = LatLngBounds.Builder()
+                markers.forEach {
+                    builder.include(it.position)
+                }
+                //Animate to marker bounds
+                cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
+            }
+
+
 
         }
     }

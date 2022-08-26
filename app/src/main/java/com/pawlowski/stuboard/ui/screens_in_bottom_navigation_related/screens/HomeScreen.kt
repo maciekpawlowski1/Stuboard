@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,16 +39,29 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
         LazyColumn(userScrollEnabled = !mapCameraPositionState.isMoving //TODO: Delete this and disable scrolling in map
         ) {
             item {
-                MyGoogleMap(
-                    modifier = Modifier.height(170.dp).fillMaxWidth(),
-                    cameraPositionState = mapCameraPositionState,
-                    preview = preview,
-                    markers = PreviewUtils.defaultMarkers,
-                    moveCameraToMarkersBound = true
-                )
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(170.dp))
                 {
-                    onNavigateToMapScreen.invoke()
+                    MyGoogleMap(
+                        modifier = Modifier
+                            .height(170.dp)
+                            .fillMaxWidth(),
+                        cameraPositionState = mapCameraPositionState,
+                        preview = preview,
+                        markers = PreviewUtils.defaultMarkers,
+                        moveCameraToMarkersBound = true,
+                        zoomButtonsEnabled = false,
+                        disableAllGestures = true
+                    )
+
+                    //To make on the map clickable effect
+                    Surface(modifier = Modifier.fillMaxSize().clickable {
+                        onNavigateToMapScreen.invoke()
+                    }, color = Color(0x3F7F7F7))
+                    { }
                 }
+
             }
 
             item {
@@ -187,7 +201,9 @@ fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardCli
         Box {
             Image(painter = painterResource(id = imageId), contentScale = ContentScale.FillBounds, contentDescription = "")
             Text(text = tittle, color = Color.White,
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 3.dp),
                 fontWeight = FontWeight.Bold,
                 fontFamily = montserratFont,
                 fontSize = 14.sp

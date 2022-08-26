@@ -64,17 +64,20 @@ object PreviewUtils {
         EventMarker(
             LatLng(50.0601, 19.9438),
             R.drawable.concert_marker_icon,
-            "Juwenalia Krakowskie 2022"
+            "Juwenalia Krakowskie 2022",
+            1
         ),
         EventMarker(
             LatLng(50.0621, 19.9394),
             R.drawable.naukowe_marker_icon,
-            "Warsztaty Tworzenia Aplikacji Mobilnych"
+            "Warsztaty Tworzenia Aplikacji Mobilnych",
+            2
         ),
         EventMarker(
             LatLng(50.0722, 19.9461),
-            R.drawable.concert_selected_marker_icon,
-            "Koncert Wielkanocny"
+            R.drawable.concert_marker_icon,
+            "Koncert Wielkanocny",
+            3
         ),
     )
 

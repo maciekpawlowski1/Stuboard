@@ -35,6 +35,9 @@ fun NavigationGraph(navController: NavHostController)
                 },
                 onNavigateToMapScreen = {
                     navController.navigate(NavRoutes.MAP)
+                    {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -57,7 +60,12 @@ fun NavigationGraph(navController: NavHostController)
 
         composable(route = NavRoutes.MAP)
         {
-            MapScreen()
+            MapScreen(onNavigateBack = {
+                navController.popBackStack()
+            }, onNavigateToEventDetailsScreen = { eventId ->
+                navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
+            })
+
         }
 
     }
