@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.ui.navigation
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -15,6 +16,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.pawlowski.stuboard.ui.theme.GrayGreen
+import com.pawlowski.stuboard.ui.theme.Green
+import com.pawlowski.stuboard.ui.theme.MidGrey
 
 @Composable
 fun BottomNavigationBar(navController: NavController)
@@ -35,11 +39,11 @@ fun BottomNavigationBar(navController: NavController)
     {
         BottomNavigation(
             backgroundColor = Color.White,
-            modifier = Modifier.height(70.dp)
+            modifier = Modifier//.height(60.dp)
         ) {
             items.forEach { item ->
                 BottomNavigationItem(icon= {
-                    Icon(painterResource(id = item.drawableId), contentDescription = "")
+                    Icon(modifier = Modifier.size(24.dp),painter = painterResource(id = item.drawableId), contentDescription = "")
                 },
                     selected = item.route == currentRoute,
                     label = { Text(text = stringResource(id = item.tittleId)) },
@@ -61,8 +65,8 @@ fun BottomNavigationBar(navController: NavController)
                             restoreState = true
                         }
                     },
-                    selectedContentColor = Color.Green,
-                    unselectedContentColor = Color.Black,
+                    selectedContentColor = Green,
+                    unselectedContentColor = MidGrey,
                     alwaysShowLabel = true
                 )
             }
