@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.pawlowski.stuboard.ui.EventDetailsScreen
+import com.pawlowski.stuboard.ui.other_screens.FiltersScreen
 import com.pawlowski.stuboard.ui.other_screens.MapScreen
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.HomeScreen
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.SearchScreen
@@ -45,6 +46,8 @@ fun NavigationGraph(navController: NavHostController)
         {
             SearchScreen(onNavigateToEventDetailsScreen = { eventId ->
                 navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
+            }, onNavigateToFiltersScreen = {
+                navController.navigate(NavRoutes.FILTERS)
             })
 
         }
@@ -66,6 +69,13 @@ fun NavigationGraph(navController: NavHostController)
                 navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
             })
 
+        }
+
+        composable(route = NavRoutes.FILTERS)
+        {
+            FiltersScreen(onNavigateBack = {
+                navController.popBackStack()
+            })
         }
 
     }

@@ -1,7 +1,7 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.flowlayout.FlowRow
@@ -34,7 +35,7 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit)
+fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {})
 {
     Surface(modifier = Modifier.fillMaxHeight()) {
         Column {
@@ -49,6 +50,9 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit)
                     ), PreviewUtils.defaultFilters)
 
                     FiltersCard(modifier = Modifier.align(CenterHorizontally),PreviewUtils.defaultFilters.size)
+                    {
+                        onNavigateToFiltersScreen.invoke()
+                    }
 
                 }
             }
@@ -151,7 +155,7 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
                 mainAxisSpacing = 10.dp
             ) {
                 filters.forEach {
-                    FilterLabelBox(text = it, PaddingValues())
+                    FilterLabelBox(text = it)
                 }
 
             }
@@ -177,23 +181,30 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
 }
 
 @Composable
-fun FilterLabelBox(text: String, padding: PaddingValues)
+fun FilterLabelBox(
+    modifier: Modifier = Modifier,
+    text: String,
+    borderColor: Color = Green,
+    borderWith: Dp = 1.3.dp,
+    height: Dp = 29.dp,
+)
 {
-    Box(modifier = Modifier
-        .padding(padding)
-        .height(29.dp)
-        .wrapContentWidth(CenterHorizontally)
-        .border(1.3.dp, Green),
-        contentAlignment = Center
-    )
-    {
-        Text(
-            modifier = Modifier.padding(horizontal = 5.dp),
-            text = text,
-            fontFamily = montserratFont,
-            fontWeight = FontWeight.Normal,
-            fontSize = 13.sp
-        )
+    Card(modifier = modifier
+        .height(height),
+        shape = RectangleShape,
+        border = BorderStroke(borderWith, color = borderColor)
+    ) {
+        Box(contentAlignment = Center)
+        {
+            Text(
+                modifier = Modifier.padding(horizontal = 5.dp),
+                text = text,
+                fontFamily = montserratFont,
+                fontWeight = FontWeight.Normal,
+                fontSize = 13.sp
+            )
+        }
+
     }
 }
 
