@@ -5,6 +5,13 @@ import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.models.*
 
 object PreviewUtils {
+
+    val categoryItemsForPreview = listOf(
+        CategoryItem(R.drawable.concerts_category_image, "Koncerty", 1),
+        CategoryItem(R.drawable.learning_category_image, "Naukowe", 2),
+        CategoryItem(R.drawable.sports_category_image, "Sportowe", 3),
+    )
+
     val defaultEventPreviews = listOf(
         EventItemForPreview(
             eventId = 1,
