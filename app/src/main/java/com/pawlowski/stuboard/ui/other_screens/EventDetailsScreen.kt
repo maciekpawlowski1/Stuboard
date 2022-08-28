@@ -49,8 +49,13 @@ import kotlinx.coroutines.flow.asStateFlow
 fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDetailsViewModel>())
 {
     val uiState = viewModel.uiState.collectAsState()
-    val displayLoadingEffect = uiState.value.eventDetails == null
-    val displaySwipeRefresh = uiState.value.isRefreshing
+    val displayLoadingEffectState = derivedStateOf {
+        uiState.value.eventDetails == null
+    }
+    //TODO: Create swipe refresh
+    val displaySwipeRefreshState = derivedStateOf {
+        uiState.value.isRefreshing
+    }
     val eventItemWithDetails: EventItemWithDetails = uiState.value.eventDetails?: EventItemWithDetails()
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -63,7 +68,7 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
             AsyncImage(modifier = Modifier
                 .fillMaxWidth()
                 .height((screenWidth / 1.5).dp)
-                .myLoadingEffect(displayLoadingEffect),
+                .myLoadingEffect(displayLoadingEffectState.value),
                 model = eventItemWithDetails.imageUrl,
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds
@@ -73,7 +78,7 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
                     .padding(horizontal = 15.dp, vertical = 15.dp)
                     .fillMaxWidth()
                     .align(CenterHorizontally)
-                    .myLoadingEffect(displayLoadingEffect),
+                    .myLoadingEffect(displayLoadingEffectState.value),
                 text = eventItemWithDetails.tittle,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.SemiBold,
@@ -86,28 +91,28 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
             DateRow(
                 date = eventItemWithDetails.dateDisplay,
                 hour = eventItemWithDetails.hourDisplay,
-                isLoading = displayLoadingEffect
+                isLoading = displayLoadingEffectState.value
             )
 
             Divider()
 
-            PlaceRow(place = eventItemWithDetails.place, isLoading = displayLoadingEffect)
+            PlaceRow(place = eventItemWithDetails.place, isLoading = displayLoadingEffectState.value)
 
             Divider()
 
-            OrganisationRow(organisation = eventItemWithDetails.organisation, isLoading = displayLoadingEffect)
+            OrganisationRow(organisation = eventItemWithDetails.organisation, isLoading = displayLoadingEffectState.value)
 
             Divider()
 
-            CategoriesRow(categoriesDrawableIds = eventItemWithDetails.categoriesDrawablesId, isLoading = displayLoadingEffect)
+            CategoriesRow(categoriesDrawableIds = eventItemWithDetails.categoriesDrawablesId, isLoading = displayLoadingEffectState.value)
 
             Divider()
 
-            PriceRow(price = eventItemWithDetails.price, isLoading = displayLoadingEffect)
+            PriceRow(price = eventItemWithDetails.price, isLoading = displayLoadingEffectState.value)
 
             Divider()
 
-            DescriptionRow(description = eventItemWithDetails.description, isLoading = displayLoadingEffect)
+            DescriptionRow(description = eventItemWithDetails.description, isLoading = displayLoadingEffectState.value)
 
             Divider()
 
