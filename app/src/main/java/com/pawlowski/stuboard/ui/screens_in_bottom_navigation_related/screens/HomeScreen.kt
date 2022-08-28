@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +50,7 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
     Surface {
         LazyColumn() {
 
-            //Google map or fake surface
+            //Google map or fake surface if preview
             item {
                 Box(modifier = Modifier
                     .fillMaxWidth()
@@ -81,7 +81,9 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
             //SearchCardButton
             item {
-                SearchCardButton(15.dp)
+                SearchCardButton(modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 20.dp)
+                )
                 {
                     onNavigateToSearchScreen.invoke()
                 }
@@ -89,13 +91,13 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
             //CategoriesRow
             item {
-                CategoriesRow(PreviewUtils.categoryItemsForPreview)
+                CategoriesRow(categories = PreviewUtils.categoryItemsForPreview)
             }
 
             //Events suggestions
             items(items = suggestionsState.value)
             {
-                LabelsRow(padding = PaddingValues(vertical = 10.dp, horizontal = 5.dp), label1 = it.suggestionType, label2 = "Więcej") {
+                LabelsRow(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp), label1 = it.suggestionType, label2 = "Więcej") {
 
                 }
                 EventsRow(eventItemsForPreview = it.events, isLoading = it.isLoading)
@@ -118,7 +120,7 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
 
 @Composable
-fun SearchCardButton(horizontalPadding: Dp, onClick: () -> Unit)
+fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit)
 {
 
 
@@ -126,11 +128,7 @@ fun SearchCardButton(horizontalPadding: Dp, onClick: () -> Unit)
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(0.3.dp, MidGrey),
         backgroundColor = LightGray,
-        modifier = Modifier
-            .padding(
-                horizontal = horizontalPadding,
-                vertical = 20.dp
-            )
+        modifier = modifier
             .fillMaxWidth()
             .height(55.dp)
             .clickable {
@@ -146,14 +144,14 @@ fun SearchCardButton(horizontalPadding: Dp, onClick: () -> Unit)
 }
 
 @Composable
-fun CategoriesRow(categories: List<CategoryItem>)
+fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>)
 {
 
-    LazyRow()
+    LazyRow(modifier = modifier)
     {
         items(categories)
         {
-            CategoryCard(imageId = it.imageId, tittle = it.tittle, PaddingValues(start = 10.dp))
+            CategoryCard(modifier = Modifier.padding(start = 10.dp), imageId = it.imageId, tittle = it.tittle)
             {
 
             }
@@ -163,9 +161,9 @@ fun CategoriesRow(categories: List<CategoryItem>)
 }
 
 @Composable
-fun LabelsRow(padding: PaddingValues, label1: String, label2: String, onLabel2Click: () -> Unit)
+fun LabelsRow(modifier: Modifier = Modifier, label1: String, label2: String, onLabel2Click: () -> Unit)
 {
-    Row(modifier = Modifier.padding(padding)) {
+    Row(modifier = modifier) {
         Box(modifier = Modifier.weight(1f)) {
             Text(text = label1,
                 fontWeight = FontWeight.Medium,
@@ -192,10 +190,9 @@ fun LabelsRow(padding: PaddingValues, label1: String, label2: String, onLabel2Cl
 }
 
 @Composable
-fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardClick: () -> Unit)
+fun CategoryCard(modifier: Modifier = Modifier ,imageId: Int, tittle: String, onCardClick: () -> Unit)
 {
-    Card(shape = RoundedCornerShape(8.dp), modifier = Modifier
-        .padding(padding)
+    Card(shape = RoundedCornerShape(8.dp), modifier = modifier
         .width(115.dp)
         .height(75.dp)
         .clickable {
@@ -220,11 +217,10 @@ fun CategoryCard(imageId: Int, tittle: String, padding: PaddingValues, onCardCli
 
 
 @Composable
-fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues = PaddingValues(), isLoading: Boolean = false, onCardClick: () -> Unit = {})
+fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPreview, isLoading: Boolean = false, onCardClick: () -> Unit = {})
 {
     Card(
-        modifier = Modifier
-            .padding(padding)
+        modifier = modifier
             .width(166.dp)
             .height(177.dp)
             .clickable(enabled = !isLoading) { onCardClick.invoke() }
@@ -259,7 +255,10 @@ fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues =
                 .padding(bottom = 5.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 5.dp).fillMaxWidth().myLoadingEffect(isLoading),
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .fillMaxWidth()
+                        .myLoadingEffect(isLoading),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = eventItemForPreview.place,
@@ -278,20 +277,21 @@ fun EventCard(eventItemForPreview: EventItemForPreview, padding: PaddingValues =
 }
 
 @Composable
-fun EventsRow(eventItemsForPreview: List<EventItemForPreview>, isLoading: Boolean = false, onEventCardClick: (eventId: Int) -> Unit)
+fun EventsRow(modifier: Modifier = Modifier, eventItemsForPreview: List<EventItemForPreview>, isLoading: Boolean = false, onEventCardClick: (eventId: Int) -> Unit)
 {
-    val eventsToDisplay = eventItemsForPreview.ifEmpty { listOf(EventItemForPreview(), EventItemForPreview(), EventItemForPreview()) }
-    LazyRow()
+    val eventsToDisplay = remember(eventItemsForPreview) {
+        //If empty, generates empty event to display loading effect
+        eventItemsForPreview.ifEmpty { listOf(EventItemForPreview(), EventItemForPreview(), EventItemForPreview()) }
+    }
+    LazyRow(modifier = modifier)
     {
         items(eventsToDisplay)
         {
-            EventCard(eventItemForPreview = it, PaddingValues(start = 10.dp), isLoading = isLoading)
+            EventCard(modifier = Modifier.padding(start = 10.dp), eventItemForPreview = it, isLoading = isLoading)
             {
                 onEventCardClick.invoke(it.eventId)
             }
         }
-
-
     }
 }
 

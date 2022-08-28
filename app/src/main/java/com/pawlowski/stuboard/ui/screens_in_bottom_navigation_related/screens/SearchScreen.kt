@@ -75,7 +75,7 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
             {
                 items(PreviewUtils.defaultEventPreviews)
                 {
-                    EventCard(eventItemForPreview = it, padding = PaddingValues(vertical = 10.dp, horizontal = 6.dp)) {
+                    EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
                         onNavigateToEventDetailsScreen.invoke(it.eventId)
                     }
                 }
