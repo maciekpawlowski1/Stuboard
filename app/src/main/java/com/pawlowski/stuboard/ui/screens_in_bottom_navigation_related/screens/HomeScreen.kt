@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.home.HomeViewModel
 import com.pawlowski.stuboard.ui.models.CategoryItem
@@ -40,13 +39,16 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
 
 @Composable
-fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {}, onNavigateToMapScreen : () -> Unit = {},preview: Boolean = false, viewModel: HomeViewModel = hiltViewModel())
+fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {}, onNavigateToMapScreen : () -> Unit = {}, preview: Boolean = false, viewModel: HomeViewModel = hiltViewModel(), onNavigateToSearchScreenWithParameter: (categoryId: Int) -> Unit = {})
 {
     val uiState = viewModel.uiState.collectAsState()
     val suggestionsState = derivedStateOf {
         uiState.value.eventsSuggestions
     }
-    val mapCameraPositionState = rememberCameraPositionState()
+    val categoriesState = derivedStateOf {
+        uiState.value.preferredCategories
+    }
+
     Surface {
         LazyColumn() {
 
@@ -60,7 +62,6 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
                         modifier = Modifier
                             .height(170.dp)
                             .fillMaxWidth(),
-                        cameraPositionState = mapCameraPositionState,
                         preview = preview,
                         markers = PreviewUtils.defaultMarkers,
                         moveCameraToMarkersBound = true,
@@ -91,7 +92,10 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
             //CategoriesRow
             item {
-                CategoriesRow(categories = PreviewUtils.categoryItemsForPreview)
+                CategoriesRow(categories = categoriesState.value)
+                {
+                    onNavigateToSearchScreenWithParameter.invoke(it)
+                }
             }
 
             //Events suggestions
@@ -144,7 +148,7 @@ fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit)
 }
 
 @Composable
-fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>)
+fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>, onCategoryClicked: (categoryId: Int) -> Unit = {})
 {
 
     LazyRow(modifier = modifier)
@@ -153,7 +157,7 @@ fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>)
         {
             CategoryCard(modifier = Modifier.padding(start = 10.dp), imageId = it.imageId, tittle = it.tittle)
             {
-
+                onCategoryClicked.invoke(it.categoryId)
             }
         }
 

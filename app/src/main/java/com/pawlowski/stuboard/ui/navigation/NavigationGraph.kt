@@ -39,6 +39,12 @@ fun NavigationGraph(navController: NavHostController)
                     {
                         launchSingleTop = true
                     }
+                },
+                onNavigateToSearchScreenWithParameter = { categoryId ->
+                    navController.navigate(NavRoutes.SEARCH)
+                    {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
