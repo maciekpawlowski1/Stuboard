@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 
 class FakePreferencesRepositoryImpl: PreferencesRepository {
     override fun getCategoriesInPreferredOrder(): Flow<List<CategoryItem>> = flow {
+        emit(listOf())
         delay(20)
         emit(PreviewUtils.categoryItemsForPreview)
     }

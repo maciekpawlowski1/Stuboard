@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.ui
+package com.pawlowski.stuboard.ui.other_screens
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -26,8 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.event_details.EventDetailsViewModel
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
 import com.pawlowski.stuboard.ui.theme.Green
@@ -36,12 +38,16 @@ import com.pawlowski.stuboard.ui.theme.jostFontNormalWeight
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.VerticalDivider
+import com.pawlowski.stuboard.ui.utils.myLoadingEffect
 
 @Composable
-fun EventDetailsScreen(eventId: Int)
+fun EventDetailsScreen(eventId: Int, viewModel: EventDetailsViewModel = hiltViewModel())
 {
+    val uiState = viewModel.uiState.collectAsState()
+    val displayLoadingEffect = uiState.value.eventDetails == null
+    val displaySwipeRefresh = uiState.value.isRefreshing
     //TODO: Change to collecting from ViewModel
-    val eventItemWithDetails: EventItemWithDetails = PreviewUtils.defaultFullEvent
+    val eventItemWithDetails: EventItemWithDetails = uiState.value.eventDetails?: EventItemWithDetails()
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
     Surface(modifier = Modifier
@@ -52,7 +58,8 @@ fun EventDetailsScreen(eventId: Int)
             //Screen images will be in 1.5:1 proportion (width:height)
             AsyncImage(modifier = Modifier
                 .fillMaxWidth()
-                .height((screenWidth / 1.5).dp),
+                .height((screenWidth / 1.5).dp)
+                .myLoadingEffect(displayLoadingEffect),
                 model = eventItemWithDetails.imageUrl,
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds
@@ -60,7 +67,8 @@ fun EventDetailsScreen(eventId: Int)
             Text(
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 15.dp)
-                    .align(CenterHorizontally),
+                    .align(CenterHorizontally)
+                    .myLoadingEffect(displayLoadingEffect),
                 text = eventItemWithDetails.tittle,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.SemiBold,
@@ -72,7 +80,8 @@ fun EventDetailsScreen(eventId: Int)
 
             DateRow(
                 date = eventItemWithDetails.dateDisplay,
-                hour = eventItemWithDetails.hourDisplay
+                hour = eventItemWithDetails.hourDisplay,
+                isLoading = displayLoadingEffect
             )
 
             Divider()
@@ -239,9 +248,9 @@ private fun OrganisationRow(organisation: OrganisationItemForPreview, onOrganisa
 }
 
 @Composable
-private fun DateRow(date: String, hour: String)
+private fun DateRow(modifier: Modifier = Modifier, date: String, hour: String, isLoading: Boolean)
 {
-    Row(modifier = Modifier.height(57.dp), verticalAlignment = CenterVertically) {
+    Row(modifier = modifier.height(57.dp), verticalAlignment = CenterVertically) {
         Icon(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -249,7 +258,7 @@ private fun DateRow(date: String, hour: String)
             painter = painterResource(id = R.drawable.calendar_icon),
             contentDescription = ""
         )
-        Column {
+        Column(modifier = Modifier.myLoadingEffect(isLoading)) {
             Text(text = date,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.SemiBold,

@@ -5,6 +5,7 @@ import com.pawlowski.stuboard.domain.EventsRepository
 import com.pawlowski.stuboard.domain.FakeEventsRepositoryImpl
 import com.pawlowski.stuboard.domain.FakePreferencesRepositoryImpl
 import com.pawlowski.stuboard.domain.PreferencesRepository
+import com.pawlowski.stuboard.presentation.use_cases.GetEventDetailsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetHomeEventTypesSuggestionsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetPreferredCategoriesUseCase
 import dagger.Module
@@ -43,4 +44,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getHomeEventTypesSuggestionsUseCase(eventsRepository: EventsRepository) = GetHomeEventTypesSuggestionsUseCase(eventsRepository::getHomeEventTypesSuggestion)
+
+    @Singleton
+    @Provides
+    fun getEventDetailsUseCase(eventsRepository: EventsRepository) = GetEventDetailsUseCase(eventsRepository::getEventDetails)
 }

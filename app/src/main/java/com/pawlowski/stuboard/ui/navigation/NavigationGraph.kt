@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.pawlowski.stuboard.ui.EventDetailsScreen
+import com.pawlowski.stuboard.ui.other_screens.EventDetailsScreen
 import com.pawlowski.stuboard.ui.other_screens.FiltersScreen
 import com.pawlowski.stuboard.ui.other_screens.MapScreen
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.HomeScreen

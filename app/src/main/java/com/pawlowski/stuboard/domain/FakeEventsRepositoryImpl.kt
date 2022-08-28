@@ -1,6 +1,8 @@
 package com.pawlowski.stuboard.domain
 
+import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
+import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -25,5 +27,11 @@ class FakeEventsRepositoryImpl: EventsRepository {
             HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
         )
         emit(thirdEmit)
+    }
+
+    override fun getEventDetails(eventId: Int): Flow<EventDetailsResult?> = flow {
+        emit(null)
+        delay(2000)
+        emit(EventDetailsResult(event = PreviewUtils.defaultFullEvent, isFresh = true))
     }
 }
