@@ -79,6 +79,9 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
+    //Hilt for Jetpack Compose navigation
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
     //coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
@@ -114,5 +117,8 @@ dependencies {
     //Flow Layout
     implementation "com.google.accompanist:accompanist-flowlayout:0.21.1-beta"
     implementation "com.google.accompanist:accompanist-pager:0.21.1-beta"
+
+    //Placeholder modifier
+    implementation "com.google.accompanist:accompanist-placeholder-material:0.21.1-beta"
 
 }

@@ -13,16 +13,16 @@ class FakeEventsRepositoryImpl: EventsRepository {
             HomeEventTypeSuggestion(suggestionType = "Online", isLoading = true, listOf())
         )
         emit(firstEmit)
-        delay(500)
+        delay(1500)
         val secondEmit = listOf(
-        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = true, PreviewUtils.defaultEventPreviews),
+        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, PreviewUtils.defaultEventPreviews),
         HomeEventTypeSuggestion(suggestionType = "Online", isLoading = true, listOf())
         )
         emit(secondEmit)
-        delay(300)
+        delay(1000)
         val thirdEmit = listOf(
-            HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = true, PreviewUtils.defaultEventPreviews),
-            HomeEventTypeSuggestion(suggestionType = "Online", isLoading = true, PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
+            HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, PreviewUtils.defaultEventPreviews),
+            HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
         )
         emit(thirdEmit)
     }
