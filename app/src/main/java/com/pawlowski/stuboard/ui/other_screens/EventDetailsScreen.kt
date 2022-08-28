@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.event_details.EventDetailsUiState
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsViewModel
+import com.pawlowski.stuboard.presentation.event_details.IEventDetailsViewModel
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
 import com.pawlowski.stuboard.ui.theme.Green
@@ -39,14 +41,16 @@ import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.VerticalDivider
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
-fun EventDetailsScreen(eventId: Int, viewModel: EventDetailsViewModel = hiltViewModel())
+fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDetailsViewModel>())
 {
     val uiState = viewModel.uiState.collectAsState()
     val displayLoadingEffect = uiState.value.eventDetails == null
     val displaySwipeRefresh = uiState.value.isRefreshing
-    //TODO: Change to collecting from ViewModel
     val eventItemWithDetails: EventItemWithDetails = uiState.value.eventDetails?: EventItemWithDetails()
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -67,6 +71,7 @@ fun EventDetailsScreen(eventId: Int, viewModel: EventDetailsViewModel = hiltView
             Text(
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 15.dp)
+                    .fillMaxWidth()
                     .align(CenterHorizontally)
                     .myLoadingEffect(displayLoadingEffect),
                 text = eventItemWithDetails.tittle,
@@ -86,23 +91,23 @@ fun EventDetailsScreen(eventId: Int, viewModel: EventDetailsViewModel = hiltView
 
             Divider()
 
-            PlaceRow(place = eventItemWithDetails.place)
+            PlaceRow(place = eventItemWithDetails.place, isLoading = displayLoadingEffect)
 
             Divider()
 
-            OrganisationRow(organisation = eventItemWithDetails.organisation)
+            OrganisationRow(organisation = eventItemWithDetails.organisation, isLoading = displayLoadingEffect)
 
             Divider()
 
-            CategoriesRow(categoriesDrawableIds = PreviewUtils.defaultFullEvent.categoriesDrawablesId)
+            CategoriesRow(categoriesDrawableIds = eventItemWithDetails.categoriesDrawablesId, isLoading = displayLoadingEffect)
 
             Divider()
 
-            PriceRow(price = PreviewUtils.defaultFullEvent.price)
+            PriceRow(price = eventItemWithDetails.price, isLoading = displayLoadingEffect)
 
             Divider()
 
-            DescriptionRow(description = PreviewUtils.defaultFullEvent.description)
+            DescriptionRow(description = eventItemWithDetails.description, isLoading = displayLoadingEffect)
 
             Divider()
 
@@ -114,7 +119,7 @@ fun EventDetailsScreen(eventId: Int, viewModel: EventDetailsViewModel = hiltView
 }
 
 @Composable
-private fun DescriptionRow(description: String, linesUntilOverflow: Int = 8)
+private fun DescriptionRow(description: String, linesUntilOverflow: Int = 8, isLoading: Boolean = false)
 {
     Column(modifier = Modifier.padding(10.dp)) {
         var showMore by remember {
@@ -126,9 +131,18 @@ private fun DescriptionRow(description: String, linesUntilOverflow: Int = 8)
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
         )
+
         Text(
             modifier= Modifier
                 .padding(top = 10.dp)
+                .fillMaxWidth()
+                .heightIn(
+                    min = if (isLoading)
+                        80.dp
+                    else
+                        Dp.Unspecified
+                )
+                .myLoadingEffect(isLoading)
                 .animateContentSize(tween(300)),
             text = description,
             maxLines = if(showMore) Int.MAX_VALUE else linesUntilOverflow,
@@ -137,23 +151,28 @@ private fun DescriptionRow(description: String, linesUntilOverflow: Int = 8)
             fontSize = 12.sp,
             fontFamily = jostFontNormalWeight
                 )
-        Text(
-            modifier = Modifier
-                .align(End)
-                .clickable { showMore = !showMore }
-                .padding(vertical = 5.dp),
-            text = if(showMore) "Pokaż mniej" else "Pokaż więcej",
-            textDecoration = TextDecoration.Underline,
-            color = LightGreen,
-            fontFamily = montserratFont,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp
-        )
+
+        if(!isLoading)
+        {
+            Text(
+                modifier = Modifier
+                    .align(End)
+                    .clickable { showMore = !showMore }
+                    .padding(vertical = 5.dp),
+                text = if(showMore) "Pokaż mniej" else "Pokaż więcej",
+                textDecoration = TextDecoration.Underline,
+                color = LightGreen,
+                fontFamily = montserratFont,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp
+            )
+        }
+
     }
 }
 
 @Composable
-private fun PriceRow(price: Float)
+private fun PriceRow(price: Float, isLoading: Boolean = false)
 {
     val priceText = if(price == 0f)
     {
@@ -164,7 +183,9 @@ private fun PriceRow(price: Float)
     TableRow(header = "Cena:") {
         Text(
             modifier = Modifier
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+                .myLoadingEffect(isLoading),
             text = priceText,
             fontFamily = montserratFont,
             fontSize = 13.sp,
@@ -174,40 +195,63 @@ private fun PriceRow(price: Float)
 }
 
 @Composable
-private fun CategoriesRow(categoriesDrawableIds: List<Int>)
+private fun CategoriesRow(categoriesDrawableIds: List<Int>, isLoading: Boolean = false)
 {
     TableRow(header = "Kategorie:") {
         Row {
-            categoriesDrawableIds.forEach {
-                CategoryRoundIcon(modifier = Modifier.padding(horizontal = 5.dp), categoryDrawableId = it)
+            if(!isLoading)
+            {
+                categoriesDrawableIds.forEach {
+                    CategoryRoundIcon(modifier = Modifier.padding(horizontal = 5.dp), categoryDrawableId = it)
+                }
             }
+            else
+            {
+                repeat(3)
+                {
+                    CategoryRoundIcon(
+                        isLoading = isLoading,
+                        modifier = Modifier.padding(horizontal = 5.dp),
+                        //To not crash by case
+                        categoryDrawableId = R.drawable.sports_category_icon)
+                }
+            }
+
         }
     }
 }
 
 @Composable
-fun CategoryRoundIcon(modifier: Modifier = Modifier, categoryDrawableId: Int, size: Dp = 42.dp)
+fun CategoryRoundIcon(modifier: Modifier = Modifier, categoryDrawableId: Int, size: Dp = 42.dp, isLoading: Boolean = false)
 {
     Card(modifier = modifier
-        .size(size),
+        .size(size)
+        .myLoadingEffect(isLoading),
         shape = CircleShape,
         backgroundColor = Green
     ) {
-        Icon(
-            modifier = Modifier.padding(6.dp),
-            painter = painterResource(id = categoryDrawableId),
-            contentDescription = "",
-            tint = Color.White
-        )
+        if(!isLoading)
+        {
+            Icon(
+                modifier = Modifier.padding(6.dp),
+                painter = painterResource(id = categoryDrawableId),
+                contentDescription = "",
+                tint = Color.White
+            )
+        }
+
     }
 }
 
 @Composable
-private fun PlaceRow(place: String)
+private fun PlaceRow(place: String, isLoading: Boolean = false)
 {
     TableRow(header = "Miejsce:") {
         Text(
-            modifier = Modifier.padding(horizontal = 10.dp),
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+                .myLoadingEffect(isLoading),
             text = place,
             fontFamily = montserratFont,
             fontWeight = FontWeight.Normal,
@@ -218,30 +262,42 @@ private fun PlaceRow(place: String)
 }
 
 @Composable
-private fun OrganisationRow(organisation: OrganisationItemForPreview, onOrganisationClick: () -> Unit = {})
+private fun OrganisationRow(organisation: OrganisationItemForPreview, isLoading: Boolean = false, onOrganisationClick: () -> Unit = {})
 {
     TableRow(header = "Organizator:") {
         Row(verticalAlignment = CenterVertically) {
             Card(shape = CircleShape, modifier = Modifier
                 .padding(5.dp)
                 .height(42.dp)
-                .width(42.dp)) {
-                AsyncImage(model = organisation.logoImageUrl, contentDescription = "", contentScale = ContentScale.Fit)
+                .width(42.dp)
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .myLoadingEffect(isLoading),
+                    model = organisation.logoImageUrl,
+                    contentDescription = "",
+                    contentScale = ContentScale.FillBounds
+                )
             }
             Text(
                 modifier= Modifier
                     .padding(end = 4.dp)
-                    .weight(1f),
+                    .weight(1f)
+                    .myLoadingEffect(isLoading),
                 text = organisation.tittle,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.Normal,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center
             )
-            Box(modifier = Modifier.clickable { onOrganisationClick.invoke() })
+            if(!isLoading)
             {
-                Icon(painter = painterResource(id = R.drawable.arrow_right_icon), contentDescription = "", tint = Green)
+                Box(modifier = Modifier.clickable { onOrganisationClick.invoke() })
+                {
+                    Icon(painter = painterResource(id = R.drawable.arrow_right_icon), contentDescription = "", tint = Green)
+                }
             }
+
         }
 
     }
@@ -258,7 +314,10 @@ private fun DateRow(modifier: Modifier = Modifier, date: String, hour: String, i
             painter = painterResource(id = R.drawable.calendar_icon),
             contentDescription = ""
         )
-        Column(modifier = Modifier.myLoadingEffect(isLoading)) {
+        Column(modifier = Modifier
+            .padding(end = 10.dp)
+            .weight(1f)
+            .myLoadingEffect(isLoading)) {
             Text(text = date,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.SemiBold,
@@ -335,5 +394,11 @@ private fun FirstColumnHeaderText(text: String)
 @Composable
 private fun EventDetailsScreenPreview()
 {
-    EventDetailsScreen(-1)
+    EventDetailsScreen(viewModel = object : IEventDetailsViewModel
+    {
+        //Mock uiState for preview
+        override val uiState: StateFlow<EventDetailsUiState> =
+            MutableStateFlow(EventDetailsUiState(isRefreshing = false,
+            eventDetails = PreviewUtils.defaultFullEvent)).asStateFlow()
+    })
 }

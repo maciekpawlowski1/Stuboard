@@ -12,13 +12,13 @@ import javax.inject.Inject
 class EventDetailsViewModel @Inject constructor(
     private val getEventDetailsUseCase: GetEventDetailsUseCase,
     private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+): ViewModel(), IEventDetailsViewModel {
 
     private val eventId = savedStateHandle.get<String>("eventId")!!.toInt()
 
     private val eventResult = getEventDetailsUseCase(eventId)
     private val isRefreshing = eventResult.map { it == null || !it.isFresh }
-    val uiState = combine(eventResult, isRefreshing)
+    override val uiState = combine(eventResult, isRefreshing)
     { eventResult, isRefreshing ->
         EventDetailsUiState(isRefreshing = isRefreshing, eventDetails = eventResult?.event)
     }.stateIn(

@@ -2,7 +2,6 @@ package com.pawlowski.stuboard.domain
 
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
-import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

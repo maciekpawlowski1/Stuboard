@@ -64,7 +64,7 @@ fun NavigationGraph(navController: NavHostController)
             )
         )
         {
-            EventDetailsScreen(it.arguments!!.getInt("eventId"))
+            EventDetailsScreen()
         }
 
         composable(route = NavRoutes.MAP)
