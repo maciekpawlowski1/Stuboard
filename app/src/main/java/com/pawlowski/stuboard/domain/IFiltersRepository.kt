@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface IFiltersRepository {
     fun getSelectedFilters(): Flow<List<FilterModel>>
+    fun getAllSuggestedNotSelectedFilters(): Flow<List<FilterModel>>
 }

@@ -2,10 +2,7 @@ package com.pawlowski.stuboard.di
 
 import android.app.Application
 import com.pawlowski.stuboard.domain.*
-import com.pawlowski.stuboard.presentation.use_cases.GetEventDetailsUseCase
-import com.pawlowski.stuboard.presentation.use_cases.GetHomeEventTypesSuggestionsUseCase
-import com.pawlowski.stuboard.presentation.use_cases.GetPreferredCategoriesUseCase
-import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
+import com.pawlowski.stuboard.presentation.use_cases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,4 +54,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getSelectedFiltersUseCase(filtersRepository: IFiltersRepository) = GetSelectedFiltersUseCase(filtersRepository::getSelectedFilters)
+
+    @Singleton
+    @Provides
+    fun getAllSuggestedNotSelectedFilters(filtersRepository: IFiltersRepository) = GetAllSuggestedNotSelectedFiltersUseCase(filtersRepository::getAllSuggestedNotSelectedFilters)
 }

@@ -2,14 +2,14 @@ package com.pawlowski.stuboard.presentation.filters
 
 import java.text.DecimalFormat
 
-sealed class FilterModel(tittle: String, filterType: FilterType)
+sealed class FilterModel(val tittle: String, val filterType: FilterType)
 {
-    data class Category(val tittle: String, val categoryDrawable: Int): FilterModel(tittle, FilterType.CATEGORY)
+    data class Category(private val _tittle: String, val categoryDrawable: Int): FilterModel(_tittle, FilterType.CATEGORY)
 
-    sealed class Place(val tittle: String): FilterModel(tittle, FilterType.PLACE)
+    sealed class Place(private val _tittle: String): FilterModel(_tittle, FilterType.PLACE)
     {
-        object Online: Place(tittle = "Online")
-        data class RealPlace(val city: String): Place(tittle = city)
+        object Online: Place(_tittle = "Online")
+        data class RealPlace(val city: String): Place(_tittle = city)
     }
 
     sealed class EntryPrice(tittle: String): FilterModel(tittle, FilterType.ENTRY_PRICE)
@@ -38,11 +38,11 @@ sealed class FilterModel(tittle: String, filterType: FilterType)
 
 }
 
-enum class FilterType(filterTypeId: Int) {
-    CATEGORY(1),
-    PLACE(2),
-    ENTRY_PRICE(3),
-    TIME(4),
-    CUSTOM_TEXT(5)
+enum class FilterType(val filterTypeId: Int, val typeString: String) {
+    CATEGORY(1, "Kategorie"),
+    PLACE(2, "Miejsce"),
+    ENTRY_PRICE(3, "Cena"),
+    TIME(4, "Czas"),
+    CUSTOM_TEXT(5, "Wyszukiwanie tekstowe")
 }
 

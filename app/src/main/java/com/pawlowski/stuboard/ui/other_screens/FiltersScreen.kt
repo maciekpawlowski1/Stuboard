@@ -5,11 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,46 +21,60 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.filters.*
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.FilterLabelBox
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LightGray
 import com.pawlowski.stuboard.ui.theme.montserratFont
+import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.VerticalDivider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun FiltersScreen(onNavigateBack: () -> Unit = {}) {
+fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel = hiltViewModel<FiltersViewModel>()) {
+    val uiState = viewModel.uiState.collectAsState()
+    val selectedFiltersState = derivedStateOf {
+        uiState.value.selectedFilters
+    }
+    val suggestedFiltersState = derivedStateOf {
+        uiState.value.suggestedFilters
+    }
+
+    val searchTextState = derivedStateOf {
+        uiState.value.searchText
+    }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
             SearchBar(onBackClick = {
                 onNavigateBack.invoke()
-            })
-            CurrentFilters(filters = listOf("Kraków", "Naukowe", "Ten tydzień"))
+            }, onSearchTextChange = {
+                viewModel.onAction(FiltersScreenAction.SearchTextChange(it))
+            }, searchInputText = searchTextState.value)
+            val selectedFilters = selectedFiltersState.value
+            val selectedFiltersTittles = remember(selectedFilters) {
+                selectedFilters.map { it.tittle }
+            }
+            CurrentFilters(filters = selectedFiltersTittles)
 
-            FiltersToChooseRow(
-                modifier = Modifier.padding(vertical = 5.dp),
-                filterName = "Kategorie",
-                filters = listOf("Naukowe", "Koncerty", "Sportowe", "Biznesowe", "Na zewnątrz")
-            )
+            val suggestedFilters = suggestedFiltersState.value
+            suggestedFilters.entries.forEach { entry ->
+                val typeTittle = entry.key.typeString
+                val filtersTittles = remember(entry.value) {
+                    entry.value.map { it.tittle }
+                }
 
-            FiltersToChooseRow(
-                modifier = Modifier.padding(vertical = 5.dp),
-                filterName = "Miejsce",
-                filters = listOf("Online", "Katowice", "Warszawa", "Gliwice","Szczecin", "Gdańsk")
-            )
+                FiltersToChooseRow(
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    filterName = typeTittle,
+                    filters = filtersTittles
+                )
+            }
 
-            FiltersToChooseRow(
-                modifier = Modifier.padding(vertical = 5.dp),
-                filterName = "Cena",
-                filters = listOf("Za darmo", "<25zł","<50zł", "<100zł", "<200zł","<300zł")
-            )
-
-            FiltersToChooseRow(
-                modifier = Modifier.padding(vertical = 5.dp),
-                filterName = "Czas",
-                filters = listOf("Dzisiaj", "Jutro","Ten tydzień", "Do 2 tyg.", "Do 4 tyg.")
-            )
         }
     }
 
@@ -174,7 +189,7 @@ fun CancellableFilterLabel(filter: String) {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, onBackClick: () -> Unit = {}) {
+fun SearchBar(modifier: Modifier = Modifier, isSearchInputVisible: Boolean = true, searchInputText: String = "", onSearchTextChange: (newText: String) -> Unit = {},onBackClick: () -> Unit = {}) {
     Card(
         modifier = modifier
             .height(68.dp)
@@ -191,11 +206,26 @@ fun SearchBar(modifier: Modifier = Modifier, onBackClick: () -> Unit = {}) {
                 contentDescription = ""
             )
             VerticalDivider(color = Color.Black, thickness = 0.3.dp)
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .weight(1f), text = "Wpisz aby wyszukać"
-            )
+            if(!isSearchInputVisible)
+            {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .weight(1f), text = "Wpisz aby wyszukać"
+                )
+            }
+            else
+            {
+                //TODO: hide and show when needed
+                BasicTextField(
+                    modifier = Modifier.padding(horizontal = 10.dp).weight(1f),
+                    value = searchInputText,
+                    maxLines = 1,
+                    onValueChange = {
+                    onSearchTextChange.invoke(it)
+                })
+            }
+
             SearchIconBox()
         }
     }
@@ -221,5 +251,43 @@ fun SearchIconBox() {
 @Preview(showBackground = true)
 @Composable
 fun FiltersScreenPreview() {
-    FiltersScreen()
+    FiltersScreen(viewModel = object: IFiltersViewModel
+    {
+        override val uiState: StateFlow<FiltersUiState> = MutableStateFlow(FiltersUiState(
+                searchText = "",
+                editTextVisible = false,
+                selectedFilters = listOf(
+                    FilterModel.Category("Sportowe", R.drawable.sports_category_image),
+                    FilterModel.Place.Online
+                ),
+                suggestedFilters = mapOf(
+                    Pair(FilterType.CATEGORY,
+                    listOf(
+                        FilterModel.Category("Naukowe", R.drawable.learning_category_image),
+                        FilterModel.Category("Koncerty", R.drawable.concerts_category_image)
+                    )
+                    ),
+                    Pair(FilterType.PLACE,
+                        listOf(
+                            FilterModel.Place.RealPlace("Kraków"),
+                            FilterModel.Place.RealPlace("Katowice"),
+                            FilterModel.Place.RealPlace("Warszawa")
+                        )
+                    ),
+                    Pair(FilterType.ENTRY_PRICE,
+                        listOf(
+                            FilterModel.EntryPrice.Free,
+                            FilterModel.EntryPrice.MaxPrice(25.0),
+                            FilterModel.EntryPrice.MaxPrice(50.0),
+                            FilterModel.EntryPrice.MaxPrice(100.0)
+                        )
+                    ),
+                )
+        )
+            )
+
+        override fun onAction(action: FiltersScreenAction) {
+        }
+
+    })
 }
