@@ -1,0 +1,6 @@
+package com.pawlowski.stuboard.presentation.filters
+
+data class FiltersUiState(
+    val searchText: String,
+    val selectedFilters: List<FilterModel>
+)

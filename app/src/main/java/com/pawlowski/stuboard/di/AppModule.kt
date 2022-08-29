@@ -1,13 +1,11 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
-import com.pawlowski.stuboard.domain.EventsRepository
-import com.pawlowski.stuboard.domain.FakeEventsRepositoryImpl
-import com.pawlowski.stuboard.domain.FakePreferencesRepositoryImpl
-import com.pawlowski.stuboard.domain.PreferencesRepository
+import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.presentation.use_cases.GetEventDetailsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetHomeEventTypesSuggestionsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetPreferredCategoriesUseCase
+import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +37,13 @@ class AppModule {
 
     @Singleton
     @Provides
+    fun filtersRepository(): IFiltersRepository
+    {
+        return FakeFiltersRepository()
+    }
+
+    @Singleton
+    @Provides
     fun getPreferredCategoriesUseCase(preferencesRepository: PreferencesRepository) = GetPreferredCategoriesUseCase(preferencesRepository::getCategoriesInPreferredOrder)
 
     @Singleton
@@ -48,4 +53,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getEventDetailsUseCase(eventsRepository: EventsRepository) = GetEventDetailsUseCase(eventsRepository::getEventDetails)
+
+    @Singleton
+    @Provides
+    fun getSelectedFiltersUseCase(filtersRepository: IFiltersRepository) = GetSelectedFiltersUseCase(filtersRepository::getSelectedFilters)
 }
