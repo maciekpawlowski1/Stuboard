@@ -50,11 +50,11 @@ class FiltersViewModel @Inject constructor(
         combine(searchText, selectedFilters, suggestedFilters)
         { searchText, selectedFilters, suggestedFilters ->
             val mappedSuggestions = suggestedFilters.groupBy { it.filterType }
-            FiltersUiState(searchText, selectedFilters, mappedSuggestions, TODO())
+            FiltersUiState(searchText, selectedFilters, mappedSuggestions)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = FiltersUiState("", listOf(), mapOf(), false)
+            initialValue = FiltersUiState("", listOf(), mapOf())
         )
 
     override fun onAction(action: FiltersScreenAction) {

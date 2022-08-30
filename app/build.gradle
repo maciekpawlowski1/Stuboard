@@ -123,5 +123,5 @@ dependencies {
     implementation "com.google.accompanist:accompanist-placeholder-material:0.21.1-beta"
 
     //Firebase auth
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.7'
 }

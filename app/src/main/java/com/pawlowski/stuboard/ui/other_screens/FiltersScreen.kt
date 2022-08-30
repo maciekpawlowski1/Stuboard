@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,7 +29,6 @@ import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.Fi
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LightGray
 import com.pawlowski.stuboard.ui.theme.montserratFont
-import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.VerticalDivider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,11 +49,15 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
-            SearchBar(onBackClick = {
-                onNavigateBack.invoke()
-            }, onSearchTextChange = {
+            SearchBar(searchInputText = {searchTextState.value}, onSearchTextChange = {
                 viewModel.onAction(FiltersScreenAction.SearchTextChange(it))
-            }, searchInputText = searchTextState.value)
+            },
+                onTypingDone = {
+                    viewModel.onAction(FiltersScreenAction.AddNewTextFilter(searchTextState.value))
+                }
+            ) {
+                onNavigateBack.invoke()
+            }
             val selectedFilters = selectedFiltersState.value
             val selectedFiltersTittles = remember(selectedFilters) {
                 selectedFilters.map { it.tittle }
@@ -189,7 +192,13 @@ fun CancellableFilterLabel(filter: String) {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, isSearchInputVisible: Boolean = true, searchInputText: String = "", onSearchTextChange: (newText: String) -> Unit = {},onBackClick: () -> Unit = {}) {
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    searchInputText: () -> String = {""},
+    onSearchTextChange: (newText: String) -> Unit = {},
+    onTypingDone: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+) {
     Card(
         modifier = modifier
             .height(68.dp)
@@ -197,7 +206,10 @@ fun SearchBar(modifier: Modifier = Modifier, isSearchInputVisible: Boolean = tru
         shape = RectangleShape,
         elevation = 13.dp
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxHeight(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(
                 modifier = Modifier
                     .clickable { onBackClick.invoke() }
@@ -206,25 +218,28 @@ fun SearchBar(modifier: Modifier = Modifier, isSearchInputVisible: Boolean = tru
                 contentDescription = ""
             )
             VerticalDivider(color = Color.Black, thickness = 0.3.dp)
-            if(!isSearchInputVisible)
-            {
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .weight(1f), text = "Wpisz aby wyszukać"
-                )
-            }
-            else
-            {
-                //TODO: hide and show when needed
-                BasicTextField(
-                    modifier = Modifier.padding(horizontal = 10.dp).weight(1f),
-                    value = searchInputText,
-                    maxLines = 1,
-                    onValueChange = {
-                    onSearchTextChange.invoke(it)
-                })
-            }
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                value = searchInputText.invoke(),
+                maxLines = 1,
+                singleLine = true,
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White,
+                    focusedIndicatorColor = Green,
+                    focusedLabelColor = Green,
+                    cursorColor = Green
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    onTypingDone.invoke()
+                }),
+                shape = RectangleShape,
+                onValueChange = {
+                onSearchTextChange.invoke(it)
+            },
+                label = { Text(modifier = Modifier.padding(top = 7.dp),text = "Wpisz aby wyszukać") }
+            )
 
             SearchIconBox()
         }
@@ -255,7 +270,6 @@ fun FiltersScreenPreview() {
     {
         override val uiState: StateFlow<FiltersUiState> = MutableStateFlow(FiltersUiState(
                 searchText = "",
-                editTextVisible = false,
                 selectedFilters = listOf(
                     FilterModel.Category("Sportowe", R.drawable.sports_category_image),
                     FilterModel.Place.Online
