@@ -14,4 +14,3 @@
 .cxx
 local.properties
 /app/src/main/res/values/local_secrets.xml
-/app/google-services.json
