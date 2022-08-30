@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -121,4 +122,6 @@ dependencies {
     //Placeholder modifier
     implementation "com.google.accompanist:accompanist-placeholder-material:0.21.1-beta"
 
+    //Firebase auth
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
 }
