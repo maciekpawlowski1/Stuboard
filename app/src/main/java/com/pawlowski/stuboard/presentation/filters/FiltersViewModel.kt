@@ -52,9 +52,16 @@ class FiltersViewModel @Inject constructor(
     override val uiState: StateFlow<FiltersUiState> =
         combine(searchText, selectedFilters, suggestedFilters)
         { searchText, selectedFilters, suggestedFilters ->
-            val mappedSuggestions = suggestedFilters.groupBy { it.filterType }
+            val filteredSuggestions = if(searchText.isEmpty())
+                suggestedFilters
+            else
+                suggestedFilters.filter { it.tittle.contains(searchText, ignoreCase = true) }
+            val mappedSuggestions = filteredSuggestions
+                .groupBy { it.filterType }
             FiltersUiState(searchText, selectedFilters, mappedSuggestions)
-        }.stateIn(
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
             initialValue = FiltersUiState("", listOf(), mapOf())

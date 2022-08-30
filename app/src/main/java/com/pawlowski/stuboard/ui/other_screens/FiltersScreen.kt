@@ -1,16 +1,17 @@
 package com.pawlowski.stuboard.ui.other_screens
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -18,7 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -49,7 +54,13 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
     val searchTextState = derivedStateOf {
         uiState.value.searchText
     }
-    val keyboardController =LocalSoftwareKeyboardController.current
+
+    val isSearchTextEmptyState = derivedStateOf {
+        uiState.value.searchText.isEmpty()
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
             SearchBar(searchInputText = {searchTextState.value}, onSearchTextChange = {
@@ -63,6 +74,9 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
                         )
                     )
                     keyboardController?.hide()
+                },
+                onSearchIconClick = {
+                    onNavigateBack.invoke() //TODO: do something
                 }
             ) {
                 onNavigateBack.invoke()
@@ -72,6 +86,11 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
             {
                 viewModel.onAction(FiltersScreenAction.UnselectFilter(it))
             }
+
+            CustomSearchRow(searchInputText = { searchTextState.value },
+            onFilterChosen = {
+                viewModel.onAction(FiltersScreenAction.AddNewFilter(it))
+            })
 
             val suggestedFilters = suggestedFiltersState.value
             suggestedFilters.entries.forEach { entry ->
@@ -83,13 +102,35 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
                     filters = entry.value,
                     onFilterChosen = {
                         viewModel.onAction(FiltersScreenAction.AddNewFilter(it))
-                    }
+                    },
+                    displaySeeMore = isSearchTextEmptyState.value,
+                    highlightedPart = { searchTextState.value }
                 )
             }
 
         }
     }
 
+}
+
+
+
+@Composable
+private fun CustomSearchRow(searchInputText: () -> String, onFilterChosen: (FilterModel) -> Unit)
+{
+    if(searchInputText().isNotEmpty())
+    {
+        FiltersToChooseRow(
+            modifier = Modifier.padding(vertical = 5.dp),
+            filterName = "Wyszukiwanie tekstowe",
+            filters = listOf(FilterModel.CustomTextFilter(searchInputText())),
+            iconsDrawables = listOf(R.drawable.custom_text_search_icon),
+            onFilterChosen = {
+                onFilterChosen.invoke(it)
+            },
+            displaySeeMore = false
+        )
+    }
 }
 
 @Composable
@@ -101,7 +142,10 @@ fun FiltersToChooseRow(
     filterName: String,
     filters: List<FilterModel>,
     onFilterChosen: (FilterModel) -> Unit = {},
-    onSeeMoreClick: () -> Unit = {}
+    displaySeeMore: Boolean = true,
+    onSeeMoreClick: () -> Unit = {},
+    iconsDrawables: List<Int?>? = null,
+    highlightedPart: () -> String? = { null }
 ) {
     Column(modifier = modifier) {
         Row(
@@ -116,65 +160,124 @@ fun FiltersToChooseRow(
                 fontWeight = FontWeight.Medium
             )
 
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd)
+            if(displaySeeMore)
             {
-                Text(
-                    modifier = Modifier
-                        .clickable { onSeeMoreClick.invoke() }
-                        .padding(vertical = 5.dp, horizontal = endPadding),
-                    text = "Zobacz więcej",
-                    fontFamily = montserratFont,
-                    color = Green,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd)
+                {
+                    Text(
+                        modifier = Modifier
+                            .clickable { onSeeMoreClick.invoke() }
+                            .padding(vertical = 5.dp, horizontal = endPadding),
+                        text = "Zobacz więcej",
+                        fontFamily = montserratFont,
+                        color = Green,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
         }
+
         LazyRow(modifier = Modifier.padding(top = 5.dp))
         {
             item {
                 Spacer(modifier = Modifier.width(startPadding))
             }
-            items(filters)
-            {
+            itemsIndexed(filters, key = { index, item ->  item.tittle})
+            { index, item ->
                 FilterLabelBox(
                     modifier = Modifier
                         .padding(end = spaceBetweenFilters)
-                        .clickable { onFilterChosen.invoke(it) },
-                    text = it.tittle
+                        .clickable { onFilterChosen.invoke(item) },
+                    text = {
+                        val tittle = item.tittle
+                        Text(
+                            buildAnnotatedString {
+                                displayHighlightedText(tittle, /*highlightedPart()*/null)
+                            },
+                            modifier = Modifier.padding(horizontal = 5.dp),
+                            fontFamily = montserratFont,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 13.sp
+
+                        )
+                    },
+                    icon = {
+                        iconsDrawables?.getOrNull(index)?.let {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .size(24.dp),
+                                painter = painterResource(id = it),
+                                contentDescription = "",
+                                tint = Green
+                            )
+                        }
+                    }
                 )
             }
         }
     }
 }
 
+fun AnnotatedString.Builder.displayHighlightedText(fullText: String, highlightedPart: String?)
+{
+    if(highlightedPart != null && fullText.contains(highlightedPart, ignoreCase = true))
+    {
+        var startSearchingIndex = 0
+        while (true)
+        {
+            val startBoldIndex = fullText.indexOf(highlightedPart, startIndex = startSearchingIndex, ignoreCase = true)
+            if(startBoldIndex == -1)
+                break
+            val finishBoldIndex = startBoldIndex + highlightedPart.length
+            val boldString = fullText.subSequence(startBoldIndex, finishBoldIndex).toString()
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold))
+            {
+                append(boldString)
+            }
+            startSearchingIndex += boldString.length
+        }
 
+    }
+    else
+    {
+        append(fullText)
+    }
+}
 
 @Composable
 fun CurrentFilters(filters: List<FilterModel>, onFilterUnselect: (FilterModel) -> Unit = {}) {
-    Surface(modifier = Modifier.fillMaxWidth(), color = LightGray) {
-        Column {
-            Text(
-                modifier = Modifier.padding(5.dp),
-                text = "Wybrane:",
-                fontFamily = montserratFont,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp
-            )
-            FlowRow(
-                modifier = Modifier
-                    .padding(start = 5.dp, end = 5.dp, bottom = 10.dp),
-                mainAxisSpacing = 5.dp
-            ) {
-                filters.forEach {
-                    CancellableFilterLabel(filter = it)
-                    { unselectedFilter ->
-                        onFilterUnselect.invoke(unselectedFilter)
+    Surface(modifier = Modifier
+        .fillMaxWidth()
+        .animateContentSize(tween(200)), color = LightGray) {
+        if(filters.isNotEmpty())
+        {
+            Column {
+                Text(
+                    modifier = Modifier.padding(5.dp),
+                    text = "Wybrane:",
+                    fontFamily = montserratFont,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                )
+                FlowRow(
+                    modifier = Modifier
+                        .padding(start = 5.dp, end = 5.dp, bottom = 10.dp),
+                    mainAxisSpacing = 5.dp,
+                    crossAxisSpacing = 10.dp
+                ) {
+                    filters.forEach {
+                        CancellableFilterLabel(filter = it)
+                        { unselectedFilter ->
+                            onFilterUnselect.invoke(unselectedFilter)
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -209,6 +312,7 @@ fun SearchBar(
     searchInputText: () -> String = {""},
     onSearchTextChange: (newText: String) -> Unit = {},
     onTypingDone: () -> Unit = {},
+    onSearchIconClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
     Card(
@@ -253,19 +357,23 @@ fun SearchBar(
                 label = { Text(modifier = Modifier.padding(top = 7.dp),text = "Wpisz aby wyszukać") }
             )
 
-            SearchIconBox()
+            SearchIconBox(modifier = Modifier.clickable {
+                onSearchIconClick.invoke()
+            })
         }
     }
 }
 
 @Composable
-fun SearchIconBox() {
+fun SearchIconBox(modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
             .width(65.dp), color = Green
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.search_icon),
                 contentDescription = "",

@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -13,8 +14,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -155,7 +158,17 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
                 mainAxisSpacing = 10.dp
             ) {
                 filters.forEach {
-                    FilterLabelBox(text = it)
+                    FilterLabelBox(
+                        text = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 5.dp),
+                                text = it,
+                                fontFamily = montserratFont,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 13.sp
+                            )
+                        }
+                    )
                 }
 
             }
@@ -183,10 +196,11 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
 @Composable
 fun FilterLabelBox(
     modifier: Modifier = Modifier,
-    text: String,
+    text: @Composable () -> Unit = { },
     borderColor: Color = Green,
     borderWith: Dp = 1.3.dp,
     height: Dp = 29.dp,
+    icon: @Composable () -> Unit = {  },
 )
 {
     Card(modifier = modifier
@@ -194,15 +208,13 @@ fun FilterLabelBox(
         shape = RectangleShape,
         border = BorderStroke(borderWith, color = borderColor)
     ) {
-        Box(contentAlignment = Center)
+        Box(contentAlignment = CenterStart)
         {
-            Text(
-                modifier = Modifier.padding(horizontal = 5.dp),
-                text = text,
-                fontFamily = montserratFont,
-                fontWeight = FontWeight.Normal,
-                fontSize = 13.sp
-            )
+            Row(verticalAlignment = CenterVertically) {
+                icon.invoke()
+                text.invoke()
+            }
+
         }
 
     }
