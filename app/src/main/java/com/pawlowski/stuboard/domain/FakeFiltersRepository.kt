@@ -33,4 +33,12 @@ class FakeFiltersRepository: IFiltersRepository {
         delay(20)
         emit(defaultEmit)
     }
+
+    override suspend fun selectFilter(filterModel: FilterModel) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun unselectFilter(filterModel: FilterModel) {
+        TODO("Not yet implemented")
+    }
 }

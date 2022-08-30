@@ -1,6 +1,10 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
+import com.pawlowski.stuboard.data.DefaultSuggestedFiltersProvider
+import com.pawlowski.stuboard.data.IFiltersDao
+import com.pawlowski.stuboard.data.ISuggestedFiltersProvider
+import com.pawlowski.stuboard.data.InMemoryFiltersDao
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.presentation.use_cases.*
 import dagger.Module
@@ -34,9 +38,23 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun filtersRepository(): IFiltersRepository
+    fun filtersRepository(filtersDao: IFiltersDao): IFiltersRepository
     {
-        return FakeFiltersRepository()
+        return FiltersRepository(filtersDao)
+    }
+
+    @Singleton
+    @Provides
+    fun suggestedFiltersProvider(defaultSuggestedFiltersProvider: DefaultSuggestedFiltersProvider): ISuggestedFiltersProvider
+    {
+        return defaultSuggestedFiltersProvider
+    }
+
+    @Singleton
+    @Provides
+    fun filtersDao(suggestedFiltersProvider: ISuggestedFiltersProvider): IFiltersDao
+    {
+        return InMemoryFiltersDao(suggestedFiltersProvider)
     }
 
     @Singleton
@@ -58,4 +76,12 @@ class AppModule {
     @Singleton
     @Provides
     fun getAllSuggestedNotSelectedFilters(filtersRepository: IFiltersRepository) = GetAllSuggestedNotSelectedFiltersUseCase(filtersRepository::getAllSuggestedNotSelectedFilters)
+
+    @Singleton
+    @Provides
+    fun selectNewFilterUseCase(filtersRepository: IFiltersRepository) = SelectNewFilterUseCase(filtersRepository::selectFilter)
+
+    @Singleton
+    @Provides
+    fun unselectFilterUseCase(filtersRepository: IFiltersRepository) = UnselectFilterUseCase(filtersRepository::unselectFilter)
 }

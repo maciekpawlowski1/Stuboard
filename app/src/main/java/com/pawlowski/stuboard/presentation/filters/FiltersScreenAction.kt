@@ -4,5 +4,7 @@ sealed class FiltersScreenAction
 {
     data class SearchTextChange(val newText: String): FiltersScreenAction()
 
-    data class AddNewTextFilter(val text: String): FiltersScreenAction()
+    data class AddNewFilter(val filterModel: FilterModel): FiltersScreenAction()
+
+    data class UnselectFilter(val filterModel: FilterModel): FiltersScreenAction()
 }

@@ -12,9 +12,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +35,7 @@ import com.pawlowski.stuboard.ui.utils.VerticalDivider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel = hiltViewModel<FiltersViewModel>()) {
     val uiState = viewModel.uiState.collectAsState()
@@ -46,35 +49,41 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
     val searchTextState = derivedStateOf {
         uiState.value.searchText
     }
-
+    val keyboardController =LocalSoftwareKeyboardController.current
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
             SearchBar(searchInputText = {searchTextState.value}, onSearchTextChange = {
                 viewModel.onAction(FiltersScreenAction.SearchTextChange(it))
             },
                 onTypingDone = {
-                    viewModel.onAction(FiltersScreenAction.AddNewTextFilter(searchTextState.value))
+                    //TODO: Validate input
+                    viewModel.onAction(
+                        FiltersScreenAction.AddNewFilter(
+                            filterModel = FilterModel.CustomTextFilter(searchTextState.value)
+                        )
+                    )
+                    keyboardController?.hide()
                 }
             ) {
                 onNavigateBack.invoke()
             }
             val selectedFilters = selectedFiltersState.value
-            val selectedFiltersTittles = remember(selectedFilters) {
-                selectedFilters.map { it.tittle }
+            CurrentFilters(filters = selectedFilters)
+            {
+                viewModel.onAction(FiltersScreenAction.UnselectFilter(it))
             }
-            CurrentFilters(filters = selectedFiltersTittles)
 
             val suggestedFilters = suggestedFiltersState.value
             suggestedFilters.entries.forEach { entry ->
                 val typeTittle = entry.key.typeString
-                val filtersTittles = remember(entry.value) {
-                    entry.value.map { it.tittle }
-                }
 
                 FiltersToChooseRow(
                     modifier = Modifier.padding(vertical = 5.dp),
                     filterName = typeTittle,
-                    filters = filtersTittles
+                    filters = entry.value,
+                    onFilterChosen = {
+                        viewModel.onAction(FiltersScreenAction.AddNewFilter(it))
+                    }
                 )
             }
 
@@ -90,8 +99,8 @@ fun FiltersToChooseRow(
     endPadding: Dp = 8.dp,
     spaceBetweenFilters: Dp = 8.dp,
     filterName: String,
-    filters: List<String>,
-    onFilterChosen: () -> Unit = {},
+    filters: List<FilterModel>,
+    onFilterChosen: (FilterModel) -> Unit = {},
     onSeeMoreClick: () -> Unit = {}
 ) {
     Column(modifier = modifier) {
@@ -132,8 +141,8 @@ fun FiltersToChooseRow(
                 FilterLabelBox(
                     modifier = Modifier
                         .padding(end = spaceBetweenFilters)
-                        .clickable { onFilterChosen.invoke() },
-                    text = it
+                        .clickable { onFilterChosen.invoke(it) },
+                    text = it.tittle
                 )
             }
         }
@@ -143,7 +152,7 @@ fun FiltersToChooseRow(
 
 
 @Composable
-fun CurrentFilters(filters: List<String>) {
+fun CurrentFilters(filters: List<FilterModel>, onFilterUnselect: (FilterModel) -> Unit = {}) {
     Surface(modifier = Modifier.fillMaxWidth(), color = LightGray) {
         Column {
             Text(
@@ -160,6 +169,9 @@ fun CurrentFilters(filters: List<String>) {
             ) {
                 filters.forEach {
                     CancellableFilterLabel(filter = it)
+                    { unselectedFilter ->
+                        onFilterUnselect.invoke(unselectedFilter)
+                    }
                 }
             }
         }
@@ -167,13 +179,13 @@ fun CurrentFilters(filters: List<String>) {
 }
 
 @Composable
-fun CancellableFilterLabel(filter: String) {
+fun CancellableFilterLabel(filter: FilterModel, onCancelClick: (FilterModel) -> Unit = {}) {
     Card(shape = RectangleShape, border = BorderStroke(width = 0.5.dp, color = Green)) {
         Row(modifier = Modifier.height(27.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier
                     .padding(horizontal = 4.dp),
-                text = filter,
+                text = filter.tittle,
                 color = Green,
                 fontFamily = montserratFont,
                 fontWeight = FontWeight.SemiBold,
@@ -181,7 +193,7 @@ fun CancellableFilterLabel(filter: String) {
             )
             VerticalDivider(color = Green, thickness = 0.3.dp)
             Icon(modifier = Modifier
-                .clickable { }
+                .clickable { onCancelClick.invoke(filter) }
                 .fillMaxHeight()
                 .padding(vertical = 3.dp),
                 painter = painterResource(id = R.drawable.close_icon),

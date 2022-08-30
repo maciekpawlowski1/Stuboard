@@ -1,10 +1,11 @@
 package com.pawlowski.stuboard.presentation.filters
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pawlowski.stuboard.presentation.use_cases.GetAllSuggestedNotSelectedFiltersUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
+import com.pawlowski.stuboard.presentation.use_cases.SelectNewFilterUseCase
+import com.pawlowski.stuboard.presentation.use_cases.UnselectFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -15,6 +16,8 @@ import javax.inject.Inject
 class FiltersViewModel @Inject constructor(
     private val getSelectedFiltersUseCase: GetSelectedFiltersUseCase,
     private val getAllSuggestedNotSelectedFiltersUseCase: GetAllSuggestedNotSelectedFiltersUseCase,
+    private val selectNewFilterUseCase: SelectNewFilterUseCase,
+    private val unselectFilterUseCase: UnselectFilterUseCase,
 ): ViewModel(), IFiltersViewModel {
 
     private val actionSharedFlow = MutableSharedFlow<FiltersScreenAction>()
@@ -60,6 +63,20 @@ class FiltersViewModel @Inject constructor(
     override fun onAction(action: FiltersScreenAction) {
         viewModelScope.launch {
             actionSharedFlow.emit(action)
+
+            when(action)
+            {
+                is FiltersScreenAction.AddNewFilter ->
+                {
+                    selectNewFilterUseCase.invoke(action.filterModel)
+                    actionSharedFlow.emit(FiltersScreenAction.SearchTextChange(""))
+                }
+                is FiltersScreenAction.UnselectFilter ->
+                {
+                    unselectFilterUseCase.invoke(action.filterModel)
+                }
+                else -> {}
+            }
         }
     }
 }
