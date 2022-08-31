@@ -23,9 +23,11 @@ class FiltersViewModel @Inject constructor(
     private val initialSearchTextValue = ""
     private val initialUiState: FiltersUiState = FiltersUiState(initialSearchTextValue, listOf(), mapOf())
 
+
+    //Call emit only from onAction function, else be careful of suspending
     private val actionSharedFlow = MutableSharedFlow<FiltersScreenAction>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 10
+        onBufferOverflow = BufferOverflow.SUSPEND,
+        extraBufferCapacity = 0
     )
 
     private val searchText = actionSharedFlow
@@ -46,6 +48,8 @@ class FiltersViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(initialUiState)
     override val uiState: StateFlow<FiltersUiState> get() = _uiState.asStateFlow()
 
+
+    //Call it on every new uiAction, also inside this ViewModel to not care of suspending
     override fun onAction(action: FiltersScreenAction) {
         viewModelScope.launch(Dispatchers.Main.immediate) {
             actionSharedFlow.emit(action)
@@ -80,7 +84,7 @@ class FiltersViewModel @Inject constructor(
                 if(it is FiltersScreenAction.AddNewFilter)
                 {
                     selectNewFilterUseCase(it.filterModel)
-                    actionSharedFlow.emit(FiltersScreenAction.SearchTextChange(""))
+                    onAction(FiltersScreenAction.SearchTextChange(""))
                 }
                 else if(it is FiltersScreenAction.UnselectFilter)
                 {
