@@ -19,6 +19,7 @@ class FiltersViewModel @Inject constructor(
     private val selectNewFilterUseCase: SelectNewFilterUseCase,
     private val unselectFilterUseCase: UnselectFilterUseCase,
 ): ViewModel(), IFiltersViewModel {
+    private val initialSearchTextValue = ""
 
     private val actionSharedFlow = MutableSharedFlow<FiltersScreenAction>()
 
@@ -26,26 +27,16 @@ class FiltersViewModel @Inject constructor(
         .filterIsInstance<FiltersScreenAction.SearchTextChange>()
         .distinctUntilChanged()
         .map { it.newText }
-        .flowOn(Dispatchers.IO)
-            //To keep replay value
-        .shareIn(scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            replay = 1
-        )
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = ""
-        )
+        .onStart { emit(initialSearchTextValue) }
 
     private val selectedFilters = getSelectedFiltersUseCase()
         .distinctUntilChanged()
-        .onStart { listOf<FilterModel>() }
+        .onStart { emit(listOf()) }
 
 
     private val suggestedFilters = getAllSuggestedNotSelectedFiltersUseCase()
         .distinctUntilChanged()
-        .onStart { listOf<FilterModel>() }
+        .onStart { emit(listOf()) }
 
 
 
@@ -60,17 +51,22 @@ class FiltersViewModel @Inject constructor(
                 .groupBy { it.filterType }
             FiltersUiState(searchText, selectedFilters, mappedSuggestions)
         }
-            .flowOn(Dispatchers.IO)
+            //.flowOn(Dispatchers.IO) //if it's here,
+            // problem starts with TextField onValueChange (sometimes resets the current string to "")
+            // - problem showed only on my real device, not emulator.
+            // Maybe try to separate the searchText state from uiState and try again with Dispatchers.IO here?
+            // TODO: Check it
             .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = FiltersUiState("", listOf(), mapOf())
+            initialValue = FiltersUiState(initialSearchTextValue, listOf(), mapOf())
         )
 
     override fun onAction(action: FiltersScreenAction) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             actionSharedFlow.emit(action)
-
+            if(action is FiltersScreenAction.SearchTextChange)
+                println("TextChange: ${action.newText}")
             when(action)
             {
                 is FiltersScreenAction.AddNewFilter ->
