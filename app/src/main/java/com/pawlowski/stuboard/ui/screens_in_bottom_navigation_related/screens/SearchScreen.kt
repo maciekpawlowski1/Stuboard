@@ -12,6 +12,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
@@ -25,17 +27,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.search.ISearchViewModel
+import com.pawlowski.stuboard.presentation.search.SearchUiState
+import com.pawlowski.stuboard.presentation.search.SearchViewModel
 import com.pawlowski.stuboard.ui.theme.GrayGreen
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {})
+fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {}, viewModel: ISearchViewModel = hiltViewModel<SearchViewModel>())
 {
+    val uiState = viewModel.uiState.collectAsState()
+    val selectedFiltersState = derivedStateOf {
+        uiState.value.selectedFilters
+    }
+    val selectedFiltersCountState = derivedStateOf {
+        selectedFiltersState.value.size
+    }
     Surface(modifier = Modifier.fillMaxHeight()) {
         Column {
             Surface(modifier = Modifier
@@ -46,9 +61,9 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
                         start = 20.dp,
                         end = 20.dp,
                         bottom= 10.dp
-                    ), PreviewUtils.defaultFilters)
+                    ), selectedFiltersState.value.map { it.tittle })
 
-                    FiltersCard(modifier = Modifier.align(CenterHorizontally),PreviewUtils.defaultFilters.size)
+                    FiltersCard(modifier = Modifier.align(CenterHorizontally), selectedFiltersCountState.value)
                     {
                         onNavigateToFiltersScreen.invoke()
                     }
@@ -220,6 +235,14 @@ fun FilterLabelBox(
 @Composable
 fun SearchScreenPreview() {
     StuboardTheme {
-        SearchScreen {}
+        SearchScreen(viewModel = object : ISearchViewModel
+        {
+            override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
+                SearchUiState(
+                selectedFilters = PreviewUtils.defaultFilters,
+            )
+            )
+
+        })
     }
 }

@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.ui.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.models.*
 
 object PreviewUtils {
@@ -89,7 +90,9 @@ object PreviewUtils {
     )
 
     val defaultFilters = listOf(
-        "Kraków", "Ten tydzień", "Naukowe", "Koncerty", "Na zewnątrz"
+        FilterModel.Place.Online,
+        FilterModel.Category("Naukowe", R.drawable.learning_category_image),
+        FilterModel.EntryPrice.Free,
     )
 
     val defaultFullEvent = EventItemWithDetails(
