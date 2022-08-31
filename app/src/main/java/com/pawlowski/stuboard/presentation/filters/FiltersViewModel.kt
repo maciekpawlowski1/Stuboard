@@ -51,11 +51,12 @@ class FiltersViewModel @Inject constructor(
                 .groupBy { it.filterType }
             FiltersUiState(searchText, selectedFilters, mappedSuggestions)
         }
-            //.flowOn(Dispatchers.IO) //if it's here,
+            .flowOn(Dispatchers.IO) //if it's here,
             // problem starts with TextField onValueChange (sometimes resets the current string to "")
             // - problem showed only on my real device, not emulator.
             // Maybe try to separate the searchText state from uiState and try again with Dispatchers.IO here?
-            // TODO: Check it
+            // Problem sound to disappear when updating jetpack compose version to stable 1.2.1
+            // TODO: Make sure it always work
             .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
