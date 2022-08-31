@@ -179,12 +179,13 @@ fun FiltersToChooseRow(
 
         }
 
+
         LazyRow(modifier = Modifier.padding(top = 5.dp))
         {
             item {
                 Spacer(modifier = Modifier.width(startPadding))
             }
-            itemsIndexed(filters, key = { index, item ->  item.tittle})
+            itemsIndexed(filters)
             { index, item ->
                 FilterLabelBox(
                     modifier = Modifier
@@ -194,7 +195,7 @@ fun FiltersToChooseRow(
                         val tittle = item.tittle
                         Text(
                             buildAnnotatedString {
-                                displayHighlightedText(tittle, /*highlightedPart()*/null)
+                                displayHighlightedText(tittle, highlightedPart.invoke())
                             },
                             modifier = Modifier.padding(horizontal = 5.dp),
                             fontFamily = montserratFont,
@@ -223,7 +224,7 @@ fun FiltersToChooseRow(
 
 fun AnnotatedString.Builder.displayHighlightedText(fullText: String, highlightedPart: String?)
 {
-    if(highlightedPart != null && fullText.contains(highlightedPart, ignoreCase = true))
+    if(highlightedPart != null && highlightedPart.isNotEmpty() && fullText.contains(highlightedPart, ignoreCase = true))
     {
         var startSearchingIndex = 0
         while (true)
@@ -233,12 +234,16 @@ fun AnnotatedString.Builder.displayHighlightedText(fullText: String, highlighted
                 break
             val finishBoldIndex = startBoldIndex + highlightedPart.length
             val boldString = fullText.subSequence(startBoldIndex, finishBoldIndex).toString()
+            if(startBoldIndex != startSearchingIndex)
+                append(fullText.subSequence(startSearchingIndex, startBoldIndex).toString())
             withStyle(SpanStyle(fontWeight = FontWeight.Bold))
             {
                 append(boldString)
             }
-            startSearchingIndex += boldString.length
+            startSearchingIndex = finishBoldIndex
         }
+        if(startSearchingIndex != fullText.length)
+            append(fullText.subSequence(startSearchingIndex, fullText.length).toString())
 
     }
     else
