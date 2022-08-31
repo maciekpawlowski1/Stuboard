@@ -1,20 +1,17 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
@@ -36,7 +33,6 @@ import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {})
 {
@@ -68,7 +64,7 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
             )
 
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(
                     start = 10.dp,
                     end = 10.dp,

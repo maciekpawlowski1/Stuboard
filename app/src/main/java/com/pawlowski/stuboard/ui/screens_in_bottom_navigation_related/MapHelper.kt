@@ -10,6 +10,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
@@ -36,9 +38,9 @@ fun MyGoogleMap(
         val showLocationButtons = if(locationButtonsEnabledWithAskingPermission)
         {
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
-            val hasPermission = locationPermissionState.hasPermission
+            val hasPermission = locationPermissionState.status.isGranted
 
-            if(!hasPermission && !locationPermissionState.permissionRequested)
+            if(!hasPermission && locationPermissionState.status !is PermissionStatus.Denied)
             {
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(key1 = lifecycleOwner, effect = {
