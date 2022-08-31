@@ -8,6 +8,7 @@ import com.pawlowski.stuboard.presentation.use_cases.SelectNewFilterUseCase
 import com.pawlowski.stuboard.presentation.use_cases.UnselectFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,8 +21,12 @@ class FiltersViewModel @Inject constructor(
     private val unselectFilterUseCase: UnselectFilterUseCase,
 ): ViewModel(), IFiltersViewModel {
     private val initialSearchTextValue = ""
+    private val initialUiState: FiltersUiState = FiltersUiState(initialSearchTextValue, listOf(), mapOf())
 
-    private val actionSharedFlow = MutableSharedFlow<FiltersScreenAction>()
+    private val actionSharedFlow = MutableSharedFlow<FiltersScreenAction>(
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 10
+    )
 
     private val searchText = actionSharedFlow
         .filterIsInstance<FiltersScreenAction.SearchTextChange>()
@@ -38,9 +43,17 @@ class FiltersViewModel @Inject constructor(
         .distinctUntilChanged()
         .onStart { emit(listOf()) }
 
+    private val _uiState = MutableStateFlow(initialUiState)
+    override val uiState: StateFlow<FiltersUiState> get() = _uiState.asStateFlow()
+
+    override fun onAction(action: FiltersScreenAction) {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            actionSharedFlow.emit(action)
+        }
+    }
 
 
-    override val uiState: StateFlow<FiltersUiState> =
+    private val uiStateUpdaterJob = //Update uiState when particular state change
         combine(searchText, selectedFilters, suggestedFilters)
         { searchText, selectedFilters, suggestedFilters ->
             val filteredSuggestions = if(searchText.isEmpty())
@@ -49,38 +62,33 @@ class FiltersViewModel @Inject constructor(
                 suggestedFilters.filter { it.tittle.contains(searchText, ignoreCase = true) }
             val mappedSuggestions = filteredSuggestions
                 .groupBy { it.filterType }
-            FiltersUiState(searchText, selectedFilters, mappedSuggestions)
-        }
-            .flowOn(Dispatchers.IO) //if it's here,
-            // problem starts with TextField onValueChange (sometimes resets the current string to "")
-            // - problem showed only on my real device, not emulator.
-            // Maybe try to separate the searchText state from uiState and try again with Dispatchers.IO here?
-            // Problem sound to disappear when updating jetpack compose version to stable 1.2.1
-            // TODO: Make sure it always work
-            .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = FiltersUiState(initialSearchTextValue, listOf(), mapOf())
-        )
-
-    override fun onAction(action: FiltersScreenAction) {
-        viewModelScope.launch(Dispatchers.Main.immediate) {
-            actionSharedFlow.emit(action)
-            if(action is FiltersScreenAction.SearchTextChange)
-                println("TextChange: ${action.newText}")
-            when(action)
-            {
-                is FiltersScreenAction.AddNewFilter ->
-                {
-                    selectNewFilterUseCase.invoke(action.filterModel)
-                    actionSharedFlow.emit(FiltersScreenAction.SearchTextChange(""))
-                }
-                is FiltersScreenAction.UnselectFilter ->
-                {
-                    unselectFilterUseCase.invoke(action.filterModel)
-                }
-                else -> {}
+            _uiState.update {
+                it.copy(
+                    searchText= searchText,
+                    selectedFilters = selectedFilters,
+                    suggestedFilters = mappedSuggestions
+                )
             }
         }
-    }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
+
+
+    private val uiActionHandlerJob = //Synchronous action handler
+        actionSharedFlow
+            .onEach {
+                if(it is FiltersScreenAction.AddNewFilter)
+                {
+                    selectNewFilterUseCase(it.filterModel)
+                    actionSharedFlow.emit(FiltersScreenAction.SearchTextChange(""))
+                }
+                else if(it is FiltersScreenAction.UnselectFilter)
+                {
+                    unselectFilterUseCase(it.filterModel)
+                }
+
+            }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
+
 }
