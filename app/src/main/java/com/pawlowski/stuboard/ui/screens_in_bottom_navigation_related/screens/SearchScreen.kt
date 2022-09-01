@@ -100,7 +100,7 @@ fun SearchScreen(
             val lazyPagingItems = viewModel.pagingData?.collectAsLazyPagingItems()
             if (lazyPagingItems != null) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    val listState = rememberLazyGridState()
+                    val listState = rememberLazyGridState() //TODO: Remember where last time scrolled and start from this place
                     LazyVerticalGrid(
                         state = listState,
                         columns = GridCells.Fixed(2),
@@ -112,15 +112,24 @@ fun SearchScreen(
                     )
                     {
                         item(span = { GridItemSpan(2) }) {
-                            if (lazyPagingItems.loadState.refresh is LoadState.Loading) {
-                                Box(contentAlignment = Center) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .padding(vertical = 5.dp)
-                                            .size(40.dp),
-                                        color = Green
-                                    )
+                            when(lazyPagingItems.loadState.refresh)
+                            {
+                                is LoadState.Loading -> {
+                                    Box(contentAlignment = Center) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .padding(vertical = 5.dp)
+                                                .size(40.dp),
+                                            color = Green
+                                        )
+                                    }
                                 }
+                                is LoadState.Error -> {
+                                    Button(onClick = { lazyPagingItems.retry() }, colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
+                                        Text(text = "Try again", color = Color.White)
+                                    }
+                                }
+                                else -> {}
                             }
                         }
                         items(count = lazyPagingItems.itemCount)
@@ -139,16 +148,26 @@ fun SearchScreen(
                         }
                         item(span = { GridItemSpan(2) })
                         {
-                            if (lazyPagingItems.loadState.append is LoadState.Loading) {
-                                Box(contentAlignment = Center) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .padding(vertical = 5.dp)
-                                            .size(40.dp),
-                                        color = Green
-                                    )
+                            when(lazyPagingItems.loadState.append)
+                            {
+                                is LoadState.Loading -> {
+                                    Box(contentAlignment = Center) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .padding(vertical = 5.dp)
+                                                .size(40.dp),
+                                            color = Green
+                                        )
+                                    }
                                 }
+                                is LoadState.Error -> {
+                                    Button(onClick = { lazyPagingItems.retry() }, colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
+                                        Text(text = "Try again", color = Color.White)
+                                    }
+                                }
+                                else -> {}
                             }
+
                         }
                     }
 

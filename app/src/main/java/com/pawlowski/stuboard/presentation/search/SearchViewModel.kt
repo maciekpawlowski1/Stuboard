@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.presentation.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.pawlowski.stuboard.presentation.use_cases.GetEventsPagingStreamUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
@@ -20,7 +21,7 @@ class SearchViewModel @Inject constructor(
     private val selectedFilters = getSelectedFiltersUseCase()
 
     override val pagingData: Flow<PagingData<EventItemForPreview>> = getEventsPagingStreamUseCase(
-        listOf())
+        listOf()).cachedIn(viewModelScope)
 
     private val _uiState = MutableStateFlow(initialUiState)
     override val uiState: StateFlow<SearchUiState>

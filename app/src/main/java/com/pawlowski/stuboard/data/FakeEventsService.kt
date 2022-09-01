@@ -3,9 +3,11 @@ package com.pawlowski.stuboard.data
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
+import java.util.concurrent.atomic.AtomicInteger
 
 class FakeEventsService: EventsService {
     private val fakeNumbers = (1..100).toList()
+    private val tryCount = AtomicInteger(0)
 
     override suspend fun loadItemPreviews(
         page: Int,
@@ -17,7 +19,10 @@ class FakeEventsService: EventsService {
         else 100
 
         delay(3000)
+        val isError = tryCount.getAndIncrement()%3 == 1
 
+        if(isError)
+            return Result.failure(okio.IOException())
         return if(startIndex <= 100)
             Result.success(fakeNumbers.subList(startIndex, endIndex).map {
             EventItemForPreview(
