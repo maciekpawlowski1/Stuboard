@@ -3,11 +3,9 @@ package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -30,17 +28,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.search.ISearchViewModel
 import com.pawlowski.stuboard.presentation.search.SearchUiState
 import com.pawlowski.stuboard.presentation.search.SearchViewModel
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
-import com.pawlowski.stuboard.ui.theme.GrayGreen
-import com.pawlowski.stuboard.ui.theme.Green
-import com.pawlowski.stuboard.ui.theme.StuboardTheme
-import com.pawlowski.stuboard.ui.theme.montserratFont
+import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +62,9 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
                         start = 20.dp,
                         end = 20.dp,
                         bottom= 10.dp
-                    ), selectedFiltersState.value.map { it.tittle })
+                    ), filters = selectedFiltersState.value.map { it.tittle }, onNavigateToFiltersScreen = {
+                        onNavigateToFiltersScreen.invoke()
+                    })
 
                     FiltersCard(modifier = Modifier.align(CenterHorizontally), selectedFiltersCountState.value)
                     {
@@ -84,39 +80,55 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = montserratFont
             )
-            val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(
-                    start = 10.dp,
-                    end = 10.dp,
-                    bottom = 80.dp,
-                )
-            )
+            val lazyPagingItems = viewModel.pagingData?.collectAsLazyPagingItems()
+            if(lazyPagingItems != null)
             {
-                items(count = lazyPagingItems.itemCount)
-                { index ->
-                    lazyPagingItems[index]?.let {
-                        EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
-                            onNavigateToEventDetailsScreen.invoke(it.eventId)
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(
+                        start = 10.dp,
+                        end = 10.dp,
+                        bottom = 80.dp,
+                    )
+                )
+                {
+                    item(span = { GridItemSpan(2)}) {
+                        if(lazyPagingItems.loadState.refresh is LoadState.Loading)
+                        {
+                            Box(contentAlignment = Center) {
+                                CircularProgressIndicator(modifier = Modifier
+                                    .padding(vertical = 5.dp)
+                                    .size(40.dp),
+                                    color = Green
+                                )
+                            }
                         }
                     }
+                    items(count = lazyPagingItems.itemCount)
+                    { index ->
+                        lazyPagingItems[index]?.let {
+                            EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
+                                onNavigateToEventDetailsScreen.invoke(it.eventId)
+                            }
+                        }
 
-                }
-                item(span = { GridItemSpan(2)})
-                {
-                    if(lazyPagingItems.loadState.append is LoadState.Loading)
+                    }
+                    item(span = { GridItemSpan(2)})
                     {
-                        Box(contentAlignment = Center) {
-                            CircularProgressIndicator(modifier = Modifier
-                                .padding(vertical = 5.dp)
-                                .size(40.dp),
-                                color = Green
-                            )
+                        if(lazyPagingItems.loadState.append is LoadState.Loading)
+                        {
+                            Box(contentAlignment = Center) {
+                                CircularProgressIndicator(modifier = Modifier
+                                    .padding(vertical = 5.dp)
+                                    .size(40.dp),
+                                    color = Green
+                                )
+                            }
                         }
                     }
                 }
             }
+
 
 
         }
@@ -173,7 +185,7 @@ fun FiltersCountCircle(padding: PaddingValues = PaddingValues(), filtersCount: I
 }
 
 @Composable
-fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String>, onClearClick: () -> Unit = {})
+fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String>, onClearClick: () -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {})
 {
     Card(
         modifier = Modifier
@@ -184,45 +196,89 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
         elevation = 4.dp
 
     ) {
-        Row(modifier = Modifier.padding(vertical = 10.dp)) {
-            FlowRow(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .weight(1f, true),
-                crossAxisSpacing = 8.dp,
-                mainAxisSpacing = 10.dp
-            ) {
-                filters.forEach {
-                    FilterLabelBox(
-                        text = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 5.dp),
-                                text = it,
-                                fontFamily = montserratFont,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 13.sp
+        Row(
+            verticalAlignment = CenterVertically) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .clickable { onNavigateToFiltersScreen.invoke() }
+                .padding(vertical = 10.dp))
+            {
+                Row(verticalAlignment = CenterVertically) {
+                    if(filters.isEmpty())
+                    {
+                        Box(contentAlignment = Center,
+                            modifier = Modifier
+                                .clickable { onClearClick.invoke() }
+                                .padding(
+                                    vertical = 10.dp,
+                                    horizontal = 10.dp
+                                )
+                                .wrapContentWidth()
+                        )
+                        {
+                            Icon(
+                                painter = painterResource(id = R.drawable.search_icon),
+                                contentDescription = ""
                             )
                         }
+                        Text(
+                            text = "Wpisz aby wyszukać",
+                            color = MidGrey,
+                            fontFamily = montserratFont,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp
+                        )
+                    }
+                    else
+                    {
+                        FlowRow(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .weight(1f, true),
+                            crossAxisSpacing = 8.dp,
+                            mainAxisSpacing = 10.dp,
+                        ) {
+                            filters.forEach {
+                                FilterLabelBox(
+                                    text = {
+                                        Text(
+                                            modifier = Modifier.padding(horizontal = 5.dp),
+                                            text = it,
+                                            fontFamily = montserratFont,
+                                            fontWeight = FontWeight.Normal,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                )
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+            if(filters.isNotEmpty())
+            {
+
+                Box(contentAlignment = Center,
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .clickable { onClearClick.invoke() }
+                        .padding(
+                            vertical = 10.dp,
+                            horizontal = 10.dp
+                        )
+                        .wrapContentWidth()
+                )
+                {
+                    Icon(
+                        painter = painterResource(id = R.drawable.close_icon),
+                        contentDescription = ""
                     )
                 }
-
             }
 
-            Box(contentAlignment = Center,
-                modifier = Modifier
-                    .clickable { onClearClick.invoke() }
-                    .padding(
-                        vertical = 10.dp,
-                        horizontal = 10.dp
-                    )
-                    .wrapContentWidth()
-            )
-            {
-                Icon(
-                    painter = painterResource(id = R.drawable.close_icon),
-                    contentDescription = ""
-                )
-            }
         }
 
     }
@@ -255,20 +311,20 @@ fun FilterLabelBox(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun SearchScreenPreview() {
-//    StuboardTheme {
-//        SearchScreen(viewModel = object : ISearchViewModel
-//        {
-//            override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
-//                SearchUiState(
-//                selectedFilters = PreviewUtils.defaultFilters,
-//            )
-//            )
-//            override val pagingData: Flow<PagingData<EventItemForPreview>>
-//                get() = TODO("Not yet implemented")
-//
-//        })
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun SearchScreenPreview() {
+    StuboardTheme {
+        SearchScreen(viewModel = object : ISearchViewModel
+        {
+            override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
+                SearchUiState(
+                selectedFilters = PreviewUtils.defaultFilters,
+            )
+            )
+            override val pagingData: Flow<PagingData<EventItemForPreview>>?
+                get() = null
+
+        })
+    }
+}

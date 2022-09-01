@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface ISearchViewModel {
     val uiState: StateFlow<SearchUiState>
-    val pagingData: Flow<PagingData<EventItemForPreview>>
+    val pagingData: Flow<PagingData<EventItemForPreview>>?
 }

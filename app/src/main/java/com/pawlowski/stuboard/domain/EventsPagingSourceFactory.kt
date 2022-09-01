@@ -1,7 +1,8 @@
-package com.pawlowski.stuboard.data
+package com.pawlowski.stuboard.domain
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.pawlowski.stuboard.data.EventsService
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import okio.IOException

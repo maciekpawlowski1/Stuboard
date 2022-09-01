@@ -3,7 +3,6 @@ package com.pawlowski.stuboard.domain
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.pawlowski.stuboard.data.EventsPagingSourceFactory
 import com.pawlowski.stuboard.data.FakeEventsService
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
 import com.pawlowski.stuboard.presentation.filters.FilterModel
@@ -13,7 +12,6 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
 class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService): EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = flow {
