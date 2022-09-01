@@ -3,14 +3,13 @@ package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -28,16 +27,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.search.ISearchViewModel
 import com.pawlowski.stuboard.presentation.search.SearchUiState
 import com.pawlowski.stuboard.presentation.search.SearchViewModel
+import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.theme.GrayGreen
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -51,6 +56,8 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
     val selectedFiltersCountState = derivedStateOf {
         selectedFiltersState.value.size
     }
+
+
     Surface(modifier = Modifier.fillMaxHeight()) {
         Column {
             Surface(modifier = Modifier
@@ -77,7 +84,7 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = montserratFont
             )
-
+            val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(
@@ -87,13 +94,30 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
                 )
             )
             {
-                items(PreviewUtils.defaultEventPreviews)
+                items(count = lazyPagingItems.itemCount)
+                { index ->
+                    lazyPagingItems[index]?.let {
+                        EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
+                            onNavigateToEventDetailsScreen.invoke(it.eventId)
+                        }
+                    }
+
+                }
+                item(span = { GridItemSpan(2)})
                 {
-                    EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
-                        onNavigateToEventDetailsScreen.invoke(it.eventId)
+                    if(lazyPagingItems.loadState.append is LoadState.Loading)
+                    {
+                        Box(contentAlignment = Center) {
+                            CircularProgressIndicator(modifier = Modifier
+                                .padding(vertical = 5.dp)
+                                .size(40.dp),
+                                color = Green
+                            )
+                        }
                     }
                 }
             }
+
 
         }
     }
@@ -231,18 +255,20 @@ fun FilterLabelBox(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SearchScreenPreview() {
-    StuboardTheme {
-        SearchScreen(viewModel = object : ISearchViewModel
-        {
-            override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
-                SearchUiState(
-                selectedFilters = PreviewUtils.defaultFilters,
-            )
-            )
-
-        })
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SearchScreenPreview() {
+//    StuboardTheme {
+//        SearchScreen(viewModel = object : ISearchViewModel
+//        {
+//            override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
+//                SearchUiState(
+//                selectedFilters = PreviewUtils.defaultFilters,
+//            )
+//            )
+//            override val pagingData: Flow<PagingData<EventItemForPreview>>
+//                get() = TODO("Not yet implemented")
+//
+//        })
+//    }
+//}

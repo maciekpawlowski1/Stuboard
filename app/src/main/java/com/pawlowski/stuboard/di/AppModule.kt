@@ -1,10 +1,7 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
-import com.pawlowski.stuboard.data.DefaultSuggestedFiltersProvider
-import com.pawlowski.stuboard.data.IFiltersDao
-import com.pawlowski.stuboard.data.ISuggestedFiltersProvider
-import com.pawlowski.stuboard.data.InMemoryFiltersDao
+import com.pawlowski.stuboard.data.*
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.presentation.use_cases.*
 import dagger.Module
@@ -33,7 +30,7 @@ class AppModule {
     @Provides
     fun eventsRepository(): EventsRepository
     {
-        return FakeEventsRepositoryImpl()
+        return FakeEventsRepositoryImpl(FakeEventsService())
     }
 
     @Singleton
@@ -84,4 +81,8 @@ class AppModule {
     @Singleton
     @Provides
     fun unselectFilterUseCase(filtersRepository: IFiltersRepository) = UnselectFilterUseCase(filtersRepository::unselectFilter)
+
+    @Singleton
+    @Provides
+    fun getEventsPagingStreamUseCase(filtersRepository: EventsRepository) = GetEventsPagingStreamUseCase(filtersRepository::getEventResultStream)
 }
