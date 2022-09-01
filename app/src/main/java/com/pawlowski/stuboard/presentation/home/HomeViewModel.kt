@@ -16,14 +16,14 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getPreferredCategoriesUseCase: GetPreferredCategoriesUseCase,
     private val getHomeEventTypesSuggestionsUseCase: GetHomeEventTypesSuggestionsUseCase
-): ViewModel() {
+): ViewModel(), IHomeViewModel {
 
     private val preferredCategories = getPreferredCategoriesUseCase()
 
     private val eventTypeSuggestion = getHomeEventTypesSuggestionsUseCase()
         .flowOn(Dispatchers.IO)
 
-    val uiState = combine(preferredCategories, eventTypeSuggestion)
+    override val uiState = combine(preferredCategories, eventTypeSuggestion)
     { categories, eventsSuggestionsState ->
         HomeUiState(eventsSuggestionsState, categories)
     }

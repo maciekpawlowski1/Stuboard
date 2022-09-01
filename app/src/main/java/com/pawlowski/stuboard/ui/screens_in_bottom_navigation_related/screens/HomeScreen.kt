@@ -1,4 +1,5 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -30,17 +31,27 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.home.HomeUiState
 import com.pawlowski.stuboard.presentation.home.HomeViewModel
+import com.pawlowski.stuboard.presentation.home.IHomeViewModel
 import com.pawlowski.stuboard.ui.models.CategoryItem
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {}, onNavigateToMapScreen : () -> Unit = {}, preview: Boolean = false, viewModel: HomeViewModel = hiltViewModel(), onNavigateToSearchScreenWithParameter: (categoryId: Int) -> Unit = {})
-{
+fun HomeScreen(
+    onNavigateToSearchScreen: () -> Unit = {},
+    onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {},
+    onNavigateToMapScreen: () -> Unit = {},
+    preview: Boolean = false,
+    viewModel: IHomeViewModel = hiltViewModel<HomeViewModel>(),
+    onNavigateToSearchScreenWithParameter: (categoryId: Int) -> Unit = {}
+) {
     val uiState = viewModel.uiState.collectAsState()
     val suggestionsState = derivedStateOf {
         uiState.value.eventsSuggestions
@@ -48,15 +59,16 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
     val categoriesState = derivedStateOf {
         uiState.value.preferredCategories
     }
-
     Surface {
         LazyColumn() {
 
             //Google map or fake surface if preview
             item {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(170.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(170.dp)
+                )
                 {
                     MyGoogleMap(
                         modifier = Modifier
@@ -74,7 +86,8 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
                         .fillMaxSize()
                         .clickable {
                             onNavigateToMapScreen.invoke()
-                        }, color = Color(0x3F7F7F7))
+                        }, color = Color(0x3F7F7F7)
+                    )
                     { }
                 }
 
@@ -82,8 +95,9 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
             //SearchCardButton
             item {
-                SearchCardButton(modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 20.dp)
+                SearchCardButton(
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp, vertical = 20.dp)
                 )
                 {
                     onNavigateToSearchScreen.invoke()
@@ -101,7 +115,11 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
             //Events suggestions
             items(items = suggestionsState.value)
             {
-                LabelsRow(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp), label1 = it.suggestionType, label2 = "Więcej") {
+                LabelsRow(
+                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp),
+                    label1 = it.suggestionType,
+                    label2 = "Więcej"
+                ) {
 
                 }
                 EventsRow(eventItemsForPreview = it.events, isLoading = it.isLoading)
@@ -112,9 +130,11 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
 
             item {
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp))
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
             }
 
         }
@@ -124,8 +144,7 @@ fun HomeScreen(onNavigateToSearchScreen: () -> Unit = {}, onNavigateToEventDetai
 
 
 @Composable
-fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit)
-{
+fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
 
 
     Card(elevation = 8.dp,
@@ -141,21 +160,37 @@ fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit)
 
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(modifier = Modifier.padding(horizontal = 15.dp), painter = painterResource(id = R.drawable.search_icon), contentDescription = "")
-            Text(text = stringResource(id = R.string.search_for_events), fontWeight = FontWeight.Normal, color = LighterMidGrey, fontFamily = montserratFont)
+            Icon(
+                modifier = Modifier.padding(horizontal = 15.dp),
+                painter = painterResource(id = R.drawable.search_icon),
+                contentDescription = ""
+            )
+            Text(
+                text = stringResource(id = R.string.search_for_events),
+                fontWeight = FontWeight.Normal,
+                color = LighterMidGrey,
+                fontFamily = montserratFont
+            )
         }
     }
 }
 
 @Composable
-fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>, onCategoryClicked: (categoryId: Int) -> Unit = {})
-{
+fun CategoriesRow(
+    modifier: Modifier = Modifier,
+    categories: List<CategoryItem>,
+    onCategoryClicked: (categoryId: Int) -> Unit = {}
+) {
 
     LazyRow(modifier = modifier)
     {
         items(categories)
         {
-            CategoryCard(modifier = Modifier.padding(start = 10.dp), imageId = it.imageId, tittle = it.tittle)
+            CategoryCard(
+                modifier = Modifier.padding(start = 10.dp),
+                imageId = it.imageId,
+                tittle = it.tittle
+            )
             {
                 onCategoryClicked.invoke(it.categoryId)
             }
@@ -165,11 +200,16 @@ fun CategoriesRow(modifier: Modifier = Modifier, categories: List<CategoryItem>,
 }
 
 @Composable
-fun LabelsRow(modifier: Modifier = Modifier, label1: String, label2: String, onLabel2Click: () -> Unit)
-{
+fun LabelsRow(
+    modifier: Modifier = Modifier,
+    label1: String,
+    label2: String,
+    onLabel2Click: () -> Unit
+) {
     Row(modifier = modifier) {
         Box(modifier = Modifier.weight(1f)) {
-            Text(text = label1,
+            Text(
+                text = label1,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(5.dp),
                 fontFamily = montserratFont,
@@ -188,14 +228,18 @@ fun LabelsRow(modifier: Modifier = Modifier, label1: String, label2: String, onL
                 textDecoration = TextDecoration.Underline,
                 color = Green,
                 fontSize = 14.sp
-                )
+            )
         }
     }
 }
 
 @Composable
-fun CategoryCard(modifier: Modifier = Modifier ,imageId: Int, tittle: String, onCardClick: () -> Unit)
-{
+fun CategoryCard(
+    modifier: Modifier = Modifier,
+    imageId: Int,
+    tittle: String,
+    onCardClick: () -> Unit
+) {
     Card(shape = RoundedCornerShape(8.dp), modifier = modifier
         .width(115.dp)
         .height(75.dp)
@@ -204,8 +248,13 @@ fun CategoryCard(modifier: Modifier = Modifier ,imageId: Int, tittle: String, on
         }
     ) {
         Box {
-            Image(painter = painterResource(id = imageId), contentScale = ContentScale.FillBounds, contentDescription = "")
-            Text(text = tittle, color = Color.White,
+            Image(
+                painter = painterResource(id = imageId),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = ""
+            )
+            Text(
+                text = tittle, color = Color.White,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 3.dp),
@@ -219,20 +268,24 @@ fun CategoryCard(modifier: Modifier = Modifier ,imageId: Int, tittle: String, on
 }
 
 
-
 @Composable
-fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPreview, isLoading: Boolean = false, onCardClick: () -> Unit = {})
-{
+fun EventCard(
+    modifier: Modifier = Modifier,
+    eventItemForPreview: EventItemForPreview,
+    isLoading: Boolean = false,
+    onCardClick: () -> Unit = {}
+) {
     Card(
         modifier = modifier
             .width(166.dp)
             .height(177.dp)
-            .clickable(enabled = !isLoading) { onCardClick.invoke() }
-        ,
+            .clickable(enabled = !isLoading) { onCardClick.invoke() },
         elevation = 5.dp
     ) {
-        Column(modifier = Modifier.padding(top = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.padding(top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             AsyncImage(
                 modifier = Modifier
                     .padding(bottom = 7.dp)
@@ -243,9 +296,10 @@ fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPre
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds
             )
-            
-            Text(text = eventItemForPreview.tittle,
-                modifier= Modifier
+
+            Text(
+                text = eventItemForPreview.tittle,
+                modifier = Modifier
                     .padding(horizontal = 5.dp)
                     .fillMaxWidth()
                     .myLoadingEffect(isLoading),
@@ -253,10 +307,11 @@ fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPre
                 fontSize = 11.sp,
                 textAlign = TextAlign.Center
             )
-            
-            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier
-                .fillMaxHeight()
-                .padding(bottom = 5.dp)
+
+            Box(
+                contentAlignment = Alignment.BottomCenter, modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(bottom = 5.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -265,14 +320,18 @@ fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPre
                         .myLoadingEffect(isLoading),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = eventItemForPreview.place,
+                    Text(
+                        text = eventItemForPreview.place,
                         fontWeight = FontWeight.Light,
                         fontSize = 10.sp,
-                        textAlign = TextAlign.Center)
-                    Text(text = eventItemForPreview.dateDisplayString,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = eventItemForPreview.dateDisplayString,
                         fontWeight = FontWeight.Normal,
                         fontSize = 10.sp,
-                        textAlign = TextAlign.Center)
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
@@ -281,17 +340,31 @@ fun EventCard(modifier: Modifier = Modifier,eventItemForPreview: EventItemForPre
 }
 
 @Composable
-fun EventsRow(modifier: Modifier = Modifier, eventItemsForPreview: List<EventItemForPreview>, isLoading: Boolean = false, onEventCardClick: (eventId: Int) -> Unit)
-{
+fun EventsRow(
+    modifier: Modifier = Modifier,
+    eventItemsForPreview: List<EventItemForPreview>,
+    isLoading: Boolean = false,
+    onEventCardClick: (eventId: Int) -> Unit
+) {
     val eventsToDisplay = remember(eventItemsForPreview) {
         //If empty, generates empty event to display loading effect
-        eventItemsForPreview.ifEmpty { listOf(EventItemForPreview(), EventItemForPreview(), EventItemForPreview()) }
+        eventItemsForPreview.ifEmpty {
+            listOf(
+                EventItemForPreview(),
+                EventItemForPreview(),
+                EventItemForPreview()
+            )
+        }
     }
     LazyRow(modifier = modifier)
     {
         items(eventsToDisplay)
         {
-            EventCard(modifier = Modifier.padding(start = 10.dp), eventItemForPreview = it, isLoading = isLoading)
+            EventCard(
+                modifier = Modifier.padding(start = 10.dp),
+                eventItemForPreview = it,
+                isLoading = isLoading
+            )
             {
                 onEventCardClick.invoke(it.eventId)
             }
@@ -303,6 +376,13 @@ fun EventsRow(modifier: Modifier = Modifier, eventItemsForPreview: List<EventIte
 @Composable
 fun HomeScreenPreview() {
     StuboardTheme {
-        HomeScreen(preview = true)
+        HomeScreen(preview = true, viewModel = object : IHomeViewModel
+        {
+            override val uiState: StateFlow<HomeUiState> = MutableStateFlow(HomeUiState(
+                preferredCategories = PreviewUtils.categoryItemsForPreview,
+                eventsSuggestions = PreviewUtils.defaultHomeEventsSuggestions
+            ))
+
+        })
     }
 }

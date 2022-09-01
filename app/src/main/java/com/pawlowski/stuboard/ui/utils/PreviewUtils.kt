@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.ui.utils
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
+import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
 import com.pawlowski.stuboard.ui.models.*
 
 object PreviewUtils {
@@ -108,5 +109,10 @@ object PreviewUtils {
             tittle = "Akademia Górniczo-Hutnicza w Krakowie",
             "https://mecc20.pl/wp-content/uploads/2020/01/Logo-AGH-1.jpg"
         )
+    )
+
+    val defaultHomeEventsSuggestions = listOf(
+        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, defaultEventPreviews),
+        HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, defaultEventPreviews.filter { it.place.lowercase() == "online" })
     )
 }
