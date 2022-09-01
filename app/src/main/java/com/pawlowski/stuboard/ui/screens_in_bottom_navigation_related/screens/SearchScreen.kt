@@ -1,16 +1,21 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
@@ -41,8 +46,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {}, viewModel: ISearchViewModel = hiltViewModel<SearchViewModel>())
-{
+fun SearchScreen(
+    onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {},
+    onNavigateToFiltersScreen: () -> Unit = {},
+    viewModel: ISearchViewModel = hiltViewModel<SearchViewModel>(),
+    onNavigateToMapScreen: () -> Unit = {}
+) {
     val uiState = viewModel.uiState.collectAsState()
     val selectedFiltersState = derivedStateOf {
         uiState.value.selectedFilters
@@ -54,19 +63,26 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
 
     Surface(modifier = Modifier.fillMaxHeight()) {
         Column {
-            Surface(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(), color = GrayGreen) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(), color = GrayGreen
+            ) {
                 Column(modifier = Modifier.padding(vertical = 30.dp)) {
                     SearchBarWithFilterValues(PaddingValues(
                         start = 20.dp,
                         end = 20.dp,
-                        bottom= 10.dp
-                    ), filters = selectedFiltersState.value.map { it.tittle }, onNavigateToFiltersScreen = {
-                        onNavigateToFiltersScreen.invoke()
-                    })
+                        bottom = 10.dp
+                    ),
+                        filters = selectedFiltersState.value.map { it.tittle },
+                        onNavigateToFiltersScreen = {
+                            onNavigateToFiltersScreen.invoke()
+                        })
 
-                    FiltersCard(modifier = Modifier.align(CenterHorizontally), selectedFiltersCountState.value)
+                    FiltersCard(
+                        modifier = Modifier.align(CenterHorizontally),
+                        selectedFiltersCountState.value
+                    )
                     {
                         onNavigateToFiltersScreen.invoke()
                     }
@@ -75,60 +91,85 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
             }
 
             val eventsCount = 12
-            Text(modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 15.dp),
+            Text(
+                modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 15.dp),
                 text = "Wyniki wyszukiwania ($eventsCount):",
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = montserratFont
             )
             val lazyPagingItems = viewModel.pagingData?.collectAsLazyPagingItems()
-            if(lazyPagingItems != null)
-            {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(
-                        start = 10.dp,
-                        end = 10.dp,
-                        bottom = 80.dp,
+            if (lazyPagingItems != null) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    val listState = rememberLazyGridState()
+                    LazyVerticalGrid(
+                        state = listState,
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(
+                            start = 10.dp,
+                            end = 10.dp,
+                            bottom = 80.dp,
+                        )
                     )
-                )
-                {
-                    item(span = { GridItemSpan(2)}) {
-                        if(lazyPagingItems.loadState.refresh is LoadState.Loading)
-                        {
-                            Box(contentAlignment = Center) {
-                                CircularProgressIndicator(modifier = Modifier
-                                    .padding(vertical = 5.dp)
-                                    .size(40.dp),
-                                    color = Green
-                                )
-                            }
-                        }
-                    }
-                    items(count = lazyPagingItems.itemCount)
-                    { index ->
-                        lazyPagingItems[index]?.let {
-                            EventCard(modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp), eventItemForPreview = it) {
-                                onNavigateToEventDetailsScreen.invoke(it.eventId)
-                            }
-                        }
-
-                    }
-                    item(span = { GridItemSpan(2)})
                     {
-                        if(lazyPagingItems.loadState.append is LoadState.Loading)
+                        item(span = { GridItemSpan(2) }) {
+                            if (lazyPagingItems.loadState.refresh is LoadState.Loading) {
+                                Box(contentAlignment = Center) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(vertical = 5.dp)
+                                            .size(40.dp),
+                                        color = Green
+                                    )
+                                }
+                            }
+                        }
+                        items(count = lazyPagingItems.itemCount)
+                        { index ->
+                            lazyPagingItems[index]?.let {
+                                EventCard(
+                                    modifier = Modifier.padding(
+                                        vertical = 10.dp,
+                                        horizontal = 6.dp
+                                    ), eventItemForPreview = it
+                                ) {
+                                    onNavigateToEventDetailsScreen.invoke(it.eventId)
+                                }
+                            }
+
+                        }
+                        item(span = { GridItemSpan(2) })
                         {
-                            Box(contentAlignment = Center) {
-                                CircularProgressIndicator(modifier = Modifier
-                                    .padding(vertical = 5.dp)
-                                    .size(40.dp),
-                                    color = Green
-                                )
+                            if (lazyPagingItems.loadState.append is LoadState.Loading) {
+                                Box(contentAlignment = Center) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(vertical = 5.dp)
+                                            .size(40.dp),
+                                        color = Green
+                                    )
+                                }
                             }
                         }
                     }
-                }
-            }
 
+                    Column(modifier = Modifier
+                        .align(BottomCenter)
+                        .width(130.dp)
+                        .height(100.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                        AnimatedVisibility(visible = !listState.isScrollInProgress) {
+                            GoToMapButton()
+                            {
+                                onNavigateToMapScreen()
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
 
 
         }
@@ -137,37 +178,72 @@ fun SearchScreen(onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}, on
 }
 
 @Composable
-fun FiltersCard(modifier: Modifier, filtersCount: Int, onCardClick: () -> Unit = {})
-{
-    Card(modifier = modifier
-        .height(33.dp)
-        .fillMaxWidth(0.8f)
-        .clickable { onCardClick.invoke() },
+fun GoToMapButton(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+    Card(
+        modifier = modifier
+            .wrapContentSize()
+            .clickable { onClick.invoke() },
+        shape = RoundedCornerShape(10.dp),
+        backgroundColor = Green
+    ) {
+        Row(verticalAlignment = CenterVertically) {
+            Icon(
+                modifier= Modifier.padding(vertical = 1.dp, horizontal = 3.dp),
+                painter = painterResource(id = R.drawable.map_icon),
+                contentDescription = "",
+                tint = Color.White
+            )
+            Text(
+                modifier= Modifier.padding(end = 5.dp),
+                text = "Go to map",
+                color = Color.White,
+                fontFamily = montserratFont,
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun FiltersCard(modifier: Modifier, filtersCount: Int, onCardClick: () -> Unit = {}) {
+    Card(
+        modifier = modifier
+            .height(33.dp)
+            .fillMaxWidth(0.8f)
+            .clickable { onCardClick.invoke() },
         shape = RectangleShape,
         elevation = 5.dp,
     ) {
         Box(modifier = Modifier.fillMaxHeight(), contentAlignment = Center) {
             Row(verticalAlignment = CenterVertically) {
-                Icon(modifier= Modifier.padding(vertical = 5.dp, horizontal = 5.dp),painter = painterResource(id = R.drawable.filter_list_icon), contentDescription = "")
+                Icon(
+                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
+                    painter = painterResource(id = R.drawable.filter_list_icon),
+                    contentDescription = ""
+                )
                 Text(
                     text = "Filtry",
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = montserratFont,
                     fontSize = 13.sp
                 )
-                FiltersCountCircle(padding = PaddingValues(start = 10.dp), filtersCount = filtersCount)
+                FiltersCountCircle(
+                    padding = PaddingValues(start = 10.dp),
+                    filtersCount = filtersCount
+                )
             }
         }
     }
 }
 
 @Composable
-fun FiltersCountCircle(padding: PaddingValues = PaddingValues(), filtersCount: Int)
-{
-    Surface(modifier = Modifier
-        .padding(padding)
-        .width(25.dp)
-        .height(25.dp),
+fun FiltersCountCircle(padding: PaddingValues = PaddingValues(), filtersCount: Int) {
+    Surface(
+        modifier = Modifier
+            .padding(padding)
+            .width(25.dp)
+            .height(25.dp),
         shape = CircleShape,
         color = Green
     ) {
@@ -185,8 +261,12 @@ fun FiltersCountCircle(padding: PaddingValues = PaddingValues(), filtersCount: I
 }
 
 @Composable
-fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String>, onClearClick: () -> Unit = {}, onNavigateToFiltersScreen: () -> Unit = {})
-{
+fun SearchBarWithFilterValues(
+    paddingValues: PaddingValues,
+    filters: List<String>,
+    onClearClick: () -> Unit = {},
+    onNavigateToFiltersScreen: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .padding(paddingValues)
@@ -197,15 +277,15 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
 
     ) {
         Row(
-            verticalAlignment = CenterVertically) {
+            verticalAlignment = CenterVertically
+        ) {
             Box(modifier = Modifier
                 .weight(1f)
                 .clickable { onNavigateToFiltersScreen.invoke() }
                 .padding(vertical = 10.dp))
             {
                 Row(verticalAlignment = CenterVertically) {
-                    if(filters.isEmpty())
-                    {
+                    if (filters.isEmpty()) {
                         Box(contentAlignment = Center,
                             modifier = Modifier
                                 .clickable { onClearClick.invoke() }
@@ -228,9 +308,7 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
                             fontWeight = FontWeight.Normal,
                             fontSize = 16.sp
                         )
-                    }
-                    else
-                    {
+                    } else {
                         FlowRow(
                             modifier = Modifier
                                 .padding(horizontal = 10.dp)
@@ -258,8 +336,7 @@ fun SearchBarWithFilterValues(paddingValues: PaddingValues, filters: List<String
                 }
             }
 
-            if(filters.isNotEmpty())
-            {
+            if (filters.isNotEmpty()) {
 
                 Box(contentAlignment = Center,
                     modifier = Modifier
@@ -291,11 +368,11 @@ fun FilterLabelBox(
     borderColor: Color = Green,
     borderWith: Dp = 1.3.dp,
     height: Dp = 29.dp,
-    icon: @Composable () -> Unit = {  },
-)
-{
-    Card(modifier = modifier
-        .height(height),
+    icon: @Composable () -> Unit = { },
+) {
+    Card(
+        modifier = modifier
+            .height(height),
         shape = RectangleShape,
         border = BorderStroke(borderWith, color = borderColor)
     ) {
@@ -315,12 +392,11 @@ fun FilterLabelBox(
 @Composable
 fun SearchScreenPreview() {
     StuboardTheme {
-        SearchScreen(viewModel = object : ISearchViewModel
-        {
+        SearchScreen(viewModel = object : ISearchViewModel {
             override val uiState: StateFlow<SearchUiState> = MutableStateFlow(
                 SearchUiState(
-                selectedFilters = PreviewUtils.defaultFilters,
-            )
+                    selectedFilters = PreviewUtils.defaultFilters,
+                )
             )
             override val pagingData: Flow<PagingData<EventItemForPreview>>?
                 get() = null

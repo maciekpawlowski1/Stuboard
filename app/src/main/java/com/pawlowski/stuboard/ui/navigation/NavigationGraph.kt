@@ -60,6 +60,12 @@ fun NavigationGraph(navController: NavHostController)
                 navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
             }, onNavigateToFiltersScreen = {
                 navController.navigate(NavRoutes.FILTERS)
+            },
+            onNavigateToMapScreen = {
+                navController.navigate(NavRoutes.MAP)
+                {
+                    launchSingleTop = true
+                }
             })
 
         }
