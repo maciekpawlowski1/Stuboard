@@ -41,4 +41,8 @@ class FakeFiltersRepository: IFiltersRepository {
     override suspend fun unselectFilter(filterModel: FilterModel) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun unselectAllFilters() {
+        TODO("Not yet implemented")
+    }
 }

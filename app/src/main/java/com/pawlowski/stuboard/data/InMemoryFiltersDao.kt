@@ -14,15 +14,23 @@ class InMemoryFiltersDao @Inject constructor(
     private val allSuggestedFilters: List<FilterModel> = suggestedFiltersProvider.getSuggestedFilters()
 
     override suspend fun selectFilter(filterModel: FilterModel) {
-        selectedFilters.value = selectedFilters.value.toMutableList().apply {
-            add(filterModel)
+        selectedFilters.update {
+            it.toMutableList().apply {
+                add(filterModel)
+            }
         }
     }
 
     override suspend fun unselectFilter(filterModel: FilterModel) {
-        selectedFilters.value = selectedFilters.value.toMutableList().apply {
-            remove(filterModel)
+        selectedFilters.update {
+            it.toMutableList().apply {
+                remove(filterModel)
+            }
         }
+    }
+
+    override suspend fun unselectAllFilters() {
+        selectedFilters.update { listOf() }
     }
 
     override fun getSelectedFilters(): Flow<List<FilterModel>> {

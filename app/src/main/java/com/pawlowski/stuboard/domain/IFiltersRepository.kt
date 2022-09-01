@@ -8,4 +8,6 @@ interface IFiltersRepository {
     fun getAllSuggestedNotSelectedFilters(): Flow<List<FilterModel>>
     suspend fun selectFilter(filterModel: FilterModel)
     suspend fun unselectFilter(filterModel: FilterModel)
+
+    suspend fun unselectAllFilters()
 }

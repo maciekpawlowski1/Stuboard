@@ -28,4 +28,10 @@ class FiltersRepository(private val filtersDao: IFiltersDao): IFiltersRepository
             filtersDao.unselectFilter(filterModel)
         }
     }
+
+    override suspend fun unselectAllFilters() {
+        filtersDao.unselectAllFilters()
+    }
+
+
 }
