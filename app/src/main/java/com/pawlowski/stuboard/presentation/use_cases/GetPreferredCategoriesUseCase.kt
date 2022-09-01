@@ -1,6 +1,6 @@
 package com.pawlowski.stuboard.presentation.use_cases
 
-import com.pawlowski.stuboard.ui.models.CategoryItem
+import com.pawlowski.stuboard.presentation.filters.FilterModel
 import kotlinx.coroutines.flow.Flow
 
-fun interface GetPreferredCategoriesUseCase: () -> Flow<List<CategoryItem>>
+fun interface GetPreferredCategoriesUseCase: () -> Flow<List<FilterModel.Category>>

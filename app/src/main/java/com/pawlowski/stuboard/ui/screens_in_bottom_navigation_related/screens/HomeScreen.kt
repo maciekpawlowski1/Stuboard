@@ -31,10 +31,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.filters.FilterModel
+import com.pawlowski.stuboard.presentation.home.HomeUiAction
 import com.pawlowski.stuboard.presentation.home.HomeUiState
 import com.pawlowski.stuboard.presentation.home.HomeViewModel
 import com.pawlowski.stuboard.presentation.home.IHomeViewModel
-import com.pawlowski.stuboard.ui.models.CategoryItem
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.*
@@ -49,8 +50,7 @@ fun HomeScreen(
     onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {},
     onNavigateToMapScreen: () -> Unit = {},
     preview: Boolean = false,
-    viewModel: IHomeViewModel = hiltViewModel<HomeViewModel>(),
-    onNavigateToSearchScreenWithParameter: (categoryId: Int) -> Unit = {}
+    viewModel: IHomeViewModel = hiltViewModel<HomeViewModel>()
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val suggestionsState = derivedStateOf {
@@ -108,7 +108,8 @@ fun HomeScreen(
             item {
                 CategoriesRow(categories = categoriesState.value)
                 {
-                    onNavigateToSearchScreenWithParameter.invoke(it)
+                    viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilter(it))
+                    onNavigateToSearchScreen.invoke()
                 }
             }
 
@@ -178,8 +179,8 @@ fun SearchCardButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
 @Composable
 fun CategoriesRow(
     modifier: Modifier = Modifier,
-    categories: List<CategoryItem>,
-    onCategoryClicked: (categoryId: Int) -> Unit = {}
+    categories: List<FilterModel.Category>,
+    onCategoryClicked: (category: FilterModel) -> Unit = {}
 ) {
 
     LazyRow(modifier = modifier)
@@ -188,11 +189,11 @@ fun CategoriesRow(
         {
             CategoryCard(
                 modifier = Modifier.padding(start = 10.dp),
-                imageId = it.imageId,
+                imageId = it.categoryDrawable,
                 tittle = it.tittle
             )
             {
-                onCategoryClicked.invoke(it.categoryId)
+                onCategoryClicked.invoke(it)
             }
         }
 
@@ -379,9 +380,13 @@ fun HomeScreenPreview() {
         HomeScreen(preview = true, viewModel = object : IHomeViewModel
         {
             override val uiState: StateFlow<HomeUiState> = MutableStateFlow(HomeUiState(
-                preferredCategories = PreviewUtils.categoryItemsForPreview,
+                preferredCategories = PreviewUtils.defaultFilters.filterIsInstance<FilterModel.Category>(),
                 eventsSuggestions = PreviewUtils.defaultHomeEventsSuggestions
             ))
+
+            override fun onAction(homeUiAction: HomeUiAction) {
+
+            }
 
         })
     }

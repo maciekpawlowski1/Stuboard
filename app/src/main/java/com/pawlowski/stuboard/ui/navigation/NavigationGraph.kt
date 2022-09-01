@@ -39,18 +39,6 @@ fun NavigationGraph(navController: NavHostController)
                     {
                         launchSingleTop = true
                     }
-                },
-                onNavigateToSearchScreenWithParameter = { categoryId ->
-                    navController.navigate(NavRoutes.SEARCH)
-                    {
-                        navController.graph.startDestinationRoute?.let { screen_route ->
-                            popUpTo(screen_route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
                 }
             )
         }

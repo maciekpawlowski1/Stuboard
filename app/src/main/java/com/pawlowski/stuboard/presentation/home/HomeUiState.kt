@@ -1,8 +1,8 @@
 package com.pawlowski.stuboard.presentation.home
 
-import com.pawlowski.stuboard.ui.models.CategoryItem
+import com.pawlowski.stuboard.presentation.filters.FilterModel
 
 data class HomeUiState(
     val eventsSuggestions: List<HomeEventTypeSuggestion>,
-    val preferredCategories: List<CategoryItem>
+    val preferredCategories: List<FilterModel.Category>
 )

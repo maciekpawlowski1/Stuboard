@@ -92,7 +92,9 @@ object PreviewUtils {
 
     val defaultFilters = listOf(
         FilterModel.Place.Online,
+        FilterModel.Category("Koncerty", R.drawable.concerts_category_image),
         FilterModel.Category("Naukowe", R.drawable.learning_category_image),
+        FilterModel.Category("Sportowe", R.drawable.sports_category_image),
         FilterModel.EntryPrice.Free,
     )
 

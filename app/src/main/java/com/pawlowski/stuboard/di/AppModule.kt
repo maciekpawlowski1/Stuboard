@@ -84,5 +84,9 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun getEventsPagingStreamUseCase(filtersRepository: EventsRepository) = GetEventsPagingStreamUseCase(filtersRepository::getEventResultStream)
+    fun getEventsPagingStreamUseCase(eventsRepository: EventsRepository) = GetEventsPagingStreamUseCase(eventsRepository::getEventResultStream)
+
+    @Singleton
+    @Provides
+    fun unselectAllFiltersUseCase(filtersRepository: IFiltersRepository) = UnselectAllFiltersUseCase(filtersRepository::unselectAllFilters)
 }
