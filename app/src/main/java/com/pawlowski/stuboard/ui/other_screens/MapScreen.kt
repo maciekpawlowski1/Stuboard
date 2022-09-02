@@ -26,6 +26,8 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
@@ -54,13 +56,19 @@ fun MapScreen(
 ) {
     BackHandler(onBack = onNavigateBack)
     val uiState = viewModel.uiState.collectAsState()
-    val uiStateValue = uiState.value
-    val events = if (uiStateValue is MapUiState.Success)
-        uiStateValue.events
-    else
-    {
-        listOf()
+    val eventsState = derivedStateOf {
+        val uiStateValue = uiState.value
+        if(uiStateValue is MapUiState.Success)
+            uiStateValue.events
+        else
+            listOf()
     }
+    val currentFiltersState = derivedStateOf {
+        uiState.value.currentFilters
+    }
+
+    val events = eventsState.value
+
     var selectedEventId by remember {
         mutableStateOf(events.getOrNull(0)?.eventId)
     }
@@ -84,7 +92,7 @@ fun MapScreen(
 
         FiltersHeader(
             "Kraków",
-            uiStateValue.currentFilters,
+            currentFiltersState.value,
             onBackClick = { onNavigateBack.invoke() }
         )
 
@@ -95,6 +103,9 @@ fun MapScreen(
             val pagerState = rememberPagerState()
 
             val cameraPositionState = rememberCameraPositionState()
+            {
+                position = CameraPosition.fromLatLngZoom(LatLng(50.0624, 19.9116), 12f)
+            }
             MyGoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
@@ -142,6 +153,37 @@ fun MapScreen(
     }
 
 }
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun EventsPager(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState = rememberPagerState(),
+    events: List<EventItemForMapScreen>,
+    onEventCardClick: (eventId: Int) -> Unit = {},
+    onPageChanged: (pageIndex: Int, changesCount: Int) -> Unit = {_,_->},
+) {
+    HorizontalPager(
+        modifier = modifier,
+        count = events.size,
+        state = pagerState
+    ) { page ->
+        val event = events[page]
+        PagerEventCard(event = event, modifier = Modifier.clickable {
+            onEventCardClick.invoke(event.eventId)
+        })
+    }
+
+    val pageIndex = pagerState.currentPage
+    val changesCount = remember {
+        mutableStateOf(0)
+    }
+    LaunchedEffect(key1 = pageIndex, key2 = events)
+    {
+        onPageChanged.invoke(pageIndex, changesCount.value++)
+    }
+}
+
 
 @Composable
 fun FiltersHeader(
@@ -221,38 +263,6 @@ fun FiltersHeader(
 
 
         }
-    }
-}
-
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun EventsPager(
-    modifier: Modifier = Modifier,
-    pagerState: PagerState = rememberPagerState(),
-    events: List<EventItemForMapScreen>,
-    onEventCardClick: (eventId: Int) -> Unit = {},
-    onPageChanged: (pageIndex: Int, changesCount: Int) -> Unit = {_,_->},
-) {
-    HorizontalPager(
-        modifier = modifier,
-        count = events.size,
-        state = pagerState
-    ) { page ->
-        val event = events[page]
-        PagerEventCard(event = event, modifier = Modifier.clickable {
-            onEventCardClick.invoke(event.eventId)
-        })
-    }
-
-    val pageIndex = pagerState.currentPage
-    val changesCount = remember {
-        mutableStateOf(0)
-    }
-    LaunchedEffect(key1 = pageIndex, key2 = events)
-    {
-        if(events.isNotEmpty())
-            onPageChanged.invoke(pageIndex, changesCount.value++)
     }
 }
 

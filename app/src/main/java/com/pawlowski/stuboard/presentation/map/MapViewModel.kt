@@ -21,7 +21,7 @@ class MapViewModel @Inject constructor(
     private val events = selectedFilters
         .flatMapLatest {
             flow {
-                delay(20)
+                delay(120)
                 emit(PreviewUtils.defaultEventItemsForMap) //TODO: Change to some repository invocation
             }
         }.onStart { emit(listOf()) }

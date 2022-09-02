@@ -175,6 +175,7 @@ fun SearchScreen(
                     {
                         coroutineScope.launch {
                             //TODO: Find better way
+                            //TODO: Don't do it if filters changed
                             delay(50) //Without delay doesn't work...
                             listState.scrollToItem(lastScrollIndex)
                         }
