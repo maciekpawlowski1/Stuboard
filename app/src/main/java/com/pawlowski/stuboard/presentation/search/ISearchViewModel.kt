@@ -8,4 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface ISearchViewModel {
     val uiState: StateFlow<SearchUiState>
     val pagingData: Flow<PagingData<EventItemForPreview>>?
+    val lastSavedScrollPosition: StateFlow<Int>
+
+    fun onAction(action: SearchUiAction)
 }

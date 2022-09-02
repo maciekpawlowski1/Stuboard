@@ -4,17 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -36,14 +30,17 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.search.ISearchViewModel
+import com.pawlowski.stuboard.presentation.search.SearchUiAction
 import com.pawlowski.stuboard.presentation.search.SearchUiState
 import com.pawlowski.stuboard.presentation.search.SearchViewModel
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
@@ -100,7 +97,10 @@ fun SearchScreen(
             val lazyPagingItems = viewModel.pagingData?.collectAsLazyPagingItems()
             if (lazyPagingItems != null) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    val listState = rememberLazyGridState() //TODO: Remember where last time scrolled and start from this place
+                    val coroutineScope = rememberCoroutineScope()
+                    val lastScrollIndex = viewModel.lastSavedScrollPosition.collectAsState().value
+                    val listState = rememberLazyGridState(initialFirstVisibleItemIndex = lastScrollIndex)
+
                     LazyVerticalGrid(
                         state = listState,
                         columns = GridCells.Fixed(2),
@@ -171,11 +171,25 @@ fun SearchScreen(
                         }
                     }
 
+                    DisposableEffect(lazyPagingItems)
+                    {
+                        coroutineScope.launch {
+                            //TODO: Find better way
+                            delay(50) //Without delay doesn't work...
+                            listState.scrollToItem(lastScrollIndex)
+                        }
+
+                        onDispose()
+                        {
+                            viewModel.onAction(SearchUiAction.SaveScrollPosition(listState.firstVisibleItemIndex))
+                        }
+                    }
+
                     Column(modifier = Modifier
                         .align(BottomCenter)
                         .width(130.dp)
                         .height(100.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = CenterHorizontally
                         ) {
                         AnimatedVisibility(visible = !listState.isScrollInProgress) {
                             GoToMapButton()
@@ -419,6 +433,12 @@ fun SearchScreenPreview() {
             )
             override val pagingData: Flow<PagingData<EventItemForPreview>>?
                 get() = null
+
+            override val lastSavedScrollPosition: StateFlow<Int> = MutableStateFlow(0)
+
+            override fun onAction(action: SearchUiAction) {
+                TODO("Not yet implemented")
+            }
 
         })
     }

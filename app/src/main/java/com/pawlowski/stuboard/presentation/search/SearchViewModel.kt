@@ -9,6 +9,7 @@ import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,9 +24,23 @@ class SearchViewModel @Inject constructor(
     override val pagingData: Flow<PagingData<EventItemForPreview>> = getEventsPagingStreamUseCase(
         listOf()).cachedIn(viewModelScope)
 
+    private val _lastSavedScrollPosition = MutableStateFlow(0)
+    override val lastSavedScrollPosition: StateFlow<Int>
+        get() = _lastSavedScrollPosition.asStateFlow()
+
     private val _uiState = MutableStateFlow(initialUiState)
+
     override val uiState: StateFlow<SearchUiState>
         get() = _uiState
+
+    override fun onAction(action: SearchUiAction) {
+        when (action)
+        {
+            is SearchUiAction.SaveScrollPosition -> {
+                _lastSavedScrollPosition.update { action.scrollPosition }
+            }
+        }
+    }
 
     val updateUiStateJob = selectedFilters
         .onEach{ selectedFilters ->
