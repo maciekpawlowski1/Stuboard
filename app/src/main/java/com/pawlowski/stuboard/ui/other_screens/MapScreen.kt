@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -27,6 +28,10 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.filters.FilterModel
+import com.pawlowski.stuboard.presentation.map.IMapViewModel
+import com.pawlowski.stuboard.presentation.map.MapUiState
+import com.pawlowski.stuboard.presentation.map.MapViewModel
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventMarker
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
@@ -35,6 +40,8 @@ import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.Orange
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
@@ -42,11 +49,18 @@ import kotlinx.coroutines.launch
 fun MapScreen(
     preview: Boolean = false,
     onNavigateBack: () -> Unit = {},
-    onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {}
+    onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {},
+    viewModel: IMapViewModel = hiltViewModel<MapViewModel>()
 ) {
     BackHandler(onBack = onNavigateBack)
-
-    val events = PreviewUtils.defaultEventItemsForMap
+    val uiState = viewModel.uiState.collectAsState()
+    val uiStateValue = uiState.value
+    val events = if (uiStateValue is MapUiState.Success)
+        uiStateValue.events
+    else
+    {
+        listOf()
+    }
     var selectedEventId by remember {
         mutableStateOf(events.getOrNull(0)?.eventId)
     }
@@ -70,7 +84,7 @@ fun MapScreen(
 
         FiltersHeader(
             "Kraków",
-            listOf("Naukowe", "Koncerty", "Na zewnątrz"),
+            uiStateValue.currentFilters,
             onBackClick = { onNavigateBack.invoke() }
         )
 
@@ -132,7 +146,7 @@ fun MapScreen(
 @Composable
 fun FiltersHeader(
     cityFilter: String,
-    categoryFilters: List<String>,
+    categoryFilters: List<FilterModel>,
     onCardClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     onTuneFiltersClick: () -> Unit = {}
@@ -140,7 +154,7 @@ fun FiltersHeader(
     val filtersText = if (categoryFilters.isEmpty())
         "Wydarzenia w $cityFilter"
     else {
-        val categoriesAppend = categoryFilters.reduce { acc, s ->
+        val categoriesAppend = categoryFilters.map { it.tittle }.reduce { acc, s ->
             "$acc - $s"
         }
 
@@ -235,9 +249,10 @@ fun EventsPager(
     val changesCount = remember {
         mutableStateOf(0)
     }
-    LaunchedEffect(key1 = pageIndex)
+    LaunchedEffect(key1 = pageIndex, key2 = events)
     {
-        onPageChanged.invoke(pageIndex, changesCount.value++)
+        if(events.isNotEmpty())
+            onPageChanged.invoke(pageIndex, changesCount.value++)
     }
 }
 
@@ -301,5 +316,13 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) 
 @Preview(showBackground = true)
 @Composable
 fun MapScreenPreview() {
-    MapScreen(preview = true)
+    MapScreen(preview = true, viewModel = object: IMapViewModel
+    {
+        override val uiState: StateFlow<MapUiState> = MutableStateFlow(
+            MapUiState.Success(
+                events = PreviewUtils.defaultEventItemsForMap,
+                _currentFilters = PreviewUtils.defaultFilters
+            )
+        )
+    })
 }
