@@ -13,23 +13,49 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService): EventsRepository {
+class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = flow {
         val firstEmit = listOf(
-            HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = true, listOf()),
-            HomeEventTypeSuggestion(suggestionType = "Online", isLoading = true, listOf())
+            HomeEventTypeSuggestion(
+                suggestionType = "Najwcześniej",
+                isLoading = true,
+                events = listOf()
+            ),
+            HomeEventTypeSuggestion(
+                suggestionType = "Online",
+                isLoading = true,
+                events = listOf(),
+                suggestionFilters = listOf(FilterModel.Place.Online),
+            )
         )
         emit(firstEmit)
         delay(1500)
         val secondEmit = listOf(
-        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, PreviewUtils.defaultEventPreviews),
-        HomeEventTypeSuggestion(suggestionType = "Online", isLoading = true, listOf())
+            HomeEventTypeSuggestion(
+                suggestionType = "Najwcześniej",
+                isLoading = false,
+                events = PreviewUtils.defaultEventPreviews
+            ),
+            HomeEventTypeSuggestion(
+                suggestionType = "Online",
+                isLoading = true,
+                events = listOf(),
+                suggestionFilters = listOf(FilterModel.Place.Online),
+            )
         )
         emit(secondEmit)
         delay(1000)
         val thirdEmit = listOf(
-            HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, PreviewUtils.defaultEventPreviews),
-            HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" })
+            HomeEventTypeSuggestion(
+                suggestionType = "Najwcześniej",
+                isLoading = false,
+                events = PreviewUtils.defaultEventPreviews
+            ),
+            HomeEventTypeSuggestion(suggestionType = "Online",
+                isLoading = false,
+                events = PreviewUtils.defaultEventPreviews.filter { it.place.lowercase() == "online" },
+                suggestionFilters = listOf(FilterModel.Place.Online),
+            )
         )
         emit(thirdEmit)
     }
@@ -46,7 +72,12 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService): Ev
                 pageSize = 10,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { EventsPagingSourceFactory(eventsService = eventsService, filters = filters)}
+            pagingSourceFactory = {
+                EventsPagingSourceFactory(
+                    eventsService = eventsService,
+                    filters = filters
+                )
+            }
         ).flow
     }
 
