@@ -2,7 +2,6 @@ package com.pawlowski.stuboard.ui.login_screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +21,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -33,7 +33,7 @@ import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.sign_in_animation))
         val progress by animateLottieCompositionAsState(
@@ -85,7 +85,9 @@ fun LoginScreen() {
                     contentDescription = ""
                 )
             },
-            colors = textFieldColors
+            colors = textFieldColors,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+
         )
 
 
@@ -98,6 +100,7 @@ fun LoginScreen() {
             value = "",
             label = { Text(text = "Hasło") },
             onValueChange = {},
+            visualTransformation = PasswordVisualTransformation(),
             leadingIcon =
             {
                 Icon(
@@ -124,7 +127,7 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(10.dp))
         LogInByGoogleButton()
         Spacer(modifier = Modifier.height(10.dp))
-        Text(modifier = Modifier.align(CenterHorizontally).clickable {  },
+        Text(modifier = Modifier.align(CenterHorizontally).clickable { onNavigateToRegisterScreen.invoke() },
             fontFamily = montserratFont,
             text = buildAnnotatedString {
             append("Nie masz konta? ")
