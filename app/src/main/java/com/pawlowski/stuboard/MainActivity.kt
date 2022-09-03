@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import com.pawlowski.stuboard.ui.navigation.LoginRootComposable
 import com.pawlowski.stuboard.ui.navigation.RootComposable
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +26,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    RootComposable()
+                    //RootComposable()
+                    LoginRootComposable()
                 }
             }
         }
