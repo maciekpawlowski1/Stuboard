@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pawlowski.stuboard.ui.login_screens.LoginScreen
-import com.pawlowski.stuboard.ui.register_screen.RegisterScreen1
+import com.pawlowski.stuboard.ui.register_screen.RegisterScreen
 
 @Composable
 fun LoginNavigationGraph(navController: NavHostController)
@@ -20,7 +20,7 @@ fun LoginNavigationGraph(navController: NavHostController)
         }
         composable(route = "Register")
         {
-            RegisterScreen1(onNavigateBack = {
+            RegisterScreen(onNavigateBack = {
                 navController.popBackStack()
             })
         }
