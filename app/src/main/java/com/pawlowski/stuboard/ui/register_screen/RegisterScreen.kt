@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -127,13 +128,26 @@ fun RegisterScreen(onNavigateBack: () -> Unit = {})
                     )
                 }
                 RegisterScreenType.SECOND_NORMAL -> {
-                    RegisterScreenContent2Normal(horizontalPadding = horizontalPadding, onNextClick = {}, onPreviousClick = {currentScreenState.value = RegisterScreenType.FIRST_BOTH})
+                    RegisterScreenContent2Normal(horizontalPadding = horizontalPadding,
+                        onNextClick = {
+                        currentScreenState.value = RegisterScreenType.THIRD_NORMAL
+                    },
+                        onPreviousClick = {
+                            currentScreenState.value = RegisterScreenType.FIRST_BOTH
+                        }
+                    )
                 }
                 RegisterScreenType.SECOND_ORGANISATION -> {
 
                 }
                 RegisterScreenType.THIRD_NORMAL -> {
-
+                    RegisterScreenContent3Normal(
+                        horizontalPadding = horizontalPadding,
+                        onCreateAccountClick = { /*TODO*/ },
+                        onPreviousClick = {
+                            currentScreenState.value = RegisterScreenType.SECOND_NORMAL
+                        }
+                    )
                 }
                 RegisterScreenType.THIRD_ORGANISATION -> {
 
@@ -286,7 +300,100 @@ private fun RegisterScreenContent2Normal(
                 .padding(horizontal = horizontalPadding),
             onClick = { onPreviousClick.invoke() },
         ) {
-            Text(text = "Poprzedni", color= Color.DarkGray)
+            Text(text = "Poprzednia", color= Color.DarkGray)
+        }
+        Spacer(modifier = Modifier.height(15.dp))
+    }
+
+}
+
+@Composable
+private fun RegisterScreenContent3Normal(
+    horizontalPadding: Dp,
+    onCreateAccountClick: () -> Unit,
+    onPreviousClick: () -> Unit
+)
+{
+    Column {
+        val textFieldColors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Green,
+            focusedLabelColor = Green,
+            cursorColor = Green,
+            backgroundColor = Color.White
+        )
+        //TODO: Add some vertical scroll or something to textFields will be visible when keyboard appears
+        //TODO: But remember about footer buttons
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            value = "",
+            label = { Text(text = "Hasło") },
+            onValueChange = {},
+            visualTransformation = PasswordVisualTransformation(),
+            leadingIcon =
+            {
+                Icon(
+                    painter = painterResource(id = R.drawable.password_icon),
+                    contentDescription = ""
+                )
+            },
+            colors = textFieldColors,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            value = "",
+            label = { Text(text = "Powtórz hasło") },
+            onValueChange = {},
+            visualTransformation = PasswordVisualTransformation(),
+            leadingIcon =
+            {
+                Icon(
+                    painter = painterResource(id = R.drawable.password_icon),
+                    contentDescription = ""
+                )
+            },
+            colors = textFieldColors,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+
+        Text(
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 15.dp),
+            text = "* Hasło musi się składać z przynajmniej 6 znaków i musi zawierać przynajmniej jedną małą literę, dużą literę oraz cyfrę",
+            fontFamily = montserratFont,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            )
+
+        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding, vertical = 10.dp),
+            onClick = { onCreateAccountClick.invoke() },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Green)
+        ) {
+            Text(text = "Utwórz konto", color = Color.White)
+        }
+
+
+        OutlinedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding),
+            onClick = { onPreviousClick.invoke() },
+        ) {
+            Text(text = "Poprzednia", color= Color.DarkGray)
         }
         Spacer(modifier = Modifier.height(15.dp))
     }
