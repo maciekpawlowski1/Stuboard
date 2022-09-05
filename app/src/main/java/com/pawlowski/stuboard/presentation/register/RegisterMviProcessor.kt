@@ -25,6 +25,15 @@ class RegisterMviProcessor @Inject constructor(
                     is RegisterIntent.ChangeNameInputValue -> {
                         state.copy(name = intent.newValue)
                     }
+                    is RegisterIntent.ChangeSurnameInputValue -> {
+                        state.copy(surname = intent.newValue)
+                    }
+                    is RegisterIntent.ChangePasswordInputValue -> {
+                        state.copy(password = intent.newValue)
+                    }
+                    is RegisterIntent.ChangeRepeatedPasswordInputValue -> {
+                        state.copy(repeatedPassword = intent.newValue)
+                    }
                     is RegisterIntent.NextClicked -> {
                         val selectedAccountType = state.accountType
                         if(selectedAccountType == AccountType.NORMAL)
@@ -37,6 +46,15 @@ class RegisterMviProcessor @Inject constructor(
                         else{
                             TODO()
                         }
+                    }
+                    is RegisterIntent.ClearPasswordsInput -> {
+                        state.copy(password = "", repeatedPassword = "")
+                    }
+                    is RegisterIntent.ChangePasswordVisibility -> {
+                        state.copy(showPasswordPreview = !state.showPasswordPreview)
+                    }
+                    is RegisterIntent.ChangeRepeatedPasswordVisibility -> {
+                        state.copy(showRepeatedPasswordPreview = !state.showRepeatedPasswordPreview)
                     }
                     is RegisterIntent.PreviousClicked -> {
                         val selectedAccountType = state.accountType
@@ -64,6 +82,7 @@ class RegisterMviProcessor @Inject constructor(
     ): RegisterIntent? {
         return when(intent) {
             is RegisterIntent.ChangeAccountType -> null
+            is RegisterIntent.PreviousClicked -> RegisterIntent.ClearPasswordsInput
             else -> null
         }
     }

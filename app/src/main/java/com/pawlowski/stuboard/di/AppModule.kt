@@ -62,6 +62,10 @@ class AppModule {
 
     @Singleton
     @Provides
+    fun accountsRepository(accountsRepository: AccountsRepository): IAccountsRepository = accountsRepository
+
+    @Singleton
+    @Provides
     fun firebaseAuth() = FirebaseAuth.getInstance()
 
     @Singleton

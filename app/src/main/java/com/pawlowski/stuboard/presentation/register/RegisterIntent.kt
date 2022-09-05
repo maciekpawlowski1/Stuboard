@@ -14,6 +14,7 @@ sealed interface RegisterIntent: Intent {
     data class ChangePasswordInputValue(val newValue: String): RegisterIntent
     data class ChangeRepeatedPasswordInputValue(val newValue: String): RegisterIntent
     object ChangePasswordVisibility: RegisterIntent
-
+    object ChangeRepeatedPasswordVisibility: RegisterIntent
+    object ClearPasswordsInput: RegisterIntent
 
 }
