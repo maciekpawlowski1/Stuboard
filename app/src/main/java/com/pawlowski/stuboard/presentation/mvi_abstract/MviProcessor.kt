@@ -13,12 +13,23 @@ abstract class MviProcessor<S: State, I: Intent, E: SingleEvent>: ViewModel()
         MutableStateFlow(initialState)
     }
 
+    private val _singleEvent: MutableSharedFlow<E> = MutableSharedFlow()
+
     val viewState: StateFlow<S>
         get() = _viewState.asStateFlow()
+
+    val singleEvent: Flow<E> = _singleEvent
 
     fun sendIntent(intent: I) {
         viewModelScope.launch {
             _intent.emit(intent)
+        }
+    }
+
+    protected fun triggerSingleEvent(singleEvent: E)
+    {
+        viewModelScope.launch {
+            _singleEvent.emit(singleEvent)
         }
     }
 
