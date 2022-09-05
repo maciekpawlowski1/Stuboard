@@ -1,6 +1,6 @@
 package com.pawlowski.stuboard.domain
 
-import com.pawlowski.stuboard.data.IFiltersDao
+import com.pawlowski.stuboard.data.local.IFiltersDao
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

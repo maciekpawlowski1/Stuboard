@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.data
+package com.pawlowski.stuboard.data.local
 
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import kotlinx.coroutines.flow.Flow

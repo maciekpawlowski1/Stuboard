@@ -1,5 +1,6 @@
-package com.pawlowski.stuboard.data
+package com.pawlowski.stuboard.data.local
 
+import com.pawlowski.stuboard.data.ISuggestedFiltersProvider
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject

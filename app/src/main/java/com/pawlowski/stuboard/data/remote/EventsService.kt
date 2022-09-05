@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.data
+package com.pawlowski.stuboard.data.remote
 
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 

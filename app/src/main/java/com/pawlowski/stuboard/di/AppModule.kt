@@ -1,7 +1,13 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
+import com.google.firebase.auth.FirebaseAuth
 import com.pawlowski.stuboard.data.*
+import com.pawlowski.stuboard.data.authentication.AuthManager
+import com.pawlowski.stuboard.data.authentication.IAuthManager
+import com.pawlowski.stuboard.data.remote.FakeEventsService
+import com.pawlowski.stuboard.data.local.IFiltersDao
+import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.presentation.use_cases.*
 import dagger.Module
@@ -53,6 +59,14 @@ class AppModule {
     {
         return InMemoryFiltersDao(suggestedFiltersProvider)
     }
+
+    @Singleton
+    @Provides
+    fun firebaseAuth() = FirebaseAuth.getInstance()
+
+    @Singleton
+    @Provides
+    fun authManager(authManager: AuthManager): IAuthManager = authManager
 
     @Singleton
     @Provides
