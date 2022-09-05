@@ -8,10 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,8 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.register.IRegisterMviProcessor
+import com.pawlowski.stuboard.presentation.register.RegisterIntent
+import com.pawlowski.stuboard.presentation.register.RegisterMviProcessor
+import com.pawlowski.stuboard.presentation.register.RegisterUiState
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -33,14 +35,16 @@ const val ANIMATION_TIME = 1000
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun RegisterScreen(onNavigateBack: () -> Unit = {})
+fun RegisterScreen(onNavigateBack: () -> Unit = {}, viewModel: IRegisterMviProcessor = hiltViewModel<RegisterMviProcessor>())
 {
-    val selectedAccountType = remember {
-        mutableStateOf(AccountType.NORMAL)
+    val uiState = viewModel.viewState.collectAsState()
+    val selectedAccountTypeState = derivedStateOf {
+        uiState.value.accountType
     }
 
-    val currentScreenState = remember {
-        mutableStateOf(RegisterScreenType.FIRST_BOTH)
+
+    val currentScreenState = derivedStateOf {
+        uiState.value.currentScreen
     }
 
 
@@ -122,18 +126,18 @@ fun RegisterScreen(onNavigateBack: () -> Unit = {})
                 RegisterScreenType.FIRST_BOTH -> {
                     RegisterScreenContent1(
                         horizontalPadding = horizontalPadding,
-                        selectedAccountType = selectedAccountType.value,
-                        onAccountTypeSelected = { selectedAccountType.value = it },
-                        onNextClick = { currentScreenState.value = RegisterScreenType.SECOND_NORMAL },
+                        selectedAccountType = selectedAccountTypeState.value,
+                        onAccountTypeSelected = { viewModel.sendIntent(RegisterIntent.ChangeAccountType(it)) },
+                        onNextClick = { viewModel.sendIntent(RegisterIntent.NextClicked) },
                     )
                 }
                 RegisterScreenType.SECOND_NORMAL -> {
                     RegisterScreenContent2Normal(horizontalPadding = horizontalPadding,
                         onNextClick = {
-                        currentScreenState.value = RegisterScreenType.THIRD_NORMAL
+                            viewModel.sendIntent(RegisterIntent.NextClicked)
                     },
                         onPreviousClick = {
-                            currentScreenState.value = RegisterScreenType.FIRST_BOTH
+                            viewModel.sendIntent(RegisterIntent.PreviousClicked)
                         }
                     )
                 }
@@ -145,7 +149,8 @@ fun RegisterScreen(onNavigateBack: () -> Unit = {})
                         horizontalPadding = horizontalPadding,
                         onCreateAccountClick = { /*TODO*/ },
                         onPreviousClick = {
-                            currentScreenState.value = RegisterScreenType.SECOND_NORMAL
+                            viewModel.sendIntent(RegisterIntent.PreviousClicked)
+
                         }
                     )
                 }
@@ -482,5 +487,21 @@ private fun NotSelectedText(text: String)
 @Composable
 fun RegisterScreenPreview()
 {
-    RegisterScreen()
+    RegisterScreen(viewModel = object : IRegisterMviProcessor()
+    {
+        override fun initialState(): RegisterUiState {
+            return RegisterUiState()
+        }
+
+        override val reducer: Reducer<RegisterUiState, RegisterIntent>
+            get() = TODO("Not yet implemented")
+
+        override suspend fun handleIntent(
+            intent: RegisterIntent,
+            state: RegisterUiState
+        ): RegisterIntent? {
+            TODO("Not yet implemented")
+        }
+
+    })
 }
