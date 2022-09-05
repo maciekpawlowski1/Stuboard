@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.pawlowski.stuboard.ui.login_screens.LoginNavigationCallbacks
 import com.pawlowski.stuboard.ui.login_screens.LoginScreen
 import com.pawlowski.stuboard.ui.register_screen.RegisterScreen
 
@@ -14,9 +15,11 @@ fun LoginNavigationGraph(navController: NavHostController)
     {
         composable(route = "Login")
         {
-            LoginScreen(onNavigateToRegisterScreen = {
-                navController.navigate("Register")
-            })
+            LoginScreen(navigationCallbacks = LoginNavigationCallbacks(
+                onNavigateToRegisterScreen = {
+                    navController.navigate("Register")
+                },
+            ))
         }
         composable(route = "Register")
         {

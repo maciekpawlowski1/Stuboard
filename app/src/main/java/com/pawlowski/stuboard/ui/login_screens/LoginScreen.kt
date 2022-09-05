@@ -8,8 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -27,14 +26,35 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.login.ILoginMviProcessor
+import com.pawlowski.stuboard.presentation.login.LoginMviProcessor
+import com.pawlowski.stuboard.presentation.login.LoginIntent
+import com.pawlowski.stuboard.presentation.login.LoginUiState
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
+data class LoginNavigationCallbacks(
+    val onNavigateToRegisterScreen: () -> Unit = {}
+)
+
 @Composable
-fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
+fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationCallbacks(),
+                viewModel: ILoginMviProcessor = hiltViewModel<LoginMviProcessor>(),
+) {
+    val uiState = viewModel.viewState.collectAsState()
+    val emailState = derivedStateOf {
+        uiState.value.email
+    }
+
+    val passwordState = derivedStateOf {
+        uiState.value.password
+    }
+
+
     Column(Modifier.verticalScroll(rememberScrollState())) {
         val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.sign_in_animation))
         val progress by animateLottieCompositionAsState(
@@ -76,9 +96,9 @@ fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
                 .align(CenterHorizontally),
-            value = "",
+            value = emailState.value,
             label = { Text(text = "Adres e-mail") },
-            onValueChange = {},
+            onValueChange = { viewModel.sendIntent(LoginIntent.ChangeEmailInputValue(it)) },
             leadingIcon =
             {
                 Icon(
@@ -98,9 +118,9 @@ fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
                 .padding(horizontal = 15.dp)
                 .fillMaxWidth()
                 .align(CenterHorizontally),
-            value = "",
+            value = passwordState.value,
             label = { Text(text = "Hasło") },
-            onValueChange = {},
+            onValueChange = { viewModel.sendIntent(LoginIntent.ChangePasswordInputValue(it)) },
             visualTransformation = PasswordVisualTransformation(),
             leadingIcon =
             {
@@ -119,7 +139,7 @@ fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp, vertical = 10.dp),
             shape = RoundedCornerShape(20.dp),
-            onClick = { /*TODO*/ }, 
+            onClick = { /*TODO*/ },
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
             Text(text = "Zaloguj się", color = Color.White)
         }
@@ -130,7 +150,7 @@ fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
         Spacer(modifier = Modifier.height(10.dp))
         Text(modifier = Modifier
             .align(CenterHorizontally)
-            .clickable { onNavigateToRegisterScreen.invoke() },
+            .clickable { navigationCallbacks.onNavigateToRegisterScreen.invoke() },
             fontFamily = montserratFont,
             text = buildAnnotatedString {
             append("Nie masz konta? ")
@@ -209,5 +229,21 @@ fun ContinueAnonymousButton()
 @Composable
 fun LoginScreenPreview()
 {
-    LoginScreen()
+    LoginScreen(viewModel = object : ILoginMviProcessor()
+    {
+        override fun initialState(): LoginUiState {
+            return LoginUiState()
+        }
+
+        override val reducer: Reducer<LoginUiState, LoginIntent>
+            get() = TODO("Not yet implemented")
+
+        override suspend fun handleIntent(
+            intent: LoginIntent,
+            state: LoginUiState
+        ): LoginIntent? {
+            TODO("Not yet implemented")
+        }
+
+    })
 }

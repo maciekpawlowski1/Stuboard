@@ -2,10 +2,7 @@ package com.pawlowski.stuboard.presentation.mvi_abstract
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 abstract class MviProcessor<S: State, I: Intent, E: SingleEvent>: ViewModel()
@@ -16,7 +13,8 @@ abstract class MviProcessor<S: State, I: Intent, E: SingleEvent>: ViewModel()
         MutableStateFlow(initialState)
     }
 
-    val viewState: StateFlow<S> = _viewState
+    val viewState: StateFlow<S>
+        get() = _viewState.asStateFlow()
 
     fun sendIntent(intent: I) {
         viewModelScope.launch {
