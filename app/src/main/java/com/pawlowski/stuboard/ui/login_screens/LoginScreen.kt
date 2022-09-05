@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
@@ -127,7 +128,9 @@ fun LoginScreen(onNavigateToRegisterScreen: () -> Unit = {}) {
         Spacer(modifier = Modifier.height(10.dp))
         LogInByGoogleButton()
         Spacer(modifier = Modifier.height(10.dp))
-        Text(modifier = Modifier.align(CenterHorizontally).clickable { onNavigateToRegisterScreen.invoke() },
+        Text(modifier = Modifier
+            .align(CenterHorizontally)
+            .clickable { onNavigateToRegisterScreen.invoke() },
             fontFamily = montserratFont,
             text = buildAnnotatedString {
             append("Nie masz konta? ")
@@ -200,4 +203,11 @@ fun ContinueAnonymousButton()
         }
 
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview()
+{
+    LoginScreen()
 }

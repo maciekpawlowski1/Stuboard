@@ -4,5 +4,11 @@
     <string name="home">Home</string>
     <string name="search">Szukaj</string>
     <string name="search_for_events">Szukaj wydarzeń</string>
+    <string name="email_cannot_be_empty">To pole jest wymagane!</string>
+    <string name="email_is_incorrect">E-mail jest niepoprawny!</string>
+    <string name="password_cannot_be_empty">To pole jest wymagane!</string>
+    <string name="password_to_short">Hasło jest za krótkie!</string>
+    <string name="password_is_to_weak">Hasło jest za słabe!</string>
+
 
 </resources>

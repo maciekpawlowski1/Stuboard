@@ -3,4 +3,9 @@
     <string name="home">Home</string>
     <string name="search">Search</string>
     <string name="search_for_events">Search for events</string>
+    <string name="email_cannot_be_empty">Email cannot be empty!</string>
+    <string name="email_is_incorrect">Email is incorrect!</string>
+    <string name="password_cannot_be_empty">Password cannot be empty!</string>
+    <string name="password_to_short">Password is to short!</string>
+    <string name="password_is_to_weak">Password is to weak!</string>
 </resources>
