@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -14,11 +15,14 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -101,6 +105,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
             cursorColor = Green,
             backgroundColor = Color.White
         )
+        val focusManager = LocalFocusManager.current
 
         OutlinedTextField(
             modifier = Modifier
@@ -118,9 +123,11 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                     contentDescription = ""
                 )
             },
+            maxLines = 1,
+            singleLine = true,
             colors = textFieldColors,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = {focusManager.moveFocus(FocusDirection.Down)})
         )
 
 
@@ -132,6 +139,8 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                 .align(CenterHorizontally),
             value = passwordState.value,
             label = { Text(text = "Hasło") },
+            maxLines = 1,
+            singleLine = true,
             onValueChange = { viewModel.sendIntent(LoginIntent.ChangePasswordInputValue(it)) },
             visualTransformation = if(!showPasswordState.value)
                     PasswordVisualTransformation()
