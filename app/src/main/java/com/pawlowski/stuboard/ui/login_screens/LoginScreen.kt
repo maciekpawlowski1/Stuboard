@@ -21,6 +21,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +50,10 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
 
     val passwordState = derivedStateOf {
         uiState.value.password
+    }
+
+    val showPasswordState = derivedStateOf {
+        uiState.value.showPasswordPreview
     }
 
     LaunchedEffect(true) {
@@ -128,13 +133,27 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
             value = passwordState.value,
             label = { Text(text = "Hasło") },
             onValueChange = { viewModel.sendIntent(LoginIntent.ChangePasswordInputValue(it)) },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if(!showPasswordState.value)
+                    PasswordVisualTransformation()
+                else
+                    VisualTransformation.None,
             leadingIcon =
             {
                 Icon(
                     painter = painterResource(id = R.drawable.password_icon),
                     contentDescription = ""
                 )
+            },
+            trailingIcon = {
+                   Icon(painter = painterResource(
+                       id = if (showPasswordState.value)
+                           R.drawable.visibility_on_icon
+                       else
+                           R.drawable.visibility_off_icon
+                       ),
+                       contentDescription = "",
+                       modifier = Modifier.clickable { viewModel.sendIntent(LoginIntent.ChangeVisibilityOfPassword) }
+                   )
             },
             colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)

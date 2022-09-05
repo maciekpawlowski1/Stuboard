@@ -18,6 +18,9 @@ class LoginMviProcessor @Inject constructor(): ILoginMviProcessor() {
                     is LoginIntent.ChangePasswordInputValue -> {
                         state.copy(password = intent.newValue)
                     }
+                    is LoginIntent.ChangeVisibilityOfPassword -> {
+                        state.copy(showPasswordPreview = !state.showPasswordPreview)
+                    }
                     else -> {
                         state
                     }

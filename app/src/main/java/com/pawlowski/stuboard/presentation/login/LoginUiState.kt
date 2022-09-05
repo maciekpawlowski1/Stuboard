@@ -8,5 +8,5 @@ data class LoginUiState(
     val emailError: UiText? = null,
     val password: String = "",
     val passwordError: UiText? = null,
-    val showPreviewPassword: Boolean = false
+    val showPasswordPreview: Boolean = false
 ): State
