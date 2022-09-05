@@ -8,5 +8,5 @@ interface IAuthManager {
     suspend fun signInWithPassword(mail: String, password: String): AuthResult?
     suspend fun registerWithPassword(mail: String, password: String): AuthResult?
     suspend fun signInWithGoogle()
-
+    suspend fun getApiToken(): String?
 }

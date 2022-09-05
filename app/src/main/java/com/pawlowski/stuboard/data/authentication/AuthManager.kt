@@ -37,4 +37,8 @@ class AuthManager @Inject constructor(
     override suspend fun signInWithGoogle() {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getApiToken(): String? {
+        return firebaseAuth.currentUser?.getIdToken(true)?.await()?.token
+    }
 }
