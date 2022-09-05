@@ -4,5 +4,5 @@ import com.pawlowski.stuboard.presentation.mvi_abstract.SingleEvent
 
 sealed interface LoginSingleEvent: SingleEvent
 {
-    object NavigateToRegisterScreen
+    object NavigateToRegisterScreen: LoginSingleEvent
 }

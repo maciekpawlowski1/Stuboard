@@ -29,10 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import com.pawlowski.stuboard.R
-import com.pawlowski.stuboard.presentation.login.ILoginMviProcessor
-import com.pawlowski.stuboard.presentation.login.LoginMviProcessor
-import com.pawlowski.stuboard.presentation.login.LoginIntent
-import com.pawlowski.stuboard.presentation.login.LoginUiState
+import com.pawlowski.stuboard.presentation.login.*
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -52,6 +49,16 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
 
     val passwordState = derivedStateOf {
         uiState.value.password
+    }
+
+    LaunchedEffect(true) {
+        viewModel.singleEvent.collect { event ->
+            when(event) {
+                is LoginSingleEvent.NavigateToRegisterScreen -> {
+                    navigationCallbacks.onNavigateToRegisterScreen()
+                }
+            }
+        }
     }
 
 
@@ -150,7 +157,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         Spacer(modifier = Modifier.height(10.dp))
         Text(modifier = Modifier
             .align(CenterHorizontally)
-            .clickable { navigationCallbacks.onNavigateToRegisterScreen.invoke() },
+            .clickable { viewModel.sendIntent(LoginIntent.RegisterClick) },
             fontFamily = montserratFont,
             text = buildAnnotatedString {
             append("Nie masz konta? ")

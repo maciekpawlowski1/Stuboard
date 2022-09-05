@@ -29,6 +29,11 @@ class LoginMviProcessor @Inject constructor(): ILoginMviProcessor() {
         return when(intent) {
             is LoginIntent.ChangeEmailInputValue -> null
             is LoginIntent.ChangePasswordInputValue -> null
+            is LoginIntent.RegisterClick -> {
+                triggerSingleEvent(LoginSingleEvent.NavigateToRegisterScreen)
+                null
+            }
+            else -> null
         }
     }
 }
