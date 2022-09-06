@@ -11,4 +11,5 @@ sealed class LoginIntent: Intent {
     object LoginByGoogleClick: LoginIntent()
     object TryWithoutLoggingInClick: LoginIntent()
     object StopLoading: LoginIntent()
+    object ClearLoginInputs: LoginIntent()
 }

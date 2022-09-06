@@ -45,7 +45,13 @@ fun LoginNavigationGraph(navController: NavHostController, startDestination: Str
         }
         composable(route = "Root")
         {
-            RootComposable()
+            RootComposable(onNavigateToLoginScreen = {
+                navController.navigate("Login")
+                {
+                    popUpTo("Login")
+                    launchSingleTop = true
+                }
+            })
         }
     }
 }

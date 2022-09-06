@@ -6,6 +6,7 @@ sealed class BottomNavItems(val route: String, val tittleId: Int, val drawableId
 {
     object Home: BottomNavItems(NavRoutes.HOME, R.string.home, R.drawable.home_icon)
     object Search: BottomNavItems(NavRoutes.SEARCH, R.string.search, R.drawable.search_icon)
+    object Account: BottomNavItems(NavRoutes.ACCOUNT, R.string.account, R.drawable.account_icon)
 }
 
 object NavRoutes
@@ -15,6 +16,7 @@ object NavRoutes
     val EVENT_DETAILS = BasicRoute("EventDetails/{eventId}", "EventDetails")
     const val MAP = "Map"
     const val FILTERS = "Filters"
+    const val ACCOUNT = "Account"
 }
 
 data class BasicRoute(val fullRoute: String, val basicRoute: String)

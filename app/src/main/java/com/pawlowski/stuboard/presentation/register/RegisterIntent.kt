@@ -16,5 +16,5 @@ sealed interface RegisterIntent: Intent {
     object ChangePasswordVisibility: RegisterIntent
     object ChangeRepeatedPasswordVisibility: RegisterIntent
     object ClearPasswordsInput: RegisterIntent
-    data class RegisterFailure(val errorMessage: String?): RegisterIntent
+    object StopShowingLoading : RegisterIntent
 }

@@ -42,6 +42,9 @@ fun RegisterScreen(
                     Toast.makeText(context, "Zarejestrowano pomyślnie!", Toast.LENGTH_LONG).show()
                     onNavigateToRoot.invoke()
                 }
+                is RegisterSingleEvent.RegisterFailure -> {
+                    Toast.makeText(context, event.errorMessage, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

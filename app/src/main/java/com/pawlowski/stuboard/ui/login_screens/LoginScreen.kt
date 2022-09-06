@@ -74,6 +74,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                     navigationCallbacks.onNavigateToRegisterScreen()
                 }
                 is LoginSingleEvent.LoginSuccess -> {
+                    Toast.makeText(context, "Zalogowano pomyślnie!", Toast.LENGTH_LONG).show()
                     navigationCallbacks.onNavigateToRoot()
                 }
                 is LoginSingleEvent.LoginFailure -> {

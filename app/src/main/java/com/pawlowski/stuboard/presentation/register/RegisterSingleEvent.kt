@@ -6,4 +6,6 @@ sealed interface RegisterSingleEvent: SingleEvent
 {
     object NavigateBack: RegisterSingleEvent
     object RegisterSuccess: RegisterSingleEvent
+    data class RegisterFailure(val errorMessage: String): RegisterSingleEvent
+
 }

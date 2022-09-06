@@ -118,8 +118,8 @@ class RegisterMviProcessor @Inject constructor(
                         }
 
                     }
-                    is RegisterIntent.RegisterFailure -> {
-                        state.copy(registerErrorMessage = intent.errorMessage)
+                    is RegisterIntent.StopShowingLoading -> {
+                        state.copy(isLoading = false)
                     }
                     else -> {
                         state
@@ -136,6 +136,8 @@ class RegisterMviProcessor @Inject constructor(
             is RegisterIntent.ChangeAccountType -> null
             is RegisterIntent.PreviousClicked -> RegisterIntent.ClearPasswordsInput
             is RegisterIntent.CreateAccountClicked -> {
+                if(!state.isLoading)
+                    return null // Some validation error
                 val result = registerWithEmailAndPasswordUseCase(state.email.trim(), state.password)
                 return if(result is AuthenticationResult.Success)
                 {
@@ -150,8 +152,11 @@ class RegisterMviProcessor @Inject constructor(
                 }
                 else
                 {
-                    RegisterIntent.RegisterFailure((result as AuthenticationResult.Failure).errorMessage)
+                    triggerSingleEvent(RegisterSingleEvent.RegisterFailure((result as AuthenticationResult.Failure).errorMessage?:"Registration failed!"))
+
+                    RegisterIntent.StopShowingLoading
                 }
+
             }
             else -> null
         }

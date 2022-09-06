@@ -9,11 +9,12 @@ import androidx.navigation.navArgument
 import com.pawlowski.stuboard.ui.other_screens.EventDetailsScreen
 import com.pawlowski.stuboard.ui.other_screens.FiltersScreen
 import com.pawlowski.stuboard.ui.other_screens.MapScreen
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.AccountScreen
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.HomeScreen
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.SearchScreen
 
 @Composable
-fun NavigationGraph(navController: NavHostController)
+fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: () -> Unit)
 {
     NavHost(navController = navController, startDestination = NavRoutes.HOME)
     {
@@ -81,6 +82,13 @@ fun NavigationGraph(navController: NavHostController)
         {
             FiltersScreen(onNavigateBack = {
                 navController.popBackStack()
+            })
+        }
+
+        composable(route = NavRoutes.ACCOUNT)
+        {
+            AccountScreen(onNavigateToLoginScreen = {
+                onNavigateToLoginScreen.invoke()
             })
         }
 

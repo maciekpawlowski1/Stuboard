@@ -31,6 +31,9 @@ class LoginMviProcessor @Inject constructor(
                     is LoginIntent.StopLoading -> {
                         state.copy(isLoading = false)
                     }
+                    is LoginIntent.ClearLoginInputs -> {
+                        LoginUiState()
+                    }
                     else -> {
                         state
                     }
@@ -48,19 +51,15 @@ class LoginMviProcessor @Inject constructor(
             }
             is LoginIntent.LoginClick -> {
                 val loginResult = logInWithEmailAndPasswordUseCase(state.email.trim(), state.password)
-                return if(loginResult is AuthenticationResult.Success)
-                {
-                    triggerSingleEvent(LoginSingleEvent.LoginSuccess)
-                    null
-                }
-                else if(loginResult is AuthenticationResult.Failure)
-                {
-                    triggerSingleEvent(LoginSingleEvent.LoginFailure(loginResult.errorMessage?:"Login failed!"))
-                    LoginIntent.StopLoading
-                }
-                else
-                {
-                    null
+                return when (loginResult) {
+                    is AuthenticationResult.Success -> {
+                        triggerSingleEvent(LoginSingleEvent.LoginSuccess)
+                        LoginIntent.ClearLoginInputs
+                    }
+                    is AuthenticationResult.Failure -> {
+                        triggerSingleEvent(LoginSingleEvent.LoginFailure(loginResult.errorMessage?:"Login failed!"))
+                        LoginIntent.StopLoading
+                    }
                 }
             }
             else -> null

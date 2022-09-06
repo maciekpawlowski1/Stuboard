@@ -11,4 +11,5 @@
     <string name="field_is_required">This field is required!</string>
     <string name="passwords_are_not_the_same">Passwords are not the same!</string>
     <string name="input_to_short">Your input is to short!</string>
+    <string name="account">Account</string>
 </resources>

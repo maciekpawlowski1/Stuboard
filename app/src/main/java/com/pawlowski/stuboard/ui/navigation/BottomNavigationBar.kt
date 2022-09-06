@@ -25,7 +25,8 @@ fun BottomNavigationBar(navController: NavController)
 {
     val items = listOf(
         BottomNavItems.Home,
-        BottomNavItems.Search
+        BottomNavItems.Search,
+        BottomNavItems.Account
     )
 
     val itemRoutes = remember(items)
