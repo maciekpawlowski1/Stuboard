@@ -1,5 +1,9 @@
 package com.pawlowski.stuboard.presentation.register
 
+import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateEmailUseCase
+import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNameOrSurnameUseCase
+import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNewPasswordUseCase
+import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateRepeatedPasswordUseCase
 import com.pawlowski.stuboard.ui.register_screen.AccountType
 import com.pawlowski.stuboard.ui.register_screen.RegisterScreenType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,7 +11,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterMviProcessor @Inject constructor(
-
+    private val validateEmailUseCase: ValidateEmailUseCase,
+    private val validateNewPasswordUseCase: ValidateNewPasswordUseCase,
+    private val validateRepeatedPasswordUseCase: ValidateRepeatedPasswordUseCase,
+    private val validateNameOrSurnameUseCase: ValidateNameOrSurnameUseCase,
 ): IRegisterMviProcessor() {
 
     override fun initialState(): RegisterUiState = RegisterUiState()
@@ -41,14 +48,44 @@ class RegisterMviProcessor @Inject constructor(
                             if(state.currentScreen == RegisterScreenType.FIRST_BOTH)
                                 state.copy(currentScreen = RegisterScreenType.SECOND_NORMAL)
                             else
-                                state.copy(currentScreen = RegisterScreenType.THIRD_NORMAL)
+                            {
+                                val emailValidationResult = validateEmailUseCase.invoke(state.email)
+                                val nameValidationResult = validateNameOrSurnameUseCase.invoke(state.name)
+                                val surnameValidationResult = validateNameOrSurnameUseCase.invoke(state.surname)
+                                if(emailValidationResult.isCorrect && nameValidationResult.isCorrect && surnameValidationResult.isCorrect)
+                                    state.copy(
+                                        currentScreen = RegisterScreenType.THIRD_NORMAL,
+                                        emailError = null,
+                                        nameError = null,
+                                        surnameError = null
+                                    )
+                                else
+                                    state.copy(
+                                        emailError = emailValidationResult.errorMessage,
+                                        nameError = nameValidationResult.errorMessage,
+                                        surnameError = surnameValidationResult.errorMessage
+                                    )
+                            }
                         }
                         else{
                             TODO()
                         }
                     }
                     is RegisterIntent.ClearPasswordsInput -> {
-                        state.copy(password = "", repeatedPassword = "")
+                        state.copy(password = "", repeatedPassword = "", passwordError = null, repeatedPasswordError = null)
+                    }
+                    is RegisterIntent.CreateAccountClicked -> {
+                        val passwordValidationResult = validateNewPasswordUseCase(state.password)
+                        val repeatedPasswordValidationResult = validateRepeatedPasswordUseCase(state.password, state.repeatedPassword)
+                        if(passwordValidationResult.isCorrect && repeatedPasswordValidationResult.isCorrect)
+                        {
+                            //TODO: Register
+                            state.copy(repeatedPasswordError = null, passwordError = null)
+                        }
+                        else
+                        {
+                            state.copy(passwordError = passwordValidationResult.errorMessage, repeatedPasswordError = repeatedPasswordValidationResult.errorMessage)
+                        }
                     }
                     is RegisterIntent.ChangePasswordVisibility -> {
                         state.copy(showPasswordPreview = !state.showPasswordPreview)

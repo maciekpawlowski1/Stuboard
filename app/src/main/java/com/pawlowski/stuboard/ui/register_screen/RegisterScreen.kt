@@ -34,6 +34,7 @@ import com.pawlowski.stuboard.presentation.register.IRegisterMviProcessor
 import com.pawlowski.stuboard.presentation.register.RegisterIntent
 import com.pawlowski.stuboard.presentation.register.RegisterMviProcessor
 import com.pawlowski.stuboard.presentation.register.RegisterUiState
+import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -57,12 +58,17 @@ fun RegisterScreen(
     }
 
     val nameState = derivedStateOf { uiState.value.name }
+    val nameErrorState = derivedStateOf { uiState.value.nameError }
+    val surnameErrorState = derivedStateOf { uiState.value.surnameError }
     val surnameState = derivedStateOf { uiState.value.surname }
     val emailState = derivedStateOf { uiState.value.email }
+    val emailErrorState = derivedStateOf { uiState.value.emailError }
     val passwordState = derivedStateOf { uiState.value.password }
     val repeatedPasswordState = derivedStateOf { uiState.value.repeatedPassword }
     val showPasswordPreviewState = derivedStateOf { uiState.value.showPasswordPreview }
     val showRepeatedPasswordPreviewState = derivedStateOf { uiState.value.showRepeatedPasswordPreview }
+    val passwordErrorState = derivedStateOf { uiState.value.passwordError }
+    val repeatedPasswordErrorState = derivedStateOf { uiState.value.repeatedPasswordError }
 
 
     val horizontalPadding = 10.dp
@@ -179,6 +185,15 @@ fun RegisterScreen(
                                 )
                             )
                         },
+                        emailErrorText = {
+                            emailErrorState.value
+                        },
+                        nameErrorText = {
+                            nameErrorState.value
+                        },
+                        surnameErrorText = {
+                            surnameErrorState.value
+                        }
                     )
                 }
                 RegisterScreenType.SECOND_ORGANISATION -> {
@@ -199,7 +214,9 @@ fun RegisterScreen(
                         showPasswordPreview = {showPasswordPreviewState.value},
                         showRepeatedPasswordPreview = {showRepeatedPasswordPreviewState.value},
                         changePasswordPreview = {viewModel.sendIntent(RegisterIntent.ChangePasswordVisibility)},
-                        changeRepeatedPasswordPreview = {viewModel.sendIntent(RegisterIntent.ChangeRepeatedPasswordVisibility)}
+                        changeRepeatedPasswordPreview = {viewModel.sendIntent(RegisterIntent.ChangeRepeatedPasswordVisibility)},
+                        passwordError = {passwordErrorState.value},
+                        repeatedPasswordError = {repeatedPasswordErrorState.value}
                     )
                 }
                 RegisterScreenType.THIRD_ORGANISATION -> {
@@ -279,8 +296,11 @@ private fun RegisterScreenContent2Normal(
     onNextClick: () -> Unit,
     onPreviousClick: () -> Unit,
     nameValue: () -> String,
+    nameErrorText: () -> UiText?,
     surnameValue: () -> String,
+    surnameErrorText: () -> UiText?,
     emailValue: () -> String,
+    emailErrorText: () -> UiText?,
     onNameChange: (String) -> Unit,
     onSurnameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
@@ -295,6 +315,8 @@ private fun RegisterScreenContent2Normal(
         val focusManager = LocalFocusManager.current
         //TODO: Add some vertical scroll or something to textFields will be visible when keyboard appears
         //TODO: But remember about footer buttons
+
+        val nameErrorTextValue = nameErrorText()?.asString()
         OutlinedTextField(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -315,8 +337,18 @@ private fun RegisterScreenContent2Normal(
                 focusManager.moveFocus(FocusDirection.Down)
             }
             ),
+            isError = nameErrorTextValue != null,
         )
+        if(nameErrorTextValue != null)
+        {
+            Text(
+                modifier = Modifier.padding(horizontal = horizontalPadding),
+                text = nameErrorTextValue,
+                color = MaterialTheme.colors.error
+            )
+        }
 
+        val surnameErrorTextValue = surnameErrorText()?.asString()
         OutlinedTextField(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -337,8 +369,18 @@ private fun RegisterScreenContent2Normal(
                 focusManager.moveFocus(FocusDirection.Down)
             }
             ),
-        )
+            isError = surnameErrorTextValue != null,
+            )
+        if(surnameErrorTextValue != null)
+        {
+            Text(
+                modifier = Modifier.padding(horizontal = horizontalPadding),
+                text = surnameErrorTextValue,
+                color = MaterialTheme.colors.error
+            )
+        }
 
+        val emailErrorTextVal = emailErrorText.invoke()?.asString()
         OutlinedTextField(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -359,8 +401,16 @@ private fun RegisterScreenContent2Normal(
             },
             colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-
+            isError = emailErrorTextVal != null,
             )
+        if(emailErrorTextVal != null)
+        {
+            Text(
+                modifier = Modifier.padding(horizontal = horizontalPadding),
+                text = emailErrorTextVal,
+                color = MaterialTheme.colors.error
+            )
+        }
         Spacer(modifier = Modifier.height(5.dp))
         Spacer(modifier = Modifier.weight(1f))
 
@@ -400,7 +450,9 @@ private fun RegisterScreenContent3Normal(
     changePasswordPreview: () -> Unit,
     changeRepeatedPasswordPreview: () -> Unit,
     onCreateAccountClick: () -> Unit,
-    onPreviousClick: () -> Unit
+    onPreviousClick: () -> Unit,
+    passwordError: () -> UiText?,
+    repeatedPasswordError: () -> UiText?,
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         val textFieldColors = TextFieldDefaults.textFieldColors(
@@ -412,6 +464,7 @@ private fun RegisterScreenContent3Normal(
         val focusManager = LocalFocusManager.current
         //TODO: Add some vertical scroll or something to textFields will be visible when keyboard appears
         //TODO: But remember about footer buttons
+        val passwordErrorVal = passwordError()?.asString()
         OutlinedTextField(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -451,7 +504,15 @@ private fun RegisterScreenContent3Normal(
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down)
             }),
+            isError = passwordErrorVal != null,
         )
+
+        if(passwordErrorVal != null)
+        {
+            Text(modifier = Modifier.padding(horizontal = horizontalPadding),text = passwordErrorVal, color = MaterialTheme.colors.error)
+        }
+
+        val repeatedPasswordErrorVal = repeatedPasswordError()?.asString()
 
         OutlinedTextField(
             modifier = Modifier
@@ -485,8 +546,18 @@ private fun RegisterScreenContent3Normal(
                 )
             },
             colors = textFieldColors,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            isError = repeatedPasswordErrorVal != null,
         )
+
+        if(repeatedPasswordErrorVal != null)
+        {
+            Text(modifier = Modifier
+                .padding(horizontal = horizontalPadding),
+                text = repeatedPasswordErrorVal,
+                color = MaterialTheme.colors.error
+            )
+        }
 
         Text(
             modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 15.dp),
@@ -607,6 +678,48 @@ fun RegisterScreenPreview() {
     RegisterScreen(viewModel = object : IRegisterMviProcessor() {
         override fun initialState(): RegisterUiState {
             return RegisterUiState()
+        }
+
+        override val reducer: Reducer<RegisterUiState, RegisterIntent>
+            get() = TODO("Not yet implemented")
+
+        override suspend fun handleIntent(
+            intent: RegisterIntent,
+            state: RegisterUiState
+        ): RegisterIntent? {
+            TODO("Not yet implemented")
+        }
+
+    })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview2() {
+    RegisterScreen(viewModel = object : IRegisterMviProcessor() {
+        override fun initialState(): RegisterUiState {
+            return RegisterUiState(currentScreen = RegisterScreenType.SECOND_NORMAL)
+        }
+
+        override val reducer: Reducer<RegisterUiState, RegisterIntent>
+            get() = TODO("Not yet implemented")
+
+        override suspend fun handleIntent(
+            intent: RegisterIntent,
+            state: RegisterUiState
+        ): RegisterIntent? {
+            TODO("Not yet implemented")
+        }
+
+    })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview3() {
+    RegisterScreen(viewModel = object : IRegisterMviProcessor() {
+        override fun initialState(): RegisterUiState {
+            return RegisterUiState(currentScreen = RegisterScreenType.THIRD_NORMAL)
         }
 
         override val reducer: Reducer<RegisterUiState, RegisterIntent>

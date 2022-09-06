@@ -18,6 +18,9 @@ fun LoginNavigationGraph(navController: NavHostController)
             LoginScreen(navigationCallbacks = LoginNavigationCallbacks(
                 onNavigateToRegisterScreen = {
                     navController.navigate("Register")
+                    {
+                        launchSingleTop = true
+                    }
                 },
             ))
         }
