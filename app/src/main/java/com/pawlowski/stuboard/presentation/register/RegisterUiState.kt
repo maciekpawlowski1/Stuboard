@@ -9,6 +9,7 @@ data class RegisterUiState(
     val currentScreen: RegisterScreenType = RegisterScreenType.FIRST_BOTH,
     val accountType: AccountType = AccountType.NORMAL,
     val isLoading: Boolean = false,
+    val registerErrorMessage: String? = null,
     val name: String = "",
     val nameError: UiText? = null,
     val surname: String = "",

@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.pawlowski.stuboard.data.*
 import com.pawlowski.stuboard.data.authentication.AuthManager
@@ -23,7 +24,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun applicationContext(application: Application) = application.applicationContext
+    fun applicationContext(application: Application): Context = application.applicationContext
 
     @Singleton
     @Provides
@@ -116,4 +117,15 @@ class AppModule {
     @Provides
     fun logInWithEmailAndPasswordUseCase(accountsRepository: IAccountsRepository) = LogInWithEmailAndPasswordUseCase(accountsRepository::logInWithEmailAndPassword)
 
+    @Singleton
+    @Provides
+    fun addUsernameToUserUseCase(accountsRepository: IAccountsRepository) = AddUsernameToUserUseCase(accountsRepository::addUsernameToUser)
+
+    @Singleton
+    @Provides
+    fun observeLogInStateUseCase(accountsRepository: IAccountsRepository) = ObserveLogInStateUseCase(accountsRepository::observeLogInState)
+
+    @Singleton
+    @Provides
+    fun getLogInStateUseCase(accountsRepository: IAccountsRepository) = GetLogInStateUseCase(accountsRepository::getLogInState)
 }

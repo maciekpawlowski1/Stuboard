@@ -1,5 +1,8 @@
 package com.pawlowski.stuboard.presentation.register
 
+import com.pawlowski.stuboard.data.authentication.AuthenticationResult
+import com.pawlowski.stuboard.presentation.use_cases.AddUsernameToUserUseCase
+import com.pawlowski.stuboard.presentation.use_cases.RegisterWithEmailAndPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateEmailUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNameOrSurnameUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNewPasswordUseCase
@@ -15,6 +18,8 @@ class RegisterMviProcessor @Inject constructor(
     private val validateNewPasswordUseCase: ValidateNewPasswordUseCase,
     private val validateRepeatedPasswordUseCase: ValidateRepeatedPasswordUseCase,
     private val validateNameOrSurnameUseCase: ValidateNameOrSurnameUseCase,
+    private val registerWithEmailAndPasswordUseCase: RegisterWithEmailAndPasswordUseCase,
+    private val addUsernameToUserUseCase: AddUsernameToUserUseCase,
 ): IRegisterMviProcessor() {
 
     override fun initialState(): RegisterUiState = RegisterUiState()
@@ -49,9 +54,9 @@ class RegisterMviProcessor @Inject constructor(
                                 state.copy(currentScreen = RegisterScreenType.SECOND_NORMAL)
                             else
                             {
-                                val emailValidationResult = validateEmailUseCase.invoke(state.email)
-                                val nameValidationResult = validateNameOrSurnameUseCase.invoke(state.name)
-                                val surnameValidationResult = validateNameOrSurnameUseCase.invoke(state.surname)
+                                val emailValidationResult = validateEmailUseCase.invoke(state.email.trim())
+                                val nameValidationResult = validateNameOrSurnameUseCase.invoke(state.name.trim())
+                                val surnameValidationResult = validateNameOrSurnameUseCase.invoke(state.surname.trim())
                                 if(emailValidationResult.isCorrect && nameValidationResult.isCorrect && surnameValidationResult.isCorrect)
                                     state.copy(
                                         currentScreen = RegisterScreenType.THIRD_NORMAL,
@@ -79,8 +84,7 @@ class RegisterMviProcessor @Inject constructor(
                         val repeatedPasswordValidationResult = validateRepeatedPasswordUseCase(state.password, state.repeatedPassword)
                         if(passwordValidationResult.isCorrect && repeatedPasswordValidationResult.isCorrect)
                         {
-                            //TODO: Register
-                            state.copy(repeatedPasswordError = null, passwordError = null)
+                            state.copy(repeatedPasswordError = null, passwordError = null, isLoading = true)
                         }
                         else
                         {
@@ -114,6 +118,9 @@ class RegisterMviProcessor @Inject constructor(
                         }
 
                     }
+                    is RegisterIntent.RegisterFailure -> {
+                        state.copy(registerErrorMessage = intent.errorMessage)
+                    }
                     else -> {
                         state
                     }
@@ -128,6 +135,24 @@ class RegisterMviProcessor @Inject constructor(
         return when(intent) {
             is RegisterIntent.ChangeAccountType -> null
             is RegisterIntent.PreviousClicked -> RegisterIntent.ClearPasswordsInput
+            is RegisterIntent.CreateAccountClicked -> {
+                val result = registerWithEmailAndPasswordUseCase(state.email.trim(), state.password)
+                return if(result is AuthenticationResult.Success)
+                {
+                    val usernameResult = addUsernameToUserUseCase(result.user, "${state.name.trim()} ${state.surname.trim()}")
+                    if(usernameResult is AuthenticationResult.Success)
+                    {
+                        triggerSingleEvent(RegisterSingleEvent.RegisterSuccess)
+                        null
+                    }
+                    else
+                        TODO()
+                }
+                else
+                {
+                    RegisterIntent.RegisterFailure((result as AuthenticationResult.Failure).errorMessage)
+                }
+            }
             else -> null
         }
     }

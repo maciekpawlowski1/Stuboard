@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.login_screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -40,7 +42,8 @@ import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
 data class LoginNavigationCallbacks(
-    val onNavigateToRegisterScreen: () -> Unit = {}
+    val onNavigateToRegisterScreen: () -> Unit = {},
+    val onNavigateToRoot: () -> Unit = {}
 )
 
 @Composable
@@ -60,11 +63,21 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         uiState.value.showPasswordPreview
     }
 
+    val isLoadingState = derivedStateOf {
+        uiState.value.isLoading
+    }
+    val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.singleEvent.collect { event ->
             when(event) {
                 is LoginSingleEvent.NavigateToRegisterScreen -> {
                     navigationCallbacks.onNavigateToRegisterScreen()
+                }
+                is LoginSingleEvent.LoginSuccess -> {
+                    navigationCallbacks.onNavigateToRoot()
+                }
+                is LoginSingleEvent.LoginFailure -> {
+                    Toast.makeText(context, event.errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -174,9 +187,15 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp, vertical = 10.dp),
             shape = RoundedCornerShape(20.dp),
-            onClick = { /*TODO*/ },
+            onClick = { viewModel.sendIntent(LoginIntent.LoginClick) },
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
             Text(text = "Zaloguj się", color = Color.White)
+        }
+
+        if(isLoadingState.value)
+        {
+            CircularProgressIndicator(Modifier.size(50.dp).align(CenterHorizontally), color = Green)
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
         HorizontalDividerWithLabelInTheMiddle()
@@ -267,7 +286,7 @@ fun LoginScreenPreview()
     LoginScreen(viewModel = object : ILoginMviProcessor()
     {
         override fun initialState(): LoginUiState {
-            return LoginUiState()
+            return LoginUiState(isLoading = true)
         }
 
         override val reducer: Reducer<LoginUiState, LoginIntent>

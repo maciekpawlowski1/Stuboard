@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.register_screen
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -10,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,18 +23,24 @@ const val ANIMATION_TIME = 1000
 @Composable
 fun RegisterScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToRoot: () -> Unit = {},
     viewModel: IRegisterMviProcessor = hiltViewModel<RegisterMviProcessor>()
 ) {
     BackHandler {
         viewModel.sendIntent(RegisterIntent.PreviousClicked)
     }
 
+    val context = LocalContext.current
     LaunchedEffect(true)
     {
         viewModel.singleEvent.collect { event ->
             when(event) {
                 is RegisterSingleEvent.NavigateBack -> {
                     onNavigateBack.invoke()
+                }
+                is RegisterSingleEvent.RegisterSuccess -> {
+                    Toast.makeText(context, "Zarejestrowano pomyślnie!", Toast.LENGTH_LONG).show()
+                    onNavigateToRoot.invoke()
                 }
             }
         }
@@ -61,7 +69,7 @@ fun RegisterScreen(
         derivedStateOf { uiState.value.showRepeatedPasswordPreview }
     val passwordErrorState = derivedStateOf { uiState.value.passwordError }
     val repeatedPasswordErrorState = derivedStateOf { uiState.value.repeatedPasswordError }
-
+    val isLoadingState = derivedStateOf { uiState.value.isLoading }
 
     val horizontalPadding = 10.dp
     Column(
@@ -197,7 +205,8 @@ fun RegisterScreen(
                         changePasswordPreview = { viewModel.sendIntent(RegisterIntent.ChangePasswordVisibility) },
                         changeRepeatedPasswordPreview = { viewModel.sendIntent(RegisterIntent.ChangeRepeatedPasswordVisibility) },
                         passwordError = { passwordErrorState.value },
-                        repeatedPasswordError = { repeatedPasswordErrorState.value }
+                        repeatedPasswordError = { repeatedPasswordErrorState.value },
+                        showCircleProgressBar = { isLoadingState.value }
                     )
                 }
                 RegisterScreenType.THIRD_ORGANISATION -> {
@@ -257,7 +266,7 @@ fun RegisterScreenPreview2() {
 fun RegisterScreenPreview3() {
     RegisterScreen(viewModel = object : IRegisterMviProcessor() {
         override fun initialState(): RegisterUiState {
-            return RegisterUiState(currentScreen = RegisterScreenType.THIRD_NORMAL)
+            return RegisterUiState(currentScreen = RegisterScreenType.THIRD_NORMAL, isLoading = true)
         }
 
         override val reducer: Reducer<RegisterUiState, RegisterIntent>

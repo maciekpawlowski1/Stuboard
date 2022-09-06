@@ -1,10 +1,14 @@
 package com.pawlowski.stuboard.presentation.login
 
+import com.pawlowski.stuboard.data.authentication.AuthenticationResult
+import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginMviProcessor @Inject constructor(): ILoginMviProcessor() {
+class LoginMviProcessor @Inject constructor(
+    private val logInWithEmailAndPasswordUseCase: LogInWithEmailAndPasswordUseCase,
+): ILoginMviProcessor() {
 
     override fun initialState(): LoginUiState = LoginUiState()
 
@@ -21,6 +25,12 @@ class LoginMviProcessor @Inject constructor(): ILoginMviProcessor() {
                     is LoginIntent.ChangeVisibilityOfPassword -> {
                         state.copy(showPasswordPreview = !state.showPasswordPreview)
                     }
+                    is LoginIntent.LoginClick -> {
+                        state.copy(isLoading = true)
+                    }
+                    is LoginIntent.StopLoading -> {
+                        state.copy(isLoading = false)
+                    }
                     else -> {
                         state
                     }
@@ -35,6 +45,23 @@ class LoginMviProcessor @Inject constructor(): ILoginMviProcessor() {
             is LoginIntent.RegisterClick -> {
                 triggerSingleEvent(LoginSingleEvent.NavigateToRegisterScreen)
                 null
+            }
+            is LoginIntent.LoginClick -> {
+                val loginResult = logInWithEmailAndPasswordUseCase(state.email.trim(), state.password)
+                return if(loginResult is AuthenticationResult.Success)
+                {
+                    triggerSingleEvent(LoginSingleEvent.LoginSuccess)
+                    null
+                }
+                else if(loginResult is AuthenticationResult.Failure)
+                {
+                    triggerSingleEvent(LoginSingleEvent.LoginFailure(loginResult.errorMessage?:"Login failed!"))
+                    LoginIntent.StopLoading
+                }
+                else
+                {
+                    null
+                }
             }
             else -> null
         }

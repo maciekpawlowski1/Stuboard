@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -44,6 +45,7 @@ internal fun RegisterScreenContent3Normal(
     onCreateAccountClick: () -> Unit,
     onPreviousClick: () -> Unit,
     passwordError: () -> UiText?,
+    showCircleProgressBar: () -> Boolean,
     repeatedPasswordError: () -> UiText?,
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -146,6 +148,8 @@ internal fun RegisterScreenContent3Normal(
             keyboardActions = KeyboardActions(onDone = {
                 keyboardController?.hide()
             }),
+            maxLines = 1,
+            singleLine = true,
             isError = repeatedPasswordErrorVal != null,
         )
 
@@ -168,6 +172,11 @@ internal fun RegisterScreenContent3Normal(
 
         Spacer(modifier = Modifier.height(5.dp))
         Spacer(modifier = Modifier.weight(1f))
+
+        if(showCircleProgressBar())
+        {
+            CircularProgressIndicator(Modifier.size(50.dp).align(CenterHorizontally), color = Green)
+        }
 
         Button(
             modifier = Modifier
