@@ -1,9 +1,11 @@
 package com.pawlowski.stuboard.ui.register_screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
@@ -11,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pawlowski.stuboard.presentation.register.IRegisterMviProcessor
-import com.pawlowski.stuboard.presentation.register.RegisterIntent
-import com.pawlowski.stuboard.presentation.register.RegisterMviProcessor
-import com.pawlowski.stuboard.presentation.register.RegisterUiState
+import com.pawlowski.stuboard.presentation.register.*
 
 const val ANIMATION_TIME = 1000
 
@@ -24,6 +23,21 @@ fun RegisterScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: IRegisterMviProcessor = hiltViewModel<RegisterMviProcessor>()
 ) {
+    BackHandler {
+        viewModel.sendIntent(RegisterIntent.PreviousClicked)
+    }
+
+    LaunchedEffect(true)
+    {
+        viewModel.singleEvent.collect { event ->
+            when(event) {
+                is RegisterSingleEvent.NavigateBack -> {
+                    onNavigateBack.invoke()
+                }
+            }
+        }
+    }
+
     val uiState = viewModel.viewState.collectAsState()
     val selectedAccountTypeState = derivedStateOf {
         uiState.value.accountType

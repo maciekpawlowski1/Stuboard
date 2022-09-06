@@ -94,17 +94,25 @@ class RegisterMviProcessor @Inject constructor(
                         state.copy(showRepeatedPasswordPreview = !state.showRepeatedPasswordPreview)
                     }
                     is RegisterIntent.PreviousClicked -> {
-                        val selectedAccountType = state.accountType
-                        if(selectedAccountType == AccountType.NORMAL)
+                        if(state.currentScreen == RegisterScreenType.FIRST_BOTH)
                         {
-                            if(state.currentScreen == RegisterScreenType.THIRD_NORMAL)
-                                state.copy(currentScreen = RegisterScreenType.SECOND_NORMAL)
-                            else
-                                state.copy(currentScreen = RegisterScreenType.FIRST_BOTH)
+                            triggerSingleEvent(RegisterSingleEvent.NavigateBack)
+                            state
                         }
                         else{
-                            TODO()
+                            val selectedAccountType = state.accountType
+                            if(selectedAccountType == AccountType.NORMAL)
+                            {
+                                if(state.currentScreen == RegisterScreenType.THIRD_NORMAL)
+                                    state.copy(currentScreen = RegisterScreenType.SECOND_NORMAL)
+                                else
+                                    state.copy(currentScreen = RegisterScreenType.FIRST_BOTH)
+                            }
+                            else{
+                                TODO()
+                            }
                         }
+
                     }
                     else -> {
                         state
