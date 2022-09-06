@@ -107,4 +107,13 @@ class AppModule {
     @Singleton
     @Provides
     fun unselectAllFiltersUseCase(filtersRepository: IFiltersRepository) = UnselectAllFiltersUseCase(filtersRepository::unselectAllFilters)
+
+    @Singleton
+    @Provides
+    fun registerWithEmailAndPasswordUseCase(accountsRepository: IAccountsRepository) = RegisterWithEmailAndPasswordUseCase(accountsRepository::registerWithEmailAndPassword)
+
+    @Singleton
+    @Provides
+    fun logInWithEmailAndPasswordUseCase(accountsRepository: IAccountsRepository) = LogInWithEmailAndPasswordUseCase(accountsRepository::logInWithEmailAndPassword)
+
 }

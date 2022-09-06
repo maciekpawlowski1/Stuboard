@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.domain
 
+import com.pawlowski.stuboard.data.authentication.AuthenticationResult
 import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,17 @@ class AccountsRepository @Inject constructor(
 
     override fun observeLogInState(): Flow<AppLoginState> = flow {
         TODO("Not implemented yet")
+    }
+
+    override suspend fun logInWithEmailAndPassword(email: String, password: String): AuthenticationResult {
+        return authManager.signInWithPassword(email, password)
+    }
+
+    override suspend fun registerWithEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthenticationResult {
+        return authManager.registerWithPassword(email, password)
     }
 
 }

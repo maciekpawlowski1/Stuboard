@@ -1,6 +1,5 @@
 package com.pawlowski.stuboard.data.authentication
 
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -14,23 +13,31 @@ class AuthManager @Inject constructor(
         return firebaseAuth.currentUser != null
     }
 
-    override suspend fun signInWithPassword(mail: String, password: String): AuthResult? {
+    override suspend fun signInWithPassword(mail: String, password: String): AuthenticationResult {
         return try {
-            firebaseAuth.signInWithEmailAndPassword(mail, password).await()
+            val user = firebaseAuth.signInWithEmailAndPassword(mail, password).await()?.user
+            if(user != null)
+                AuthenticationResult.Success(user)
+            else
+                AuthenticationResult.Failure(null)
         }
         catch (e: Exception)
         {
-            null
+            AuthenticationResult.Failure(e.localizedMessage)
         }
     }
 
-    override suspend fun registerWithPassword(mail: String, password: String): AuthResult? {
+    override suspend fun registerWithPassword(mail: String, password: String): AuthenticationResult {
         return try {
-            firebaseAuth.createUserWithEmailAndPassword(mail, password).await()
+            val user = firebaseAuth.createUserWithEmailAndPassword(mail, password).await()?.user
+            if(user != null)
+                AuthenticationResult.Success(user)
+            else
+                AuthenticationResult.Failure(null)
         }
         catch (e: Exception)
         {
-            null
+            AuthenticationResult.Failure(e.localizedMessage)
         }
     }
 
