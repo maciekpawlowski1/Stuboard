@@ -8,10 +8,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -21,6 +23,7 @@ import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.theme.Green
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun RegisterScreenContent2Normal(
     horizontalPadding: Dp,
@@ -44,6 +47,7 @@ internal fun RegisterScreenContent2Normal(
             backgroundColor = Color.White
         )
         val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         //TODO: Add some vertical scroll or something to textFields will be visible when keyboard appears
         //TODO: But remember about footer buttons
 
@@ -130,6 +134,9 @@ internal fun RegisterScreenContent2Normal(
             },
             colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+            }),
             isError = emailErrorTextVal != null,
         )
         if (emailErrorTextVal != null) {
@@ -146,7 +153,10 @@ internal fun RegisterScreenContent2Normal(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = horizontalPadding, vertical = 10.dp),
-            onClick = { onNextClick.invoke() },
+            onClick = {
+                keyboardController?.hide()
+                onNextClick.invoke()
+                      },
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)
         ) {
             Text(text = "Dalej", color = Color.White)

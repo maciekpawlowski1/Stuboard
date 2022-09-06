@@ -9,10 +9,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -27,6 +29,7 @@ import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun RegisterScreenContent3Normal(
     horizontalPadding: Dp,
@@ -51,6 +54,7 @@ internal fun RegisterScreenContent3Normal(
             backgroundColor = Color.White
         )
         val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         //TODO: Add some vertical scroll or something to textFields will be visible when keyboard appears
         //TODO: But remember about footer buttons
         val passwordErrorVal = passwordError()?.asString()
@@ -139,6 +143,9 @@ internal fun RegisterScreenContent3Normal(
             },
             colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+            }),
             isError = repeatedPasswordErrorVal != null,
         )
 
@@ -166,7 +173,10 @@ internal fun RegisterScreenContent3Normal(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = horizontalPadding, vertical = 10.dp),
-            onClick = { onCreateAccountClick.invoke() },
+            onClick = {
+                keyboardController?.hide()
+                onCreateAccountClick.invoke()
+                      },
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)
         ) {
             Text(text = "Utwórz konto", color = Color.White)
