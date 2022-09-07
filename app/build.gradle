@@ -123,10 +123,10 @@ dependencies {
     implementation "com.google.accompanist:accompanist-placeholder-material:$accompanist_version"
 
     //Firebase auth
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.7'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.8'
 
     //Firebase coroutines support
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
 
     //Paging
     implementation("androidx.paging:paging-runtime:3.1.1")
@@ -134,4 +134,9 @@ dependencies {
 
     //Lottie
     implementation "com.airbnb.android:lottie-compose:5.2.0"
+
+    //Orbit MVI
+    implementation("org.orbit-mvi:orbit-viewmodel:4.3.2")
+    testImplementation("org.orbit-mvi:orbit-test:4.3.2")
+
 }
