@@ -91,7 +91,6 @@ fun MapScreen(
     Column(modifier = Modifier.fillMaxSize()) {
 
         FiltersHeader(
-            "Kraków",
             currentFiltersState.value,
             onBackClick = { onNavigateBack.invoke() }
         )
@@ -187,20 +186,21 @@ fun EventsPager(
 
 @Composable
 fun FiltersHeader(
-    cityFilter: String,
-    categoryFilters: List<FilterModel>,
+    filters: List<FilterModel>,
     onCardClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     onTuneFiltersClick: () -> Unit = {}
 ) {
-    val filtersText = if (categoryFilters.isEmpty())
-        "Wydarzenia w $cityFilter"
+    val filtersText = if(filters.isEmpty())
+        "Loading..."
+    else if (filters.size == 1)
+        "Wydarzenia w ${filters[0].tittle}"
     else {
-        val categoriesAppend = categoryFilters.map { it.tittle }.reduce { acc, s ->
+        val categoriesAppend = filters.map { it.tittle }.reduce { acc, s ->
             "$acc - $s"
         }
 
-        "$cityFilter - $categoriesAppend"
+        categoriesAppend
     }
     Surface(
         modifier = Modifier
