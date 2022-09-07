@@ -8,8 +8,8 @@ import com.pawlowski.stuboard.presentation.use_cases.GetEventsPagingStreamUseCas
 import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,8 +21,12 @@ class SearchViewModel @Inject constructor(
 
     private val selectedFilters = getSelectedFiltersUseCase()
 
-    override val pagingData: Flow<PagingData<EventItemForPreview>> = getEventsPagingStreamUseCase(
-        listOf()).cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val pagingData: Flow<PagingData<EventItemForPreview>> = selectedFilters
+        .distinctUntilChanged()
+        .flatMapLatest {
+            getEventsPagingStreamUseCase(it)
+        }.cachedIn(viewModelScope)
 
     private val _lastSavedScrollPosition = MutableStateFlow(0)
     override val lastSavedScrollPosition: StateFlow<Int>
