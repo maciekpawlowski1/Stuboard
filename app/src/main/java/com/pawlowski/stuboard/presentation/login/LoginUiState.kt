@@ -1,6 +1,5 @@
 package com.pawlowski.stuboard.presentation.login
 
-import com.pawlowski.stuboard.presentation.mvi_abstract.State
 import com.pawlowski.stuboard.presentation.utils.UiText
 
 data class LoginUiState(
@@ -10,4 +9,4 @@ data class LoginUiState(
     val passwordError: UiText? = null,
     val showPasswordPreview: Boolean = false,
     val isLoading: Boolean = false,
-): State
+)
