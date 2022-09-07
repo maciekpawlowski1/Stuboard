@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import com.pawlowski.stuboard.ui.models.EventMarker
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -68,7 +69,9 @@ fun MyGoogleMap(
 
 
 
-
+        val isMapLoaded = remember {
+            mutableStateOf(false)
+        }
 
         val mapProperties by remember(showLocationButtons) { mutableStateOf(MapProperties(isMyLocationEnabled = showLocationButtons)) }
         val uiSettings by remember(showLocationButtons) { mutableStateOf(MapUiSettings(myLocationButtonEnabled = showLocationButtons, zoomControlsEnabled = zoomButtonsEnabled, scrollGesturesEnabled = !disableAllGestures, zoomGesturesEnabled = !disableAllGestures, rotationGesturesEnabled = !disableAllGestures)) }
@@ -76,6 +79,7 @@ fun MyGoogleMap(
             properties = mapProperties,
             uiSettings = uiSettings,
             modifier = modifier,
+            onMapLoaded = { isMapLoaded.value = true },
             cameraPositionState = cameraPositionState,
             onMapClick = { onMapClick.invoke() } //TODO: check doesn't it ignore Marker onClick
         )
@@ -108,6 +112,10 @@ fun MyGoogleMap(
                 markers.forEach {
                     builder.include(it.position)
                 }
+
+                //Wait for map to be ready if it's not
+                while (!isMapLoaded.value)
+                    delay(5)
                 //Animate to marker bounds
                 cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
             }
