@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.airbnb.lottie.compose.*
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.search.ISearchViewModel
@@ -87,10 +90,14 @@ fun SearchScreen(
                 }
             }
 
-            val eventsCount = 12
+            val eventsCount: Int? = null //TODO: Add checking events count
+            val eventsCountText = if(eventsCount == null)
+                ""
+            else
+                " ($eventsCount)"
             Text(
                 modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 15.dp),
-                text = "Wyniki wyszukiwania ($eventsCount):",
+                text = "Wyniki wyszukiwania$eventsCountText:",
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = montserratFont
             )
@@ -111,6 +118,15 @@ fun SearchScreen(
                         )
                     )
                     {
+                        item(span = { GridItemSpan(2) }) {
+                            if(lazyPagingItems.itemCount == 0 &&
+                                lazyPagingItems.loadState.refresh is LoadState.NotLoading &&
+                                        lazyPagingItems.loadState.append is LoadState.NotLoading
+                            )
+                            {
+                                NoItemsFoundCard()
+                            }
+                        }
                         item(span = { GridItemSpan(2) }) {
                             when(lazyPagingItems.loadState.refresh)
                             {
@@ -269,6 +285,35 @@ fun FiltersCard(modifier: Modifier, filtersCount: Int, onCardClick: () -> Unit =
             }
         }
     }
+}
+
+@Composable
+fun NoItemsFoundCard()
+{
+    Column(horizontalAlignment = CenterHorizontally) {
+        NoItemsFoundAnimation()
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp),
+            text = "Nie znaleziono wydarzeń dla podanych filtrów",
+            fontFamily = montserratFont,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun NoItemsFoundAnimation()
+{
+    val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_not_found_animation))
+    val progress by animateLottieCompositionAsState(
+        lottieComposition,
+        iterations = LottieConstants.IterateForever,
+    )
+    LottieAnimation(modifier = Modifier
+        .padding(10.dp)
+        .height(180.dp), composition = lottieComposition, progress = { progress })
 }
 
 @Composable

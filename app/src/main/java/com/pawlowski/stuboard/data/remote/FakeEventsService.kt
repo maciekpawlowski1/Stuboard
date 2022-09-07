@@ -13,6 +13,9 @@ class FakeEventsService: EventsService {
         page: Int,
         pageSize: Int
     ): Result<List<EventItemForPreview>> {
+//        delay(1000)
+//        if(true)
+//            return Result.success(listOf())
         val startIndex = (page-1)*pageSize
         val endIndex = if(page*pageSize <= 100)
             page*pageSize
