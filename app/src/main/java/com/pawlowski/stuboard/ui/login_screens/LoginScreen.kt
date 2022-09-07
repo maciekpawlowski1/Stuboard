@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,17 +42,25 @@ import com.pawlowski.stuboard.presentation.login.*
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.annotation.OrbitInternal
+import org.orbitmvi.orbit.syntax.ContainerContext
 
 data class LoginNavigationCallbacks(
     val onNavigateToRegisterScreen: () -> Unit = {},
     val onNavigateToRoot: () -> Unit = {}
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationCallbacks(),
-                viewModel: ILoginMviProcessor = hiltViewModel<LoginMviProcessor>(),
+                viewModel: ILoginMviViewModel = hiltViewModel<LoginMviViewModel>(),
 ) {
-    val uiState = viewModel.viewState.collectAsState()
+    val uiState = viewModel.container.stateFlow.collectAsState()
     val emailState = derivedStateOf {
         uiState.value.email
     }
@@ -68,7 +78,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
     }
     val context = LocalContext.current
     LaunchedEffect(true) {
-        viewModel.singleEvent.collect { event ->
+        viewModel.container.sideEffectFlow.collect { event ->
             when(event) {
                 is LoginSingleEvent.NavigateToRegisterScreen -> {
                     navigationCallbacks.onNavigateToRegisterScreen()
@@ -129,7 +139,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                 .align(CenterHorizontally),
             value = emailState.value,
             label = { Text(text = "Adres e-mail") },
-            onValueChange = { viewModel.sendIntent(LoginIntent.ChangeEmailInputValue(it)) },
+            onValueChange = { viewModel.changeEmailInput(it) },
             leadingIcon =
             {
                 Icon(
@@ -155,7 +165,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
             label = { Text(text = "Hasło") },
             maxLines = 1,
             singleLine = true,
-            onValueChange = { viewModel.sendIntent(LoginIntent.ChangePasswordInputValue(it)) },
+            onValueChange = { viewModel.changePasswordInput(it) },
             visualTransformation = if(!showPasswordState.value)
                     PasswordVisualTransformation()
                 else
@@ -175,27 +185,34 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                            R.drawable.visibility_off_icon
                        ),
                        contentDescription = "",
-                       modifier = Modifier.clickable { viewModel.sendIntent(LoginIntent.ChangeVisibilityOfPassword) }
+                       modifier = Modifier.clickable { viewModel.changeVisibilityOfPassword() }
                    )
             },
             colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
-        
+
+        val keyboardController = LocalSoftwareKeyboardController.current
         
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp, vertical = 10.dp),
             shape = RoundedCornerShape(20.dp),
-            onClick = { viewModel.sendIntent(LoginIntent.LoginClick) },
+            onClick = {
+                viewModel.login()
+                keyboardController?.hide()
+                      },
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
             Text(text = "Zaloguj się", color = Color.White)
         }
 
         if(isLoadingState.value)
         {
-            CircularProgressIndicator(Modifier.size(50.dp).align(CenterHorizontally), color = Green)
+            CircularProgressIndicator(
+                Modifier
+                    .size(50.dp)
+                    .align(CenterHorizontally), color = Green)
             Spacer(modifier = Modifier.height(10.dp))
         }
 
@@ -205,7 +222,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         Spacer(modifier = Modifier.height(10.dp))
         Text(modifier = Modifier
             .align(CenterHorizontally)
-            .clickable { viewModel.sendIntent(LoginIntent.RegisterClick) },
+            .clickable { viewModel.openRegisterScreen() },
             fontFamily = montserratFont,
             text = buildAnnotatedString {
             append("Nie masz konta? ")
@@ -280,25 +297,40 @@ fun ContinueAnonymousButton()
     }
 }
 
+@OptIn(OrbitInternal::class)
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview()
 {
-    LoginScreen(viewModel = object : ILoginMviProcessor()
+    LoginScreen(viewModel = object : ILoginMviViewModel
     {
-        override fun initialState(): LoginUiState {
-            return LoginUiState(isLoading = true)
-        }
-
-        override val reducer: Reducer<LoginUiState, LoginIntent>
-            get() = TODO("Not yet implemented")
-
-        override suspend fun handleIntent(
-            intent: LoginIntent,
-            state: LoginUiState
-        ): LoginIntent? {
+        override fun changeEmailInput(newValue: String) {
             TODO("Not yet implemented")
         }
+        override fun changePasswordInput(newValue: String) {
+            TODO("Not yet implemented")
+        }
+        override fun changeVisibilityOfPassword() {
+            TODO("Not yet implemented")
+        }
+        override fun login() {
+            TODO("Not yet implemented")
+        }
+        override fun openRegisterScreen() {
+            TODO("Not yet implemented")
+        }
+        override val container: Container<LoginUiState, LoginSingleEvent>
+            get() = object: Container<LoginUiState, LoginSingleEvent> {
+                override val settings: Container.Settings
+                    get() = TODO("Not yet implemented")
+                override val sideEffectFlow: Flow<LoginSingleEvent>
+                    get() = flow {}
+                override val stateFlow: StateFlow<LoginUiState>
+                    get() = MutableStateFlow(LoginUiState())
 
+                override suspend fun orbit(orbitIntent: suspend ContainerContext<LoginUiState, LoginSingleEvent>.() -> Unit) {
+                    TODO("Not yet implemented")
+                }
+            }
     })
 }
