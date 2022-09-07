@@ -50,8 +50,7 @@ class LoginMviProcessor @Inject constructor(
                 null
             }
             is LoginIntent.LoginClick -> {
-                val loginResult = logInWithEmailAndPasswordUseCase(state.email.trim(), state.password)
-                return when (loginResult) {
+                return when (val loginResult = logInWithEmailAndPasswordUseCase(state.email.trim(), state.password)) {
                     is AuthenticationResult.Success -> {
                         triggerSingleEvent(LoginSingleEvent.LoginSuccess)
                         LoginIntent.ClearLoginInputs
