@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.airbnb.lottie.compose.*
 import com.google.accompanist.flowlayout.FlowRow
@@ -119,9 +120,7 @@ fun SearchScreen(
                     )
                     {
                         item(span = { GridItemSpan(2) }) {
-                            if(lazyPagingItems.itemCount == 0 &&
-                                lazyPagingItems.loadState.refresh is LoadState.NotLoading &&
-                                        lazyPagingItems.loadState.append is LoadState.NotLoading
+                            if(lazyPagingItems.areNoResults()
                             )
                             {
                                 NoItemsFoundCard()
@@ -208,7 +207,7 @@ fun SearchScreen(
                         .height(100.dp),
                         horizontalAlignment = CenterHorizontally
                         ) {
-                        AnimatedVisibility(visible = !listState.isScrollInProgress) {
+                        AnimatedVisibility(visible = !listState.isScrollInProgress && !lazyPagingItems.areNoResults()) {
                             GoToMapButton()
                             {
                                 onNavigateToMapScreen()
@@ -225,6 +224,13 @@ fun SearchScreen(
         }
     }
 
+}
+
+fun <T: Any> LazyPagingItems<T>.areNoResults(): Boolean
+{
+    return this.itemCount == 0 &&
+            this.loadState.refresh is LoadState.NotLoading &&
+            this.loadState.append is LoadState.NotLoading
 }
 
 @Composable
