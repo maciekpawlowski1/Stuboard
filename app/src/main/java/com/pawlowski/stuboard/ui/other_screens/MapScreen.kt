@@ -42,6 +42,7 @@ import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.Orange
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
+import com.pawlowski.stuboard.ui.utils.myLoadingEffect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -65,6 +66,10 @@ fun MapScreen(
     }
     val currentFiltersState = derivedStateOf {
         uiState.value.currentFilters
+    }
+
+    val isLoadingState = derivedStateOf {
+        uiState.value is MapUiState.Loading
     }
 
     val events = eventsState.value
@@ -132,6 +137,7 @@ fun MapScreen(
                 onEventCardClick = {
                    onNavigateToEventDetailsScreen.invoke(it)
                 },
+                isLoading = isLoadingState.value,
                 pagerState = pagerState,
             )
             { pageIndex, changesCount ->
@@ -159,16 +165,23 @@ fun EventsPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
     events: List<EventItemForMapScreen>,
+    isLoading: Boolean = false,
     onEventCardClick: (eventId: Int) -> Unit = {},
     onPageChanged: (pageIndex: Int, changesCount: Int) -> Unit = {_,_->},
 ) {
     HorizontalPager(
         modifier = modifier,
-        count = events.size,
+        count =
+        if(isLoading)
+            1
+        else
+            events.size,
         state = pagerState
     ) { page ->
-        val event = events[page]
-        PagerEventCard(event = event, modifier = Modifier.clickable {
+        val event = if(isLoading)
+            PreviewUtils.defaultEventItemsForMap[0] //To show some default shape of event
+        else events[page]
+        PagerEventCard(event = event, isLoading = isLoading, modifier = Modifier.clickable {
             onEventCardClick.invoke(event.eventId)
         })
     }
@@ -267,7 +280,7 @@ fun FiltersHeader(
 }
 
 @Composable
-fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) {
+fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen, isLoading: Boolean = false) {
     Card(
         modifier = modifier
             .width((LocalConfiguration.current.screenWidthDp - 30).dp)
@@ -282,6 +295,8 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) 
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
+                    modifier= Modifier
+                        .myLoadingEffect(isLoading),
                     text = event.dateDisplayString,
                     color = Orange,
                     fontFamily = montserratFont,
@@ -290,7 +305,9 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) 
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    modifier = Modifier.padding(top = 5.dp),
+                    modifier = Modifier
+                        .padding(top = 5.dp)
+                        .myLoadingEffect(isLoading),
                     text = event.tittle,
                     fontFamily = montserratFont,
                     fontWeight = FontWeight.SemiBold,
@@ -298,7 +315,9 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) 
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .myLoadingEffect(isLoading),
                     text = event.place,
                     fontFamily = montserratFont,
                     fontWeight = FontWeight.Normal,
@@ -308,17 +327,26 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen) 
             }
             AsyncImage(
                 modifier = Modifier
+                    .padding(end = if(isLoading)
+                        20.dp
+                    else
+                        0.dp)
                     .width(115.dp)
-                    .height(77.dp),
+                    .height(77.dp)
+                    .myLoadingEffect(isLoading),
                 model = event.imageUrl,
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds
             )
 
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_right_icon),
-                contentDescription = ""
-            )
+            if(!isLoading)
+            {
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_right_icon),
+                    contentDescription = ""
+                )
+            }
+
         }
     }
 }

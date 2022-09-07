@@ -7,6 +7,7 @@ import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -41,10 +42,11 @@ class MapViewModel @Inject constructor(
         }
         .flowOn(Dispatchers.IO)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val events = selectedFilters
         .flatMapLatest {
             flow {
-                delay(120)
+                delay(2120)
                 emit(PreviewUtils.defaultEventItemsForMap) //TODO: Change to some repository invocation
             }
         }.onStart { emit(listOf()) }
