@@ -103,4 +103,12 @@ class AccountsRepository @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
+    override fun getCurrentUser(): FirebaseUser? {
+        return authManager.getCurrentUser()
+    }
+
+    override fun signOut() {
+        authManager.signOut()
+    }
+
 }

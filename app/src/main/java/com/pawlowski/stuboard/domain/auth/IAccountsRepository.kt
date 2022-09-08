@@ -16,4 +16,6 @@ interface IAccountsRepository {
     suspend fun addUsernameToUser(user: FirebaseUser, username: String): AuthenticationResult
     fun oneTapSignInWithGoogle(): Flow<Response<BeginSignInResult>>
     fun firebaseSignInWithGoogle(googleCredential: AuthCredential): Flow<Response<Boolean>>
+    fun getCurrentUser(): FirebaseUser?
+    fun signOut()
 }

@@ -72,6 +72,10 @@ class AuthManager @Inject constructor(
         return firebaseAuth.currentUser?.getIdToken(true)?.await()?.token
     }
 
+    override fun getCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
+    }
+
     override fun observeAuthState(): Flow<FirebaseAuth> = flow {
         val stateChangeFlow = MutableStateFlow(firebaseAuth)
         val listener = FirebaseAuth.AuthStateListener()
@@ -88,6 +92,10 @@ class AuthManager @Inject constructor(
         {
             firebaseAuth.removeAuthStateListener(listener)
         }
+    }
+
+    override fun signOut() {
+        firebaseAuth.signOut()
     }
 
 

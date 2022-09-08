@@ -171,4 +171,12 @@ class AppModule {
     @Singleton
     @Provides
     fun oneTapSignInWithGoogleUseCase(accountsRepository: IAccountsRepository) = OneTapSignInWithGoogleUseCase(accountsRepository::oneTapSignInWithGoogle)
+
+    @Singleton
+    @Provides
+    fun getCurrentUserUseCase(accountsRepository: IAccountsRepository) = GetCurrentUserUseCase(accountsRepository::getCurrentUser)
+
+    @Singleton
+    @Provides
+    fun signOutUseCase(accountsRepository: IAccountsRepository) = SignOutUseCase(accountsRepository::signOut)
 }

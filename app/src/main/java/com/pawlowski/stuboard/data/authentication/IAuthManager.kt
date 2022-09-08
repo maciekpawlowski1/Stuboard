@@ -14,5 +14,7 @@ interface IAuthManager {
     suspend fun signInWithCredentials(authCredential: AuthCredential): Result<AuthResult>
     suspend fun addUsernameToUser(user: FirebaseUser, username: String): AuthenticationResult
     suspend fun getApiToken(): String?
+    fun getCurrentUser(): FirebaseUser?
     fun observeAuthState() : Flow<FirebaseAuth>
+    fun signOut()
 }
