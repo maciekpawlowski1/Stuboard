@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.presentation.login
 
+import android.content.Intent
 import org.orbitmvi.orbit.ContainerHost
 
 interface ILoginMviViewModel: ContainerHost<LoginUiState, LoginSingleEvent> {
@@ -8,4 +9,6 @@ interface ILoginMviViewModel: ContainerHost<LoginUiState, LoginSingleEvent> {
     fun changeVisibilityOfPassword()
     fun login()
     fun openRegisterScreen()
+    fun oneTapSignIn()
+    fun signInFromIntent(intent: Intent)
 }

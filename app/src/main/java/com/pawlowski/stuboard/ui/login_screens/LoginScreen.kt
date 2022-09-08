@@ -1,6 +1,11 @@
 package com.pawlowski.stuboard.ui.login_screens
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,8 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
+import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.pawlowski.stuboard.R
-import com.pawlowski.stuboard.presentation.login.*
+import com.pawlowski.stuboard.domain.Response
+import com.pawlowski.stuboard.presentation.login.ILoginMviViewModel
+import com.pawlowski.stuboard.presentation.login.LoginMviViewModel
+import com.pawlowski.stuboard.presentation.login.LoginSingleEvent
+import com.pawlowski.stuboard.presentation.login.LoginUiState
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -76,6 +86,11 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
     val isLoadingState = derivedStateOf {
         uiState.value.isLoading
     }
+
+    val oneTapResponseState = derivedStateOf {
+        uiState.value.oneTapSignInResponse
+    }
+
     val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { event ->
@@ -219,6 +234,9 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         HorizontalDividerWithLabelInTheMiddle()
         Spacer(modifier = Modifier.height(10.dp))
         LogInByGoogleButton()
+        {
+            viewModel.oneTapSignIn()
+        }
         Spacer(modifier = Modifier.height(10.dp))
         Text(modifier = Modifier
             .align(CenterHorizontally)
@@ -237,8 +255,44 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         ContinueAnonymousButton()
         Spacer(modifier = Modifier.height(10.dp))
 
+
+        HandleOneTapSignIn(oneTapResponseValue = { oneTapResponseState.value }, handleIntent = { intent ->
+            viewModel.signInFromIntent(intent)
+        })
+
     }
 
+}
+
+
+
+@Composable
+fun HandleOneTapSignIn(oneTapResponseValue: () -> Response<BeginSignInResult>, handleIntent: (Intent) -> Unit)
+{
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let {
+                handleIntent(it)
+            }
+        }
+    }
+
+    fun launch(signInResult: BeginSignInResult) {
+        val intent = IntentSenderRequest.Builder(signInResult.pendingIntent.intentSender).build()
+        launcher.launch(intent)
+    }
+
+    when(val result = oneTapResponseValue.invoke()) {
+        is Response.Success<BeginSignInResult> -> {
+            result.data?.let {
+                LaunchedEffect(it)
+                {
+                    launch(it)
+                }
+            }
+        }
+        else -> {}
+    }
 }
 
 @Composable
@@ -258,14 +312,14 @@ fun HorizontalDividerWithLabelInTheMiddle()
 }
 
 @Composable
-fun LogInByGoogleButton()
+fun LogInByGoogleButton(onClick: () -> Unit)
 {
     OutlinedButton(
         modifier = Modifier
             .padding(horizontal = 15.dp)
             .height(36.dp)
             .fillMaxWidth(),
-        onClick = { /*TODO*/ }
+        onClick = { onClick.invoke() }
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
@@ -319,6 +373,15 @@ fun LoginScreenPreview()
         override fun openRegisterScreen() {
             TODO("Not yet implemented")
         }
+
+        override fun oneTapSignIn() {
+            TODO("Not yet implemented")
+        }
+
+        override fun signInFromIntent(intent: Intent) {
+            TODO("Not yet implemented")
+        }
+
         override val container: Container<LoginUiState, LoginSingleEvent>
             get() = object: Container<LoginUiState, LoginSingleEvent> {
                 override val settings: Container.Settings

@@ -1,8 +1,6 @@
 package com.pawlowski.stuboard.data.authentication
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,9 +45,10 @@ class AuthManager @Inject constructor(
         }
     }
 
-    override suspend fun signInWithGoogle() {
-        TODO("Not yet implemented")
+    override suspend fun signInWithCredentials(authCredential: AuthCredential): AuthResult {
+        return firebaseAuth.signInWithCredential(authCredential).await()
     }
+
 
     override suspend fun addUsernameToUser(user: FirebaseUser, username: String): AuthenticationResult {
         return try {

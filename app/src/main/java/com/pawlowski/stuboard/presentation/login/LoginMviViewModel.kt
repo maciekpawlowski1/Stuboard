@@ -1,7 +1,14 @@
 package com.pawlowski.stuboard.presentation.login
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.GoogleAuthProvider.getCredential
 import com.pawlowski.stuboard.data.authentication.AuthenticationResult
+import com.pawlowski.stuboard.domain.Response
+import com.pawlowski.stuboard.domain.auth.IAccountsRepository
 import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -13,9 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginMviViewModel @Inject constructor(
     private val logInWithEmailAndPasswordUseCase: LogInWithEmailAndPasswordUseCase,
+    private val oneTapClient: SignInClient,
+    private val accountsRepository: IAccountsRepository,
 ): ILoginMviViewModel, ViewModel() {
 
     override val container = container<LoginUiState, LoginSingleEvent>(LoginUiState())
+
+
 
     override fun changeEmailInput(newValue: String) = intent {
         reduce {
@@ -58,4 +69,37 @@ class LoginMviViewModel @Inject constructor(
     override fun openRegisterScreen() = intent {
         postSideEffect(LoginSingleEvent.NavigateToRegisterScreen)
     }
+
+    override fun oneTapSignIn() = intent(registerIdling = false) {
+        accountsRepository.oneTapSignInWithGoogle().collect {
+            reduce {
+                state.copy(oneTapSignInResponse = it)
+            }
+        }
+    }
+
+    override fun signInFromIntent(intent: Intent) = intent {
+        try {
+            val credentials = oneTapClient.getSignInCredentialFromIntent(intent)
+            val googleIdToken = credentials.googleIdToken
+            val googleCredentials = getCredential(googleIdToken, null)
+            signInWithGoogle(googleCredentials)
+        } catch (e: ApiException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun signInWithGoogle(googleCredential: AuthCredential) = intent {
+        accountsRepository.firebaseSignInWithGoogle(googleCredential).collect { response ->
+            if(response is Response.Success)
+            {
+                response.data?.let {
+                    postSideEffect(LoginSingleEvent.LoginSuccess)
+                }
+            }
+        }
+    }
+
+
 }

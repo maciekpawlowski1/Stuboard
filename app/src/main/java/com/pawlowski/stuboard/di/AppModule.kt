@@ -2,7 +2,10 @@ package com.pawlowski.stuboard.di
 
 import android.app.Application
 import android.content.Context
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
+import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.*
 import com.pawlowski.stuboard.data.authentication.AuthManager
 import com.pawlowski.stuboard.data.authentication.IAuthManager
@@ -10,11 +13,14 @@ import com.pawlowski.stuboard.data.remote.FakeEventsService
 import com.pawlowski.stuboard.data.local.IFiltersDao
 import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.domain.*
+import com.pawlowski.stuboard.domain.auth.AccountsRepository
+import com.pawlowski.stuboard.domain.auth.IAccountsRepository
 import com.pawlowski.stuboard.presentation.use_cases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -72,6 +78,35 @@ class AppModule {
     @Singleton
     @Provides
     fun authManager(authManager: AuthManager): IAuthManager = authManager
+
+    @Singleton
+    @Provides
+    fun oneTapClient(appContext: Context) = Identity.getSignInClient(appContext)
+
+    @Named("SIGN_IN")
+    @Provides
+    fun signInRequest(appContext: Context) = BeginSignInRequest.builder()
+        .setGoogleIdTokenRequestOptions(
+            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                .setSupported(true)
+                .setServerClientId(appContext.getString(R.string.firebase_web_client_id))
+                .setFilterByAuthorizedAccounts(true)
+                .build())
+        .setAutoSelectEnabled(true)
+        .build()
+
+    @Named("SIGN_UP")
+    @Provides
+    fun signUpRequest(appContext: Context) = BeginSignInRequest.builder()
+        .setGoogleIdTokenRequestOptions(
+            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                .setSupported(true)
+                .setServerClientId(appContext.getString(R.string.firebase_web_client_id))
+                .setFilterByAuthorizedAccounts(false)
+                .build())
+        .setAutoSelectEnabled(true)
+        .build()
+
 
     @Singleton
     @Provides

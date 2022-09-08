@@ -128,6 +128,9 @@ dependencies {
     //Firebase coroutines support
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
 
+    //Google sign in
+    implementation "com.google.android.gms:play-services-auth:20.3.0"
+
     //Paging
     implementation("androidx.paging:paging-runtime:3.1.1")
     implementation("androidx.paging:paging-compose:1.0.0-alpha15")

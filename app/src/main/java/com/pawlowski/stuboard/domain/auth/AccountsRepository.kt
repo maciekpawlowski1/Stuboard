@@ -1,19 +1,30 @@
-package com.pawlowski.stuboard.domain
+package com.pawlowski.stuboard.domain.auth
 
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 import com.pawlowski.stuboard.data.authentication.AuthenticationResult
 import com.pawlowski.stuboard.data.authentication.IAuthManager
+import com.pawlowski.stuboard.domain.Response
 import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class AccountsRepository @Inject constructor(
-    private val authManager: IAuthManager
+    private val authManager: IAuthManager,
+    private val oneTapClient: SignInClient,
+    @Named("SIGN_IN")
+    private val signInRequest: BeginSignInRequest,
+    @Named("SIGN_UP")
+    private val signUpRequest: BeginSignInRequest,
 ): IAccountsRepository {
 
 
@@ -59,6 +70,35 @@ class AccountsRepository @Inject constructor(
     ): AuthenticationResult {
         return withContext(Dispatchers.IO) {
             authManager.addUsernameToUser(user, username)
+        }
+    }
+
+    override fun oneTapSignInWithGoogle() = flow {
+        try {
+            emit(Response.Loading)
+            val signInResult = oneTapClient.beginSignIn(signInRequest).await()
+            emit(Response.Success(signInResult))
+        } catch (e: Exception) {
+            try {
+                val signUpResult = oneTapClient.beginSignIn(signUpRequest).await()
+                emit(Response.Success(signUpResult))
+            } catch (e: Exception) {
+                emit(Response.Failure(e))
+            }
+        }
+    }
+
+    override fun firebaseSignInWithGoogle(googleCredential: AuthCredential) = flow {
+        try {
+            emit(Response.Loading)
+            val authResult = authManager.signInWithCredentials(googleCredential)
+            val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
+            if (isNewUser) {
+                //TODO
+            }
+            emit(Response.Success(true))
+        } catch (e: Exception) {
+            emit(Response.Failure(e))
         }
     }
 
