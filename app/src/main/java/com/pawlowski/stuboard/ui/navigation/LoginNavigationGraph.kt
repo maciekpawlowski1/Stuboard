@@ -26,6 +26,9 @@ fun LoginNavigationGraph(navController: NavHostController, startDestination: Str
                     navController.navigate("Root")
                     {
                         popUpTo("Login")
+                        {
+                            inclusive = true
+                        }
                         launchSingleTop = true
                     }
                 }
@@ -39,6 +42,9 @@ fun LoginNavigationGraph(navController: NavHostController, startDestination: Str
                 navController.navigate("Root")
                 {
                     popUpTo("Login")
+                    {
+                        inclusive = true
+                    }
                     launchSingleTop = true
                 }
             })
@@ -48,7 +54,10 @@ fun LoginNavigationGraph(navController: NavHostController, startDestination: Str
             RootComposable(onNavigateToLoginScreen = {
                 navController.navigate("Login")
                 {
-                    popUpTo("Login")
+                    popUpTo("Root")
+                    {
+                        inclusive = true
+                    }
                     launchSingleTop = true
                 }
             })
