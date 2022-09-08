@@ -163,4 +163,12 @@ class AppModule {
     @Singleton
     @Provides
     fun getLogInStateUseCase(accountsRepository: IAccountsRepository) = GetLogInStateUseCase(accountsRepository::getLogInState)
+
+    @Singleton
+    @Provides
+    fun firebaseSignInWithGoogleUseCase(accountsRepository: IAccountsRepository) = FirebaseSignInWithGoogleUseCase(accountsRepository::firebaseSignInWithGoogle)
+
+    @Singleton
+    @Provides
+    fun oneTapSignInWithGoogleUseCase(accountsRepository: IAccountsRepository) = OneTapSignInWithGoogleUseCase(accountsRepository::oneTapSignInWithGoogle)
 }

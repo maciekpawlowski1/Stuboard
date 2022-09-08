@@ -45,8 +45,15 @@ class AuthManager @Inject constructor(
         }
     }
 
-    override suspend fun signInWithCredentials(authCredential: AuthCredential): AuthResult {
-        return firebaseAuth.signInWithCredential(authCredential).await()
+    override suspend fun signInWithCredentials(authCredential: AuthCredential): Result<AuthResult> {
+        return try {
+            val result = firebaseAuth.signInWithCredential(authCredential).await()
+            Result.success(result)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
     }
 
 
@@ -56,6 +63,7 @@ class AuthManager @Inject constructor(
             AuthenticationResult.Success(user)
         }
         catch (e: Exception) {
+            e.printStackTrace()
             AuthenticationResult.Failure(e.localizedMessage)
         }
     }
@@ -72,13 +80,13 @@ class AuthManager @Inject constructor(
         }
         try {
             firebaseAuth.addAuthStateListener(listener)
+            stateChangeFlow.collect {
+                emit(it)
+            }
         }
         catch (e: CancellationException)
         {
             firebaseAuth.removeAuthStateListener(listener)
-        }
-        stateChangeFlow.collect {
-            emit(it)
         }
     }
 

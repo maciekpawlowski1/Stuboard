@@ -9,7 +9,6 @@ sealed class AuthenticationResult {
 
     data class Failure(
         val errorMessage: String?,
-        val exception: Exception? = null,
     ): AuthenticationResult()
 
 }

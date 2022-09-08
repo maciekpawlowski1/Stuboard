@@ -8,8 +8,9 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider.getCredential
 import com.pawlowski.stuboard.data.authentication.AuthenticationResult
 import com.pawlowski.stuboard.domain.Response
-import com.pawlowski.stuboard.domain.auth.IAccountsRepository
+import com.pawlowski.stuboard.presentation.use_cases.FirebaseSignInWithGoogleUseCase
 import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
+import com.pawlowski.stuboard.presentation.use_cases.OneTapSignInWithGoogleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class LoginMviViewModel @Inject constructor(
     private val logInWithEmailAndPasswordUseCase: LogInWithEmailAndPasswordUseCase,
     private val oneTapClient: SignInClient,
-    private val accountsRepository: IAccountsRepository,
+    private val oneTapSignInWithGoogleUseCase: OneTapSignInWithGoogleUseCase,
+    private val firebaseSignInWithGoogleUseCase: FirebaseSignInWithGoogleUseCase,
 ): ILoginMviViewModel, ViewModel() {
 
     override val container = container<LoginUiState, LoginSingleEvent>(LoginUiState())
@@ -71,7 +73,7 @@ class LoginMviViewModel @Inject constructor(
     }
 
     override fun oneTapSignIn() = intent(registerIdling = false) {
-        accountsRepository.oneTapSignInWithGoogle().collect {
+        oneTapSignInWithGoogleUseCase().collect {
             reduce {
                 state.copy(oneTapSignInResponse = it)
             }
@@ -90,14 +92,27 @@ class LoginMviViewModel @Inject constructor(
 
     }
 
-    private fun signInWithGoogle(googleCredential: AuthCredential) = intent {
-        accountsRepository.firebaseSignInWithGoogle(googleCredential).collect { response ->
-            if(response is Response.Success)
+    private fun signInWithGoogle(googleCredential: AuthCredential) = intent(registerIdling = false) {
+        firebaseSignInWithGoogleUseCase(googleCredential).collect { response ->
+            when(response)
             {
-                response.data?.let {
-                    postSideEffect(LoginSingleEvent.LoginSuccess)
+                is Response.Success -> {
+                    response.data?.let {
+                        postSideEffect(LoginSingleEvent.LoginSuccess)
+                        reduce {
+                            LoginUiState()
+                        }
+                    }
+                }
+                is Response.Loading -> {
+                    reduce { state.copy(isLoading = true) }
+                }
+                is Response.Failure -> {
+                    postSideEffect(LoginSingleEvent.LoginFailure(response.e.localizedMessage?:"Login failed"))
+                    reduce { state.copy(isLoading = false) }
                 }
             }
+
         }
     }
 

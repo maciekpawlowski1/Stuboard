@@ -11,6 +11,7 @@ import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class AccountsRepository @Inject constructor(
             else
                 emit(AppLoginState.NotLoggedIn)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun logInWithEmailAndPassword(email: String, password: String): AuthenticationResult {
         return withContext(Dispatchers.IO) {
@@ -86,12 +87,12 @@ class AccountsRepository @Inject constructor(
                 emit(Response.Failure(e))
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun firebaseSignInWithGoogle(googleCredential: AuthCredential) = flow {
         try {
             emit(Response.Loading)
-            val authResult = authManager.signInWithCredentials(googleCredential)
+            val authResult = authManager.signInWithCredentials(googleCredential).getOrThrow()
             val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
             if (isNewUser) {
                 //TODO
@@ -100,6 +101,6 @@ class AccountsRepository @Inject constructor(
         } catch (e: Exception) {
             emit(Response.Failure(e))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
 }
