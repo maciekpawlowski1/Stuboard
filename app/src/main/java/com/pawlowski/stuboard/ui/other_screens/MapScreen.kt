@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,9 +30,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
-import com.pawlowski.stuboard.presentation.map.*
+import com.pawlowski.stuboard.presentation.map.IMapMviViewModel
+import com.pawlowski.stuboard.presentation.map.MapMviViewModel
+import com.pawlowski.stuboard.presentation.map.MapSingleEvent
+import com.pawlowski.stuboard.presentation.map.MapUiState
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
-import com.pawlowski.stuboard.ui.models.EventMarker
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.LightGray
 import com.pawlowski.stuboard.ui.theme.MidGrey
@@ -41,9 +42,8 @@ import com.pawlowski.stuboard.ui.theme.Orange
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -54,6 +54,40 @@ fun MapScreen(
     viewModel: IMapMviViewModel = hiltViewModel<MapMviViewModel>()
 ) {
     BackHandler(onBack = onNavigateBack)
+
+
+    val pagerState = rememberPagerState()
+
+    val cameraPositionState = rememberCameraPositionState()
+    {
+        position = CameraPosition.fromLatLngZoom(LatLng(50.0624, 19.9116), 12f)
+    }
+    val mapsAnimationScope = rememberCoroutineScope()
+    val pagerAnimationScope = rememberCoroutineScope()
+    LaunchedEffect(true) {
+        viewModel.container.sideEffectFlow.collect { event ->
+            when(event) {
+                is MapSingleEvent.AnimatedMoveMapToPosition -> {
+                    println("Launching map")
+                    mapsAnimationScope.launch(SupervisorJob()) {
+                        println("Move map to ${event.position}")
+                        cameraPositionState.animate(CameraUpdateFactory.newLatLng(event.position))
+                    }
+
+                }
+                is MapSingleEvent.AnimatedScrollToPage -> {
+                    if(pagerAnimationScope.isActive)
+                        pagerAnimationScope.coroutineContext.cancelChildren()
+                    pagerAnimationScope.launch(SupervisorJob()) {
+                        println("Srolling")
+                        pagerState.animateScrollToPage(event.pageIndex)
+                    }
+
+                }
+            }
+        }
+    }
+
     val uiState = viewModel.container.stateFlow.collectAsState()
     val eventsState = derivedStateOf {
         val uiStateValue = uiState.value
@@ -72,25 +106,15 @@ fun MapScreen(
 
     val events = eventsState.value
 
-    var selectedEventId by remember {
-        mutableStateOf(events.getOrNull(0)?.eventId)
-    }
-
-
-    //TODO: Increase performance and don't recompose the map every time
-    val markers = remember(key1 = events, key2 = selectedEventId) {
-        events.map {
-            EventMarker(
-                position = it.position,
-                iconId = if (it.eventId == selectedEventId)
-                    it.mainCategoryDrawableIdWhenSelected
-                else
-                    it.mainCategoryDrawableId,
-                eventTittle = it.tittle,
-                eventId = it.eventId
-            )
+    val markersState = derivedStateOf {
+        when(val uiStateValue = uiState.value) {
+            is MapUiState.Success -> uiStateValue.markers
+            else -> listOf()
         }
     }
+
+
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         FiltersHeader(
@@ -101,27 +125,15 @@ fun MapScreen(
         Box(modifier = Modifier.fillMaxSize())
         {
 
-            val coroutineScope = rememberCoroutineScope()
-            val pagerState = rememberPagerState()
-
-            val cameraPositionState = rememberCameraPositionState()
-            {
-                position = CameraPosition.fromLatLngZoom(LatLng(50.0624, 19.9116), 12f)
-            }
             MyGoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 preview = preview,
-                markers = markers,
+                markers = markersState.value,
                 locationButtonsEnabledWithAskingPermission = true,
                 moveCameraToMarkersBound = false,
                 onMarkerClick = { marker ->
-                    selectedEventId = marker.eventId
-                    val selectedIndex = events.indexOfFirst { it.eventId == selectedEventId }
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(selectedIndex)
-                    }
-
+                    viewModel.onEventSelected(marker.eventId)
                 }
             )
 
@@ -138,18 +150,8 @@ fun MapScreen(
                 isLoading = isLoadingState.value,
                 pagerState = pagerState,
             )
-            { pageIndex, changesCount ->
-                val newEvent = events.getOrNull(pageIndex)
-                selectedEventId = newEvent?.eventId
-                newEvent?.let {
-                    coroutineScope.launch {
-                        if(changesCount == 0)
-                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it.position, 12f))
-                        else
-                            cameraPositionState.animate(CameraUpdateFactory.newLatLng(it.position))
-                    }
-                }
-
+            { pageIndex ->
+                viewModel.onPageChanged(pageIndex)
             }
         }
 
@@ -165,7 +167,7 @@ fun EventsPager(
     events: List<EventItemForMapScreen>,
     isLoading: Boolean = false,
     onEventCardClick: (eventId: Int) -> Unit = {},
-    onPageChanged: (pageIndex: Int, changesCount: Int) -> Unit = {_,_->},
+    onPageChanged: (pageIndex: Int) -> Unit = {},
 ) {
     HorizontalPager(
         modifier = modifier,
@@ -185,12 +187,12 @@ fun EventsPager(
     }
 
     val pageIndex = pagerState.currentPage
-    val changesCount = remember {
-        mutableStateOf(0)
-    }
-    LaunchedEffect(key1 = pageIndex, key2 = events)
+    val isScrolling = pagerState.isScrollInProgress
+
+    LaunchedEffect(pageIndex, isScrolling)
     {
-        onPageChanged.invoke(pageIndex, changesCount.value++)
+        if(!isScrolling)
+            onPageChanged.invoke(pageIndex)
     }
 }
 
@@ -325,10 +327,12 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen, 
             }
             AsyncImage(
                 modifier = Modifier
-                    .padding(end = if(isLoading)
-                        20.dp
-                    else
-                        0.dp)
+                    .padding(
+                        end = if (isLoading)
+                            20.dp
+                        else
+                            0.dp
+                    )
                     .width(115.dp)
                     .height(77.dp)
                     .myLoadingEffect(isLoading),
