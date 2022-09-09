@@ -179,4 +179,8 @@ class AppModule {
     @Singleton
     @Provides
     fun signOutUseCase(accountsRepository: IAccountsRepository) = SignOutUseCase(accountsRepository::signOut)
+
+    @Singleton
+    @Provides
+    fun getEventsForMapScreenUseCase(eventsRepository: EventsRepository) = GetEventsForMapScreenUseCase(eventsRepository::getEventsForMapScreen)
 }

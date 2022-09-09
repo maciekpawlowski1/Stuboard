@@ -44,7 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.pawlowski.stuboard.R
-import com.pawlowski.stuboard.domain.Response
+import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.login.ILoginMviViewModel
 import com.pawlowski.stuboard.presentation.login.LoginMviViewModel
 import com.pawlowski.stuboard.presentation.login.LoginSingleEvent

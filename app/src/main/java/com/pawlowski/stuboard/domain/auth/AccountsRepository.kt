@@ -6,7 +6,7 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 import com.pawlowski.stuboard.data.authentication.AuthenticationResult
 import com.pawlowski.stuboard.data.authentication.IAuthManager
-import com.pawlowski.stuboard.domain.Response
+import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

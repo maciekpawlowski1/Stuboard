@@ -7,7 +7,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider.getCredential
 import com.pawlowski.stuboard.data.authentication.AuthenticationResult
-import com.pawlowski.stuboard.domain.Response
+import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.use_cases.FirebaseSignInWithGoogleUseCase
 import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.OneTapSignInWithGoogleUseCase

@@ -4,9 +4,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.pawlowski.stuboard.data.remote.FakeEventsService
+import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
+import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
@@ -79,6 +81,11 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
                 )
             }
         ).flow
+    }
+
+    override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
+        delay(2120)
+        return Resource.Success(PreviewUtils.defaultEventItemsForMap)
     }
 
 

@@ -1,4 +1,4 @@
-package com.pawlowski.stuboard.domain
+package com.pawlowski.stuboard.domain.models
 
 sealed class Response<out T> {
     object Loading: Response<Nothing>()

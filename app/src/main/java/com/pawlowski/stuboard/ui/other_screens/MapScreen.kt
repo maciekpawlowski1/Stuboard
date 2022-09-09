@@ -31,9 +31,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
-import com.pawlowski.stuboard.presentation.map.IMapViewModel
-import com.pawlowski.stuboard.presentation.map.MapUiState
-import com.pawlowski.stuboard.presentation.map.MapViewModel
+import com.pawlowski.stuboard.presentation.map.*
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventMarker
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
@@ -53,10 +51,10 @@ fun MapScreen(
     preview: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {},
-    viewModel: IMapViewModel = hiltViewModel<MapViewModel>()
+    viewModel: IMapMviViewModel = hiltViewModel<MapMviViewModel>()
 ) {
     BackHandler(onBack = onNavigateBack)
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.container.stateFlow.collectAsState()
     val eventsState = derivedStateOf {
         val uiStateValue = uiState.value
         if(uiStateValue is MapUiState.Success)
@@ -351,16 +349,16 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen, 
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MapScreenPreview() {
-    MapScreen(preview = true, viewModel = object: IMapViewModel
-    {
-        override val uiState: StateFlow<MapUiState> = MutableStateFlow(
-            MapUiState.Success(
-                events = PreviewUtils.defaultEventItemsForMap,
-                _currentFilters = PreviewUtils.defaultFilters
-            )
-        )
-    })
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MapScreenPreview() {
+//    MapScreen(preview = true, viewModel = object: IMapViewModel
+//    {
+//        override val uiState: StateFlow<MapUiState> = MutableStateFlow(
+//            MapUiState.Success(
+//                events = PreviewUtils.defaultEventItemsForMap,
+//                _currentFilters = PreviewUtils.defaultFilters
+//            )
+//        )
+//    })
+//}
