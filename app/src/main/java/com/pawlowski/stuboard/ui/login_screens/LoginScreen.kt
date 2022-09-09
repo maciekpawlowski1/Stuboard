@@ -103,7 +103,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                     navigationCallbacks.onNavigateToRoot()
                 }
                 is LoginSingleEvent.LoginFailure -> {
-                    Toast.makeText(context, event.errorMessage, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, event.errorMessage.asString(context), Toast.LENGTH_LONG).show()
                 }
             }
         }

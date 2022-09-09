@@ -1,6 +1,8 @@
 package com.pawlowski.stuboard.data.authentication
 
 import com.google.firebase.auth.*
+import com.pawlowski.stuboard.domain.models.Resource
+import com.pawlowski.stuboard.presentation.utils.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,31 +19,31 @@ class AuthManager @Inject constructor(
         return firebaseAuth.currentUser != null
     }
 
-    override suspend fun signInWithPassword(mail: String, password: String): AuthenticationResult {
+    override suspend fun signInWithPassword(mail: String, password: String): Resource<FirebaseUser> {
         return try {
             val user = firebaseAuth.signInWithEmailAndPassword(mail, password).await()?.user
             if(user != null)
-                AuthenticationResult.Success(user)
+                Resource.Success(user)
             else
-                AuthenticationResult.Failure(null)
+                Resource.Error(UiText.StaticText("Unknown error"))
         }
         catch (e: Exception)
         {
-            AuthenticationResult.Failure(e.localizedMessage)
+            Resource.Error(UiText.StaticText(e.localizedMessage?:"Some error happened"))
         }
     }
 
-    override suspend fun registerWithPassword(mail: String, password: String): AuthenticationResult {
+    override suspend fun registerWithPassword(mail: String, password: String): Resource<FirebaseUser> {
         return try {
             val user = firebaseAuth.createUserWithEmailAndPassword(mail, password).await()?.user
             if(user != null)
-                AuthenticationResult.Success(user)
+                Resource.Success(user)
             else
-                AuthenticationResult.Failure(null)
+                Resource.Error(UiText.StaticText("Unknown error"))
         }
         catch (e: Exception)
         {
-            AuthenticationResult.Failure(e.localizedMessage)
+            Resource.Error(UiText.StaticText(e.localizedMessage?:"Some error happened"))
         }
     }
 
@@ -57,14 +59,14 @@ class AuthManager @Inject constructor(
     }
 
 
-    override suspend fun addUsernameToUser(user: FirebaseUser, username: String): AuthenticationResult {
+    override suspend fun addUsernameToUser(user: FirebaseUser, username: String): Resource<FirebaseUser> {
         return try {
             user.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(username).build()).await()
-            AuthenticationResult.Success(user)
+            Resource.Success(user)
         }
         catch (e: Exception) {
             e.printStackTrace()
-            AuthenticationResult.Failure(e.localizedMessage)
+            Resource.Error(UiText.StaticText(e.localizedMessage?:"Some problem happened"))
         }
     }
 

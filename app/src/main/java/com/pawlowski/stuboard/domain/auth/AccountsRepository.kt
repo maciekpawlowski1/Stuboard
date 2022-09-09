@@ -4,8 +4,8 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
-import com.pawlowski.stuboard.data.authentication.AuthenticationResult
 import com.pawlowski.stuboard.data.authentication.IAuthManager
+import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +50,7 @@ class AccountsRepository @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun logInWithEmailAndPassword(email: String, password: String): AuthenticationResult {
+    override suspend fun logInWithEmailAndPassword(email: String, password: String): Resource<FirebaseUser> {
         return withContext(Dispatchers.IO) {
             authManager.signInWithPassword(email, password)
         }
@@ -59,7 +59,7 @@ class AccountsRepository @Inject constructor(
     override suspend fun registerWithEmailAndPassword(
         email: String,
         password: String
-    ): AuthenticationResult {
+    ): Resource<FirebaseUser> {
         return withContext(Dispatchers.IO) {
             authManager.registerWithPassword(email, password)
         }
@@ -68,7 +68,7 @@ class AccountsRepository @Inject constructor(
     override suspend fun addUsernameToUser(
         user: FirebaseUser,
         username: String
-    ): AuthenticationResult {
+    ): Resource<FirebaseUser> {
         return withContext(Dispatchers.IO) {
             authManager.addUsernameToUser(user, username)
         }

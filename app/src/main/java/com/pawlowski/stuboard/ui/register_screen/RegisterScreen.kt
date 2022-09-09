@@ -43,7 +43,7 @@ fun RegisterScreen(
                     onNavigateToRoot.invoke()
                 }
                 is RegisterSingleEvent.RegisterFailure -> {
-                    Toast.makeText(context, event.errorMessage, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, event.errorMessage.asString(context), Toast.LENGTH_LONG).show()
                 }
             }
         }

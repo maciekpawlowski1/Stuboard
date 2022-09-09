@@ -6,11 +6,12 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider.getCredential
-import com.pawlowski.stuboard.data.authentication.AuthenticationResult
+import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.use_cases.FirebaseSignInWithGoogleUseCase
 import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.OneTapSignInWithGoogleUseCase
+import com.pawlowski.stuboard.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -53,14 +54,14 @@ class LoginMviViewModel @Inject constructor(
             state.copy(isLoading = true)
         }
         when(val result = logInWithEmailAndPasswordUseCase(state.email.trim(), state.password)) {
-            is AuthenticationResult.Success -> {
+            is Resource.Success -> {
                 postSideEffect(LoginSingleEvent.LoginSuccess)
                 reduce {
                     LoginUiState()
                 }
             }
-            is AuthenticationResult.Failure -> {
-                postSideEffect(LoginSingleEvent.LoginFailure(result.errorMessage?:"Login failed!"))
+            is Resource.Error -> {
+                postSideEffect(LoginSingleEvent.LoginFailure(result.message?:UiText.StaticText("Login failed")))
                 reduce {
                     state.copy(isLoading = false)
                 }
@@ -108,7 +109,7 @@ class LoginMviViewModel @Inject constructor(
                     reduce { state.copy(isLoading = true) }
                 }
                 is Response.Failure -> {
-                    postSideEffect(LoginSingleEvent.LoginFailure(response.e.localizedMessage?:"Login failed"))
+                    postSideEffect(LoginSingleEvent.LoginFailure(UiText.StaticText(response.e.localizedMessage?:"Login failed")))
                     reduce { state.copy(isLoading = false) }
                 }
             }

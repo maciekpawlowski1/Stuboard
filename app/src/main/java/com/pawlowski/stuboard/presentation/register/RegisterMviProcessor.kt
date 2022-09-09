@@ -1,12 +1,13 @@
 package com.pawlowski.stuboard.presentation.register
 
-import com.pawlowski.stuboard.data.authentication.AuthenticationResult
+import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.use_cases.AddUsernameToUserUseCase
 import com.pawlowski.stuboard.presentation.use_cases.RegisterWithEmailAndPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateEmailUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNameOrSurnameUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateNewPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateRepeatedPasswordUseCase
+import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.register_screen.AccountType
 import com.pawlowski.stuboard.ui.register_screen.RegisterScreenType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -139,10 +140,11 @@ class RegisterMviProcessor @Inject constructor(
                 if(!state.isLoading)
                     return null // Some validation error
                 val result = registerWithEmailAndPasswordUseCase(state.email.trim(), state.password)
-                return if(result is AuthenticationResult.Success)
+                return if(result is Resource.Success && result.data != null)
                 {
-                    val usernameResult = addUsernameToUserUseCase(result.user, "${state.name.trim()} ${state.surname.trim()}")
-                    if(usernameResult is AuthenticationResult.Success)
+
+                    val usernameResult = addUsernameToUserUseCase(result.data, "${state.name.trim()} ${state.surname.trim()}")
+                    if(usernameResult is Resource.Success)
                     {
                         triggerSingleEvent(RegisterSingleEvent.RegisterSuccess)
                         null
@@ -152,7 +154,7 @@ class RegisterMviProcessor @Inject constructor(
                 }
                 else
                 {
-                    triggerSingleEvent(RegisterSingleEvent.RegisterFailure((result as AuthenticationResult.Failure).errorMessage?:"Registration failed!"))
+                    triggerSingleEvent(RegisterSingleEvent.RegisterFailure(result.message?:UiText.StaticText("Registration failed!")))
 
                     RegisterIntent.StopShowingLoading
                 }
