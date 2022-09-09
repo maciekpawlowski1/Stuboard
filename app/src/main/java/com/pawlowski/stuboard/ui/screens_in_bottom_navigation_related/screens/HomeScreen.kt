@@ -109,7 +109,7 @@ fun HomeScreen(
                 CategoriesRow(categories = categoriesState.value)
                 {
                     //TODO: Navigate only when changing filters done to avoid possible more network calls
-                    viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilter(it))
+                    viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilters(listOf(it)))
                     onNavigateToSearchScreen.invoke()
                 }
             }
@@ -122,13 +122,7 @@ fun HomeScreen(
                     label1 = it.suggestionType,
                     label2 = "Więcej"
                 ) {
-                    it.suggestionFilters?.let { filtersList ->
-                        filtersList.forEach { filter ->
-                            viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilter(filter))
-                        }
-
-
-                    }
+                    viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilters(it.suggestionFilters))
                     onNavigateToSearchScreen.invoke()
                 }
                 EventsRow(eventItemsForPreview = it.events, isLoading = it.isLoading)

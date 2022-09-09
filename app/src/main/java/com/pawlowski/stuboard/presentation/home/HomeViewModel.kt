@@ -2,7 +2,6 @@ package com.pawlowski.stuboard.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pawlowski.stuboard.presentation.home.HomeUiAction.ClearAllFiltersAndSelectFilter
 import com.pawlowski.stuboard.presentation.use_cases.GetHomeEventTypesSuggestionsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetPreferredCategoriesUseCase
 import com.pawlowski.stuboard.presentation.use_cases.SelectNewFilterUseCase
@@ -47,9 +46,11 @@ class HomeViewModel @Inject constructor(
     private val actionHandlerJob = actionFlow.onEach {
         when(it)
         {
-            is ClearAllFiltersAndSelectFilter -> {
+            is HomeUiAction.ClearAllFiltersAndSelectFilters -> {
                 unselectAllFiltersUseCase()
-                selectNewFilterUseCase(it.filterModel)
+                it.filters?.forEach { filter ->
+                    selectNewFilterUseCase(filter)
+                }
             }
         }
     }.launchIn(viewModelScope)
