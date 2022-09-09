@@ -17,7 +17,8 @@ class InMemoryFiltersDao @Inject constructor(
     override suspend fun selectFilter(filterModel: FilterModel) {
         selectedFilters.update {
             it.toMutableList().apply {
-                add(filterModel)
+                if(!contains(filterModel))
+                    add(filterModel)
             }
         }
     }

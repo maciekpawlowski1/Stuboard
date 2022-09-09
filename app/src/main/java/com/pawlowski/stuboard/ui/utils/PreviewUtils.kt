@@ -91,6 +91,10 @@ object PreviewUtils {
     )
 
     val defaultFilters = listOf(
+        FilterModel.Place.RealPlace("Katowice"),
+        FilterModel.Place.RealPlace("Kraków"),
+        FilterModel.Place.RealPlace("Warszawa"),
+        FilterModel.Place.RealPlace("Sosnowiec"),
         FilterModel.Place.Online,
         FilterModel.Category("Koncerty", R.drawable.concerts_category_image),
         FilterModel.Category("Naukowe", R.drawable.learning_category_image),

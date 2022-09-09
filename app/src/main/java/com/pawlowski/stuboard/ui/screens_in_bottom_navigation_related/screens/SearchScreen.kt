@@ -453,6 +453,7 @@ fun FilterLabelBox(
     borderColor: Color = Green,
     borderWith: Dp = 1.3.dp,
     height: Dp = 29.dp,
+    contentAlignment: Alignment = CenterStart,
     icon: @Composable () -> Unit = { },
 ) {
     Card(
@@ -461,7 +462,7 @@ fun FilterLabelBox(
         shape = RectangleShape,
         border = BorderStroke(borderWith, color = borderColor)
     ) {
-        Box(contentAlignment = CenterStart)
+        Box(contentAlignment = contentAlignment)
         {
             Row(verticalAlignment = CenterVertically) {
                 icon.invoke()
