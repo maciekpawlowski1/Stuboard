@@ -32,7 +32,7 @@ import org.orbitmvi.orbit.annotation.OrbitInternal
 import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
-fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
+fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEventsScreen: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
 {
     val uiState = viewModel.container.stateFlow.collectAsState()
 
@@ -42,6 +42,9 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, viewModel: IAccountV
             {
                 is AccountSingleEvent.NavigateToLogIn -> {
                     onNavigateToLoginScreen()
+                }
+                is AccountSingleEvent.NavigateToMyEventsScreen -> {
+                    onNavigateToMyEventsScreen()
                 }
             }
         }
@@ -64,6 +67,8 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, viewModel: IAccountV
         Spacer(modifier = Modifier.height(20.dp))
         OptionsCard(Modifier.padding(horizontal = 10.dp), onLogOutClick = {
             viewModel.signOut()
+        }, onMyEventsClick = {
+            viewModel.myEventsClick()
         })
 
 
@@ -72,7 +77,7 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, viewModel: IAccountV
 }
 
 @Composable
-fun OptionsCard(modifier: Modifier = Modifier, onLogOutClick: () -> Unit)
+fun OptionsCard(modifier: Modifier = Modifier, onMyEventsClick: () -> Unit, onLogOutClick: () -> Unit)
 {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -90,6 +95,15 @@ fun OptionsCard(modifier: Modifier = Modifier, onLogOutClick: () -> Unit)
                 label = "Dokonaj zmian na swoim koncie"
             ) {
 
+            }
+
+            OptionRow(
+                padding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
+                iconId = R.drawable.guitar_icon,
+                tittle = "Moje wydarzenia",
+                label = "Dodawaj własne wydarzenia"
+            ) {
+                onMyEventsClick()
             }
 
             OptionRow(
@@ -231,6 +245,10 @@ private fun AccountScreenPreview()
 {
     AccountScreen(viewModel = object : IAccountViewModel {
         override fun signOut() {
+            TODO("Not yet implemented")
+        }
+
+        override fun myEventsClick() {
             TODO("Not yet implemented")
         }
 

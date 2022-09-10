@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.pawlowski.stuboard.ui.event_editing.MyEventsScreen
 import com.pawlowski.stuboard.ui.other_screens.EventDetailsScreen
 import com.pawlowski.stuboard.ui.other_screens.FiltersScreen
 import com.pawlowski.stuboard.ui.other_screens.MapScreen
@@ -89,6 +90,19 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
         {
             AccountScreen(onNavigateToLoginScreen = {
                 onNavigateToLoginScreen.invoke()
+            },
+            onNavigateToMyEventsScreen = {
+                navController.navigate(NavRoutes.MY_EVENTS)
+                {
+                    launchSingleTop = true
+                }
+            })
+        }
+
+        composable(route = NavRoutes.MY_EVENTS)
+        {
+            MyEventsScreen(onNavigateBack = {
+                navController.popBackStack()
             })
         }
 

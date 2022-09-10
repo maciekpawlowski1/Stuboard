@@ -32,6 +32,9 @@ class AccountViewModel @Inject constructor(
             }
         }
 
+    override fun myEventsClick() = intent {
+        postSideEffect(AccountSingleEvent.NavigateToMyEventsScreen)
+    }
 
     override fun signOut() = intent {
         signOutUseCase()
