@@ -4,5 +4,7 @@ import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
 
 data class EditEventUiState(
     val currentPage: EditEventScreenType = EditEventScreenType.FIRST,
-    val tittleInput: String = ""
+    val tittleInput: String = "",
+    val sinceTime: Long? = null,
+    val toTime: Long? = null,
 )

@@ -143,6 +143,6 @@ dependencies {
     testImplementation("org.orbit-mvi:orbit-test:4.3.2")
 
     //Datetime picker dialog
-    implementation 'com.afollestad.material-dialogs:datetime:3.2.1'
+    implementation 'com.afollestad.material-dialogs:datetime:3.3.0'
 
 }

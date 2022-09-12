@@ -13,6 +13,10 @@ import javax.inject.Inject
 class EditEventViewModel @Inject constructor(
 
 ): IEditEventViewModel, ViewModel() {
+    override val container: Container<EditEventUiState, EditEventSingleEvent> = container(
+        EditEventUiState()
+    )
+
     override fun moveToNextPage() = intent {
         reduce {
             state.copy(currentPage = when(state.currentPage) {
@@ -33,8 +37,22 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
-    override val container: Container<EditEventUiState, EditEventSingleEvent> = container(
-        EditEventUiState()
-    )
+    override fun changeTittleInput(newValue: String) = intent {
+        reduce {
+            state.copy(tittleInput = newValue)
+        }
+    }
+
+    override fun changeSinceTime(newTime: Long) = intent {
+        reduce {
+            state.copy(sinceTime = newTime)
+        }
+    }
+
+    override fun changeToTime(newTime: Long) = intent {
+        reduce {
+            state.copy(toTime = newTime)
+        }
+    }
 
 }

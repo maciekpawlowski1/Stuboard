@@ -36,6 +36,17 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
     val currentScreenState = derivedStateOf {
         uiState.value.currentPage
     }
+    val tittleInputState = derivedStateOf {
+        uiState.value.tittleInput
+    }
+
+    val sinceTimeState = derivedStateOf {
+        uiState.value.sinceTime
+    }
+
+    val toTimeState = derivedStateOf {
+        uiState.value.toTime
+    }
 
     Column {
         AnimatedContent(
@@ -50,9 +61,16 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                 }
             }
         ) { screen ->
-            when(screen) {
+            when (screen) {
                 EditEventScreenType.FIRST -> {
-                    EditEventScreen1()
+                    EditEventScreen1(
+                        tittleInput = { tittleInputState.value },
+                        onTittleInputChange = { viewModel.changeTittleInput(it) },
+                        sinceTime = sinceTimeState.value,
+                        toTime = toTimeState.value,
+                        onSinceTimeChange = { viewModel.changeSinceTime(it) },
+                        onToTimeChange = { viewModel.changeToTime(it) }
+                    )
                 }
                 EditEventScreenType.SECOND -> {
                     EditEventScreen2()
@@ -73,17 +91,22 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
 }
 
 @Composable
-private fun NavigationBox(currentScreenNum: Int, allScreensCount: Int, onNextClick: () -> Unit, onPreviousClick: () -> Unit)
-{
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .height(50.dp),
-    elevation = 7.dp)
+private fun NavigationBox(
+    currentScreenNum: Int,
+    allScreensCount: Int,
+    onNextClick: () -> Unit,
+    onPreviousClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        elevation = 7.dp
+    )
     {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
         {
-            if(currentScreenNum != 1)
-            {
+            if (currentScreenNum != 1) {
                 TextButton(
                     modifier = Modifier
                         .align(Alignment.CenterStart),
@@ -120,32 +143,24 @@ enum class EditEventScreenType(val num: Int) {
 @OrbitInternal
 @Preview(showBackground = true)
 @Composable
-private fun EditEventScreenPreview()
-{
-    EditEventScreen(viewModel = object: IEditEventViewModel
-    {
-        override fun moveToNextPage() {
-            TODO("Not yet implemented")
-        }
-
-        override fun moveToPreviousPage() {
-            TODO("Not yet implemented")
-        }
-
+private fun EditEventScreenPreview() {
+    EditEventScreen(viewModel = object : IEditEventViewModel {
+        override fun moveToNextPage() {}
+        override fun moveToPreviousPage() {}
+        override fun changeTittleInput(newValue: String) {}
+        override fun changeSinceTime(newTime: Long) {}
+        override fun changeToTime(newTime: Long) {}
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
-            object: Container<EditEventUiState, EditEventSingleEvent>
-            {
+            object : Container<EditEventUiState, EditEventSingleEvent> {
+                override val stateFlow: StateFlow<EditEventUiState> =
+                    MutableStateFlow(EditEventUiState())
+
                 override val settings: Container.Settings
                     get() = TODO("Not yet implemented")
                 override val sideEffectFlow: Flow<EditEventSingleEvent>
                     get() = TODO("Not yet implemented")
-                override val stateFlow: StateFlow<EditEventUiState> =
-                    MutableStateFlow(EditEventUiState())
 
-                override suspend fun orbit(orbitIntent: suspend ContainerContext<EditEventUiState, EditEventSingleEvent>.() -> Unit) {
-                    TODO("Not yet implemented")
-                }
-
+                override suspend fun orbit(orbitIntent: suspend ContainerContext<EditEventUiState, EditEventSingleEvent>.() -> Unit) {}
             }
 
     })
