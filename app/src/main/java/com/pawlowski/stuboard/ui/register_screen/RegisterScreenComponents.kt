@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.ui.components.MySwitch
+import com.pawlowski.stuboard.ui.components.SwitchButtonType
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -88,74 +90,19 @@ internal fun AccountTypeSwitch(
     selectedAccountType: AccountType,
     onAccountTypeSelected: (AccountType) -> Unit = {}
 ) {
-    Card(
-        modifier = modifier
-            .height(36.dp)
-            .fillMaxWidth()
-    ) {
-        Row {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(
-                        if (selectedAccountType == AccountType.NORMAL)
-                            Green
-                        else
-                            Color.White
-                    )
-                    .clickable { onAccountTypeSelected.invoke(AccountType.NORMAL) },
-                contentAlignment = Alignment.Center
-            )
-            {
-                if (selectedAccountType == AccountType.NORMAL) {
-                    SelectedText(text = "Zwykłe konto")
-                } else {
-                    NotSelectedText(text = "Zwykłe konto")
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(
-                        if (selectedAccountType == AccountType.NORMAL)
-                            Color.White
-                        else
-                            Green
-                    )
-                    .clickable { onAccountTypeSelected.invoke(AccountType.STUDENT_ORGANISATION) },
-                contentAlignment = Alignment.Center
-            )
-            {
-                if (selectedAccountType == AccountType.STUDENT_ORGANISATION) {
-                    SelectedText(text = "Organizacja studencka")
-                } else {
-                    NotSelectedText(text = "Organizacja studencka")
-                }
-            }
+    MySwitch(
+        modifier = modifier,
+        selectedButton = if (selectedAccountType == AccountType.NORMAL)
+            SwitchButtonType.FIRST
+        else
+            SwitchButtonType.SECOND,
+        firstButtonLabel = "Zwykłe konto",
+        secondButtonLabel ="Organizacja studencka",
+        onButtonSelected = {
+            if(it == SwitchButtonType.FIRST)
+                onAccountTypeSelected(AccountType.NORMAL)
+            else
+                onAccountTypeSelected(AccountType.STUDENT_ORGANISATION)
         }
-    }
-}
-
-@Composable
-internal fun SelectedText(text: String) {
-    Text(
-        text = text,
-        color = Color.White,
-        fontFamily = montserratFont,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-    )
-}
-
-@Composable
-internal fun NotSelectedText(text: String) {
-    Text(
-        text = text,
-        color = MidGrey,
-        fontFamily = montserratFont,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
     )
 }

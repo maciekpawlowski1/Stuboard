@@ -41,6 +41,9 @@ fun EditEventScreen() {
                 EditEventScreenType.FIRST -> {
                     EditEventScreen1()
                 }
+                EditEventScreenType.SECOND -> {
+                    EditEventScreen2()
+                }
                 else -> {
 
                 }
@@ -88,7 +91,7 @@ enum class EditEventScreenType(val num: Int) {
 
 @Preview(showBackground = true)
 @Composable
-fun EditEventScreenPreview()
+private fun EditEventScreenPreview()
 {
     EditEventScreen()
 }

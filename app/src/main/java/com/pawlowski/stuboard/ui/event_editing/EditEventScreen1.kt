@@ -10,6 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -133,4 +134,11 @@ fun ClickToPickDateCard() {
 
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EditEventScreen1Preview()
+{
+    EditEventScreen1()
 }

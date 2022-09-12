@@ -1,19 +1,19 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +36,7 @@ import com.pawlowski.stuboard.presentation.search.ISearchViewModel
 import com.pawlowski.stuboard.presentation.search.SearchUiAction
 import com.pawlowski.stuboard.presentation.search.SearchUiState
 import com.pawlowski.stuboard.presentation.search.SearchViewModel
+import com.pawlowski.stuboard.ui.components.FilterLabelBox
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.theme.*
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
@@ -446,33 +446,7 @@ fun SearchBarWithFilterValues(
     }
 }
 
-@Composable
-fun FilterLabelBox(
-    modifier: Modifier = Modifier,
-    text: @Composable () -> Unit = { },
-    borderColor: Color = Green,
-    borderWith: Dp = 1.3.dp,
-    height: Dp = 29.dp,
-    contentAlignment: Alignment = CenterStart,
-    icon: @Composable () -> Unit = { },
-) {
-    Card(
-        modifier = modifier
-            .height(height),
-        shape = RectangleShape,
-        border = BorderStroke(borderWith, color = borderColor)
-    ) {
-        Box(contentAlignment = contentAlignment)
-        {
-            Row(verticalAlignment = CenterVertically) {
-                icon.invoke()
-                text.invoke()
-            }
 
-        }
-
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

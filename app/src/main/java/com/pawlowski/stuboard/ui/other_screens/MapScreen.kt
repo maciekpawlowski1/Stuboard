@@ -68,9 +68,7 @@ fun MapScreen(
         viewModel.container.sideEffectFlow.collect { event ->
             when(event) {
                 is MapSingleEvent.AnimatedMoveMapToPosition -> {
-                    println("Launching map")
                     mapsAnimationScope.launch(SupervisorJob()) {
-                        println("Move map to ${event.position}")
                         cameraPositionState.animate(CameraUpdateFactory.newLatLng(event.position))
                     }
 
@@ -79,7 +77,6 @@ fun MapScreen(
                     if(pagerAnimationScope.isActive)
                         pagerAnimationScope.coroutineContext.cancelChildren()
                     pagerAnimationScope.launch(SupervisorJob()) {
-                        println("Srolling")
                         pagerState.animateScrollToPage(event.pageIndex)
                     }
 

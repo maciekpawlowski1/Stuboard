@@ -32,7 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.*
-import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens.FilterLabelBox
+import com.pawlowski.stuboard.ui.components.FilterLabelBox
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LightGray
 import com.pawlowski.stuboard.ui.theme.montserratFont
