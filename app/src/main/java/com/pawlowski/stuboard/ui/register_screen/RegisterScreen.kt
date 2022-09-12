@@ -17,8 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pawlowski.stuboard.presentation.register.*
 
-const val ANIMATION_TIME = 1000
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RegisterScreen(
@@ -103,24 +101,9 @@ fun RegisterScreen(
 
         AnimatedContent(targetState = currentScreenState.value,
             transitionSpec = {
-                if (targetState.progress > initialState.progress) {
-                    slideInHorizontally(
-                        animationSpec = tween(ANIMATION_TIME),
-                        initialOffsetX = { fullWidth -> fullWidth }
-                    ) with
-                            slideOutHorizontally(
-                                animationSpec = tween(ANIMATION_TIME),
-                                targetOffsetX = { fullWidth -> -fullWidth }
-                            )
-                } else {
-                    slideInHorizontally(
-                        animationSpec = tween(ANIMATION_TIME),
-                        initialOffsetX = { fullWidth -> -fullWidth }
-                    ) with
-                            slideOutHorizontally(
-                                animationSpec = tween(ANIMATION_TIME),
-                                targetOffsetX = { fullWidth -> fullWidth }
-                            )
+                swappingTransitionSpec()
+                { initialState, targetState ->
+                    targetState.progress > initialState.progress
                 }
             }) { screen ->
             when (screen) {
@@ -218,6 +201,30 @@ fun RegisterScreen(
             }
         }
 
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun <S>AnimatedContentScope<S>.swappingTransitionSpec(animationTime: Int = 1000, isMovingForward: (S, S) -> Boolean): ContentTransform
+{
+    return if (isMovingForward(initialState, targetState)) {
+        slideInHorizontally(
+            animationSpec = tween(animationTime),
+            initialOffsetX = { fullWidth -> fullWidth }
+        ) with
+                slideOutHorizontally(
+                    animationSpec = tween(animationTime),
+                    targetOffsetX = { fullWidth -> -fullWidth }
+                )
+    } else {
+        slideInHorizontally(
+            animationSpec = tween(animationTime),
+            initialOffsetX = { fullWidth -> -fullWidth }
+        ) with
+                slideOutHorizontally(
+                    animationSpec = tween(animationTime),
+                    targetOffsetX = { fullWidth -> fullWidth }
+                )
     }
 }
 
