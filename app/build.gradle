@@ -145,4 +145,6 @@ dependencies {
     //Datetime picker dialog
     implementation 'com.afollestad.material-dialogs:datetime:3.3.0'
 
+    //Image cropper
+    implementation 'com.github.CanHub:Android-Image-Cropper:4.3.2'
 }

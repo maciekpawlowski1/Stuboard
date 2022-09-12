@@ -1,12 +1,19 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.datetime.dateTimePicker
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.options
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LighterMidGrey
@@ -38,11 +47,40 @@ fun EditEventScreen1(
     onSinceTimeChange: (Long) -> Unit = {},
     onToTimeChange: (Long) -> Unit = {}
 ) {
-    val isImageSelected = false
+    val context = LocalContext.current
+    val isImageSelected = true
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())) {
         val screenWidth = LocalConfiguration.current.screenWidthDp
+
+
+
+        var imageUri by remember {
+            mutableStateOf<Uri?>(null)
+        }
+        val bitmap =  remember {
+            mutableStateOf<Bitmap?>(null)
+        }
+
+        val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+            if (result.isSuccessful) {
+                // use the cropped image
+                imageUri = result.uriContent
+                bitmap.value = getBitmapFromUri(imageUri, context)
+            } else {
+                // an error occurred cropping
+                val exception = result.error
+            }
+        }
+
+        val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            val cropOptions = options(uri = uri) {
+                setAspectRatio(3, 2)
+            }
+            imageCropLauncher.launch(cropOptions)
+        }
+
 
         Box {
             if (isImageSelected) {
@@ -51,7 +89,7 @@ fun EditEventScreen1(
                         .padding(bottom = 25.dp)
                         .fillMaxWidth()
                         .height((screenWidth / 1.5).dp),
-                    model = "",
+                    model = bitmap.value,
                     contentDescription = "",
                     contentScale = ContentScale.FillBounds
                 )
@@ -69,7 +107,9 @@ fun EditEventScreen1(
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp), onClick = { /*TODO*/ }, backgroundColor = Green
+                    .padding(end = 20.dp), onClick = {
+                    imagePickerLauncher.launch("image/*")
+                                                     }, backgroundColor = Green
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.image_icon),
@@ -92,7 +132,6 @@ fun EditEventScreen1(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        val context = LocalContext.current
         Row(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -152,6 +191,18 @@ fun EditEventScreen1(
             )
         }
 
+    }
+}
+
+fun getBitmapFromUri(imageUri: Uri?, context: Context): Bitmap?
+{
+    return imageUri?.let { imageUri ->
+        if (Build.VERSION.SDK_INT < 28) {
+            MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+        } else {
+            val source = ImageDecoder.createSource(context.contentResolver, imageUri)
+            ImageDecoder.decodeBitmap(source)
+        }
     }
 }
 
