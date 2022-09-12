@@ -18,6 +18,7 @@ object NavRoutes
     const val FILTERS = "Filters"
     const val ACCOUNT = "Account"
     const val MY_EVENTS = "MyEvents"
+    const val EDIT_EVENT = "EditEvent"
 }
 
 data class BasicRoute(val fullRoute: String, val basicRoute: String)

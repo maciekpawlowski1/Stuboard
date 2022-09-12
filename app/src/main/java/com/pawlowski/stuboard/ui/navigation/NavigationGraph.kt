@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.pawlowski.stuboard.ui.event_editing.EditEventScreen
 import com.pawlowski.stuboard.ui.event_editing.MyEventsScreen
 import com.pawlowski.stuboard.ui.other_screens.EventDetailsScreen
 import com.pawlowski.stuboard.ui.other_screens.FiltersScreen
@@ -104,6 +105,11 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
             MyEventsScreen(onNavigateBack = {
                 navController.popBackStack()
             })
+        }
+
+        composable(route= NavRoutes.EDIT_EVENT)
+        {
+            EditEventScreen()
         }
 
     }
