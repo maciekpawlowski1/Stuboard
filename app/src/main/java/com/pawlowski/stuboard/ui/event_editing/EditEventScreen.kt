@@ -13,23 +13,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.pawlowski.stuboard.presentation.edit_event.EditEventSingleEvent
+import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
+import com.pawlowski.stuboard.presentation.edit_event.EditEventViewModel
+import com.pawlowski.stuboard.presentation.edit_event.IEditEventViewModel
 import com.pawlowski.stuboard.ui.register_screen.swappingTransitionSpec
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.montserratFont
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.annotation.OrbitInternal
+import org.orbitmvi.orbit.syntax.ContainerContext
 
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun EditEventScreen() {
-    var currentScreen by remember {
-        mutableStateOf(EditEventScreenType.FIRST)
+fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>()) {
+    val uiState = viewModel.container.stateFlow.collectAsState()
+    val currentScreenState = derivedStateOf {
+        uiState.value.currentPage
     }
+
     Column {
         AnimatedContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            targetState = currentScreen,
+            targetState = currentScreenState.value,
             transitionSpec = {
                 swappingTransitionSpec()
                 { prev, new ->
@@ -50,13 +63,17 @@ fun EditEventScreen() {
             }
         }
 
-        NavigationBox(currentScreen.num, 5)
+        NavigationBox(currentScreenState.value.num, 5, onNextClick = {
+            viewModel.moveToNextPage()
+        }, onPreviousClick = {
+            viewModel.moveToPreviousPage()
+        })
     }
 
 }
 
 @Composable
-private fun NavigationBox(currentScreenNum: Int, allScreensCount: Int)
+private fun NavigationBox(currentScreenNum: Int, allScreensCount: Int, onNextClick: () -> Unit, onPreviousClick: () -> Unit)
 {
     Card(modifier = Modifier
         .fillMaxWidth()
@@ -65,6 +82,17 @@ private fun NavigationBox(currentScreenNum: Int, allScreensCount: Int)
     {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
         {
+            if(currentScreenNum != 1)
+            {
+                TextButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart),
+                    onClick = { onPreviousClick() },
+                ) {
+                    Text(text = "Poprzednia", color = Green)
+                }
+            }
+
             Text(
                 text = "$currentScreenNum z $allScreensCount",
                 fontFamily = montserratFont,
@@ -74,7 +102,7 @@ private fun NavigationBox(currentScreenNum: Int, allScreensCount: Int)
             TextButton(
                 modifier = Modifier
                     .align(Alignment.CenterEnd),
-                onClick = { /*TODO*/ },
+                onClick = { onNextClick() },
             ) {
                 Text(text = "Przejdź dalej", color = Green)
             }
@@ -89,9 +117,36 @@ enum class EditEventScreenType(val num: Int) {
     THIRD(3)
 }
 
+@OrbitInternal
 @Preview(showBackground = true)
 @Composable
 private fun EditEventScreenPreview()
 {
-    EditEventScreen()
+    EditEventScreen(viewModel = object: IEditEventViewModel
+    {
+        override fun moveToNextPage() {
+            TODO("Not yet implemented")
+        }
+
+        override fun moveToPreviousPage() {
+            TODO("Not yet implemented")
+        }
+
+        override val container: Container<EditEventUiState, EditEventSingleEvent> =
+            object: Container<EditEventUiState, EditEventSingleEvent>
+            {
+                override val settings: Container.Settings
+                    get() = TODO("Not yet implemented")
+                override val sideEffectFlow: Flow<EditEventSingleEvent>
+                    get() = TODO("Not yet implemented")
+                override val stateFlow: StateFlow<EditEventUiState> =
+                    MutableStateFlow(EditEventUiState())
+
+                override suspend fun orbit(orbitIntent: suspend ContainerContext<EditEventUiState, EditEventSingleEvent>.() -> Unit) {
+                    TODO("Not yet implemented")
+                }
+
+            }
+
+    })
 }
