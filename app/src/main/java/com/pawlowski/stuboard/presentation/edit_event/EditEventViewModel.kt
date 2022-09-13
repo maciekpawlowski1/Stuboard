@@ -75,6 +75,30 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    override fun changeCityInput(newValue: String) = intent {
+        reduce {
+            state.copy(city = newValue)
+        }
+    }
+
+    override fun changeStreetInput(newValue: String) = intent {
+        reduce {
+            state.copy(streetAndNumber = newValue)
+        }
+    }
+
+    override fun changeCountryInput(newValue: String) = intent {
+        reduce {
+            state.copy(country = newValue)
+        }
+    }
+
+    override fun changePlaceNameInput(newValue: String) = intent {
+        reduce {
+            state.copy(placeName = newValue)
+        }
+    }
+
     private fun initialCategories(): Map<FilterType, Map<FilterModel, Boolean>>
     {
         return mapOf(

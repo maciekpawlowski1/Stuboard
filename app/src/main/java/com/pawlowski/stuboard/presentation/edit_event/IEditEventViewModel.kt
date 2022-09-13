@@ -11,4 +11,8 @@ interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEv
     fun changeToTime(newTime: Long)
     fun changeCategorySelection(category: FilterModel, isSelected: Boolean)
     fun changeIsOnline(isOnline: Boolean)
+    fun changeCountryInput(newValue: String)
+    fun changeStreetInput(newValue: String)
+    fun changeCityInput(newValue: String)
+    fun changePlaceNameInput(newValue: String)
 }

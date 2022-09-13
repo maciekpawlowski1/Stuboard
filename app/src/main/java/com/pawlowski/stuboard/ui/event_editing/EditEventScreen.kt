@@ -57,6 +57,22 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.isOnline
     }
 
+    val cityState = derivedStateOf {
+        uiState.value.city
+    }
+
+    val streetState = derivedStateOf {
+        uiState.value.streetAndNumber
+    }
+
+    val countryState = derivedStateOf {
+        uiState.value.country
+    }
+
+    val placeNameState = derivedStateOf {
+        uiState.value.placeName
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -93,6 +109,18 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                     isOnlineSelected = {
                         isOnlineState.value
                     })
+                }
+                EditEventScreenType.THIRD -> {
+                    EditEventScreen3(
+                        city = { cityState.value },
+                        streetAndNum = { streetState.value },
+                        country = { countryState.value },
+                        placeName = { placeNameState.value },
+                        onCityChange = { viewModel.changeCityInput(it) },
+                        onCountryChange = { viewModel.changeCountryInput(it) },
+                        onPlaceNameChange = { viewModel.changePlaceNameInput(it) },
+                        onStreetChange = { viewModel.changeStreetInput(it) }
+                    )
                 }
                 else -> {
 
@@ -171,6 +199,10 @@ private fun EditEventScreenPreview() {
         override fun changeToTime(newTime: Long) {}
         override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) {}
         override fun changeIsOnline(isOnline: Boolean) {}
+        override fun changeCountryInput(newValue: String) {}
+        override fun changeStreetInput(newValue: String) {}
+        override fun changeCityInput(newValue: String) {}
+        override fun changePlaceNameInput(newValue: String) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

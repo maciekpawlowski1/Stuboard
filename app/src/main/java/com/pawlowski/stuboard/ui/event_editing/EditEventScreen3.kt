@@ -22,7 +22,16 @@ import com.pawlowski.stuboard.ui.theme.LighterMidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
 @Composable
-fun EditEventScreen3()
+fun EditEventScreen3(
+    city: () -> String = {""},
+    streetAndNum: () -> String = {""},
+    country: () -> String = {""},
+    placeName: () -> String = {""},
+    onCityChange: (String) -> Unit = {},
+    onStreetChange: (String) -> Unit = {},
+    onCountryChange: (String) -> Unit = {},
+    onPlaceNameChange: (String) -> Unit = {}
+)
 {
     Column(modifier = Modifier
         .fillMaxSize()
@@ -68,8 +77,9 @@ fun EditEventScreen3()
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
-            value = "",
-            onValueChange = {  },
+            value = city(),
+            singleLine = true,
+            onValueChange = { onCityChange(it) },
             colors = textFieldColors,
             label = { Text(text = "Miasto") }
         )
@@ -79,8 +89,9 @@ fun EditEventScreen3()
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
-            value = "",
-            onValueChange = {  },
+            value = streetAndNum(),
+            singleLine = true,
+            onValueChange = { onStreetChange(it) },
             colors = textFieldColors,
             label = { Text(text = "Ulica i nr budynku") }
         )
@@ -90,8 +101,9 @@ fun EditEventScreen3()
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
-            value = "",
-            onValueChange = {  },
+            value = country(),
+            singleLine = true,
+            onValueChange = { onCountryChange(it) },
             colors = textFieldColors,
             label = { Text(text = "Kraj") }
         )
@@ -101,8 +113,9 @@ fun EditEventScreen3()
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
-            value = "",
-            onValueChange = {  },
+            value = placeName(),
+            singleLine = true,
+            onValueChange = { onPlaceNameChange(it) },
             colors = textFieldColors,
             label = { Text(text = "Nazwa miejsca (opcjonalnie)") }
         )
