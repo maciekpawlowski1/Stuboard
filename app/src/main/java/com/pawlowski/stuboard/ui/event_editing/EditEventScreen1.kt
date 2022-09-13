@@ -73,7 +73,6 @@ fun EditEventScreen1(
                 val exception = result.error
             }
         }
-
         val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             val cropOptions = options(uri = uri) {
                 setAspectRatio(3, 2)
@@ -120,13 +119,19 @@ fun EditEventScreen1(
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
+        val textFieldColors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Green,
+            focusedLabelColor = Green,
+            cursorColor = Green,
+            backgroundColor = Color.White
+        )
         OutlinedTextField(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
             value = tittleInput(),
             onValueChange = onTittleInputChange,
+            colors = textFieldColors,
             label = { Text(text = "Tytuł wydarzenia (max. 35 znaków)") }
         )
 

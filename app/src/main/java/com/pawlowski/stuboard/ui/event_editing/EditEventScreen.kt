@@ -18,6 +18,7 @@ import com.pawlowski.stuboard.presentation.edit_event.EditEventSingleEvent
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.edit_event.EditEventViewModel
 import com.pawlowski.stuboard.presentation.edit_event.IEditEventViewModel
+import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.register_screen.swappingTransitionSpec
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.montserratFont
@@ -48,6 +49,10 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.toTime
     }
 
+    val categoriesState = derivedStateOf {
+        uiState.value.categories
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -73,7 +78,11 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                     )
                 }
                 EditEventScreenType.SECOND -> {
-                    EditEventScreen2()
+                    EditEventScreen2(categories = {
+                        categoriesState.value
+                    }, onCategorySelectionChange = { category, isSelected ->
+                        viewModel.changeCategorySelection(category, isSelected)
+                    })
                 }
                 else -> {
 
@@ -150,6 +159,10 @@ private fun EditEventScreenPreview() {
         override fun changeTittleInput(newValue: String) {}
         override fun changeSinceTime(newTime: Long) {}
         override fun changeToTime(newTime: Long) {}
+        override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) {
+            TODO("Not yet implemented")
+        }
+
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {
                 override val stateFlow: StateFlow<EditEventUiState> =

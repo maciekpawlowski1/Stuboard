@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.presentation.edit_event
 
+import com.pawlowski.stuboard.presentation.filters.FilterModel
 import org.orbitmvi.orbit.ContainerHost
 
 interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEvent> {
@@ -8,4 +9,5 @@ interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEv
     fun changeTittleInput(newValue: String)
     fun changeSinceTime(newTime: Long)
     fun changeToTime(newTime: Long)
+    fun changeCategorySelection(category: FilterModel, isSelected: Boolean)
 }

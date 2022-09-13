@@ -15,7 +15,27 @@ sealed class FilterModel(val tittle: String, val filterType: FilterType)
     sealed class EntryPrice(tittle: String): FilterModel(tittle, FilterType.ENTRY_PRICE)
     {
         object Free: EntryPrice(tittle = "Za darmo")
+        object Paid: EntryPrice(tittle = "Płatne")
         data class MaxPrice(val maxPrice: Double): EntryPrice("<${DecimalFormat("#.##").format(maxPrice)} zł")
+    }
+
+    sealed class Other(tittle: String): FilterModel(tittle, FilterType.OTHER)
+    {
+        object Inside: Other("W środku")
+        object Outside: Other("Na zewnątrz")
+
+    }
+
+    sealed class Access(tittle: String): FilterModel(tittle, FilterType.ACCESS)
+    {
+        object EVERYBODY: Access("Dla wszystkich")
+        object PROTECTED: Access("Ograniczony")
+    }
+
+    sealed class Registration(tittle: String): FilterModel(tittle, FilterType.REGISTRATION)
+    {
+        object NoRegistrationNeeded: Registration("Bez rejestracji")
+        object RegistrationNeeded: Registration("Wymaga rejestracji")
     }
 
     sealed class Time(tittle: String)
@@ -43,6 +63,9 @@ enum class FilterType(val filterTypeId: Int, val typeString: String) {
     PLACE(2, "Miejsce"),
     ENTRY_PRICE(3, "Cena"),
     TIME(4, "Czas"),
-    CUSTOM_TEXT(5, "Wyszukiwanie tekstowe")
+    CUSTOM_TEXT(5, "Wyszukiwanie tekstowe"),
+    OTHER(6, "Inne"),
+    ACCESS(7, "Dostęp"),
+    REGISTRATION(8, "Rejestracja")
 }
 
