@@ -53,6 +53,10 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.categories
     }
 
+    val isOnlineState = derivedStateOf {
+        uiState.value.isOnline
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -82,6 +86,12 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                         categoriesState.value
                     }, onCategorySelectionChange = { category, isSelected ->
                         viewModel.changeCategorySelection(category, isSelected)
+                    },
+                    onIsOnlineSelectedChange = {
+                        viewModel.changeIsOnline(it)
+                    },
+                    isOnlineSelected = {
+                        isOnlineState.value
                     })
                 }
                 else -> {
@@ -159,9 +169,8 @@ private fun EditEventScreenPreview() {
         override fun changeTittleInput(newValue: String) {}
         override fun changeSinceTime(newTime: Long) {}
         override fun changeToTime(newTime: Long) {}
-        override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) {
-            TODO("Not yet implemented")
-        }
+        override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) {}
+        override fun changeIsOnline(isOnline: Boolean) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

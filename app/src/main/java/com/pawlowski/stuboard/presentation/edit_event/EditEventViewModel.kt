@@ -58,6 +58,12 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    override fun changeIsOnline(isOnline: Boolean) = intent {
+        reduce {
+            state.copy(isOnline= isOnline)
+        }
+    }
+
     override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) = intent {
         reduce {
             state.copy(categories = state.categories.toMutableMap().apply {

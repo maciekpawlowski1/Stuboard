@@ -10,4 +10,5 @@ interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEv
     fun changeSinceTime(newTime: Long)
     fun changeToTime(newTime: Long)
     fun changeCategorySelection(category: FilterModel, isSelected: Boolean)
+    fun changeIsOnline(isOnline: Boolean)
 }

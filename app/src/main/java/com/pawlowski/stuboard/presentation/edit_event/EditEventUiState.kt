@@ -9,6 +9,6 @@ data class EditEventUiState(
     val tittleInput: String = "",
     val sinceTime: Long? = null,
     val toTime: Long? = null,
-    val categories: Map<FilterType, Map<FilterModel, Boolean>> = mapOf()
-
+    val categories: Map<FilterType, Map<FilterModel, Boolean>> = mapOf(),
+    val isOnline: Boolean = true,
 )
