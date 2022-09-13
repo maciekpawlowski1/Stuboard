@@ -97,22 +97,3 @@ class EditEventViewModel @Inject constructor(
     }
 
 }
-
-//categories = mapOf(
-//Pair(FilterModel.Category("Koncerty", R.drawable.guitar_icon), false)
-//),
-//access = mapOf(
-//Pair(FilterModel.Access.EVERYBODY, false),
-//Pair(FilterModel.Access.PROTECTED, false),
-//),
-//registration = mapOf(
-//Pair(FilterModel.Registration.NoRegistrationNeeded, false),
-//Pair(FilterModel.Registration.RegistrationNeeded, false)
-//),
-//price = mapOf(
-//Pair(FilterModel.EntryPrice.Free, false),
-//Pair(FilterModel.EntryPrice.Paid, false)
-//),
-//other = mapOf(
-//Pair(FilterModel.)
-//)
