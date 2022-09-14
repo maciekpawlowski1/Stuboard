@@ -31,7 +31,7 @@ fun MyGoogleMap(
     zoomButtonsEnabled: Boolean = true,
     disableAllGestures: Boolean = false,
     onMarkerClick: (EventMarker) -> Unit = {},
-    onMapClick: () -> Unit = {}
+    onMapClick: () -> Unit = {},
 )
 {
     if(!preview)

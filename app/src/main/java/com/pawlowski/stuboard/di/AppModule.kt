@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.di
 
 import android.app.Application
 import android.content.Context
+import android.location.Geocoder
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
@@ -82,6 +83,9 @@ class AppModule {
     @Singleton
     @Provides
     fun oneTapClient(appContext: Context) = Identity.getSignInClient(appContext)
+
+    @Provides
+    fun geocoder(appContext: Context) = Geocoder(appContext)
 
     @Named("SIGN_IN")
     @Provides

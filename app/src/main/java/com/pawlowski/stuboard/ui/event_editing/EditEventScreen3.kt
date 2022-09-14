@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -15,11 +16,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.ui.models.EventMarker
+import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LighterMidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
+import kotlin.Exception
 
 @Composable
 fun EditEventScreen3(
@@ -30,19 +37,25 @@ fun EditEventScreen3(
     onCityChange: (String) -> Unit = {},
     onStreetChange: (String) -> Unit = {},
     onCountryChange: (String) -> Unit = {},
-    onPlaceNameChange: (String) -> Unit = {}
+    onPlaceNameChange: (String) -> Unit = {},
+    positionOnMap: () -> LatLng? = { null }
 )
 {
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())) {
         Box {
-            MapPreview(modifier = Modifier.padding(bottom = 25.dp))
+            MapPreview(
+                modifier = Modifier
+                    .padding(bottom = 25.dp),
+                position = positionOnMap()
+            )
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 20.dp), onClick = {
                     //TODO: open location picker dialog
+
                 }, backgroundColor = Green
             ) {
                 Icon(
@@ -130,6 +143,30 @@ private fun MapPreview(modifier: Modifier = Modifier, position: LatLng? = null, 
 {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     position?.let {
+        val cameraPositionState = rememberCameraPositionState()
+        {
+            this.position = CameraPosition.fromLatLngZoom(it, 10f)
+        }
+        MyGoogleMap(
+            modifier= modifier
+                .fillMaxWidth()
+                .height((screenWidth / 1.5).dp),
+            markers = listOf(
+                EventMarker(it, markerRes?:R.drawable.naukowe_marker_icon, "", -1)
+            ),
+            disableAllGestures = true,
+            moveCameraToMarkersBound = false,
+            cameraPositionState = cameraPositionState
+        )
+
+
+        LaunchedEffect(it)
+        {
+            try {
+                cameraPositionState.move(CameraUpdateFactory.newLatLng(it))
+            }
+            catch (e: Exception) {}
+        }
 
     }?: run {
         Surface(modifier = modifier
