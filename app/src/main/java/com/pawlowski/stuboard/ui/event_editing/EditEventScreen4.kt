@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.ui.event_editing
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -16,13 +17,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LightGray
-import com.pawlowski.stuboard.ui.theme.LighterMidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
 @Composable
-fun EditEventScreen4()
+fun EditEventScreen4(
+    organisationSearchInput: () -> String = {""},
+    onOrganisationSearchInputChange: (String) -> Unit = {},
+    suggestedOrganisations: () -> List<Organisation.Existing> = { listOf() }
+)
 {
     Column(
         modifier = Modifier
@@ -63,11 +68,12 @@ fun EditEventScreen4()
         )
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(0.8f),
-            value = "",
-            onValueChange = {},
+            value = organisationSearchInput(),
+            onValueChange = onOrganisationSearchInputChange,
             label = {
                 Text(text = "Szukaj...")
             },
+            singleLine = true,
             trailingIcon = {
                 Icon(painter = painterResource(id = R.drawable.search_icon), contentDescription = "")
             },
@@ -78,10 +84,11 @@ fun EditEventScreen4()
 
         LazyColumn(modifier = Modifier.padding(horizontal = 10.dp))
         {
-            items(3) {
+            items(suggestedOrganisations()) {
                 OrganisationCard(
                     modifier = Modifier.padding(vertical = 5.dp),
-                    organisationTittle = "Akademia Górniczo-Hutnicza w Krakowie",
+                    organisationTittle = it.tittle,
+                    organisationImageUrl = it.imageUrl,
                     onCardClick = {
 
                     }

@@ -17,5 +17,8 @@ data class EditEventUiState(
     val country: String = "",
     val placeName: String = "",
     val positionOnMap: LatLng? = null,
-    val markerDrawableRes: Int? = null
+    val markerDrawableRes: Int? = null,
+    val organisationSearchText: String = "",
+    val selectedOrganisation: Organisation? = null,
+    val suggestedOrganisations: List<Organisation.Existing> = listOf(),
 )

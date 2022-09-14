@@ -81,6 +81,14 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.markerDrawableRes
     }
 
+    val organisationSearchInputState = derivedStateOf {
+        uiState.value.organisationSearchText
+    }
+
+    val suggestedOrganisationsState = derivedStateOf {
+        uiState.value.suggestedOrganisations
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -133,7 +141,11 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                     )
                 }
                 EditEventScreenType.FOURTH -> {
-                    EditEventScreen4()
+                    EditEventScreen4(
+                        organisationSearchInput = { organisationSearchInputState.value },
+                        onOrganisationSearchInputChange = { viewModel.changeOrganisationSearchInput(it) },
+                        suggestedOrganisations = { suggestedOrganisationsState.value }
+                    )
                 }
                 else -> {
 
@@ -217,6 +229,7 @@ private fun EditEventScreenPreview() {
         override fun changeStreetInput(newValue: String) {}
         override fun changeCityInput(newValue: String) {}
         override fun changePlaceNameInput(newValue: String) {}
+        override fun changeOrganisationSearchInput(newValue: String) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

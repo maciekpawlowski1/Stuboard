@@ -26,7 +26,10 @@ class EditEventViewModel @Inject constructor(
     private val geocoder: Geocoder,
 ): IEditEventViewModel, ViewModel() {
     override val container: Container<EditEventUiState, EditEventSingleEvent> = container(
-        EditEventUiState(categories = initialCategories())
+        EditEventUiState(
+            categories = initialCategories(),
+            suggestedOrganisations = initialExistingOrganisations()
+        )
     )
 
     private val positionUpdatesFlow = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -122,6 +125,15 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    override fun changeOrganisationSearchInput(newValue: String) = intent {
+        reduce {
+            state.copy(
+                organisationSearchText = newValue,
+                suggestedOrganisations = initialExistingOrganisations().filter { newValue.trim().isEmpty() || it.tittle.lowercase().contains(newValue.trim().lowercase()) }
+            )
+        }
+    }
+
     private fun handlePositionUpdates() = intent(registerIdling = false) {
         repeatOnSubscription {
             positionUpdatesFlow.collectLatest {
@@ -190,6 +202,22 @@ class EditEventViewModel @Inject constructor(
 
         )
 
+    }
+
+    private fun initialExistingOrganisations(): List<Organisation.Existing>
+    {
+        return listOf(
+            Organisation.Existing(
+                id = 1,
+                tittle = "Akademia Górniczo-Hutnicza",
+                imageUrl = null
+            ),
+            Organisation.Existing(
+                id = 2,
+                tittle = "Klub Studio",
+                imageUrl = null
+            )
+        )
     }
 
     init {
