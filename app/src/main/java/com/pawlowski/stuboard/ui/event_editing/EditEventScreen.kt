@@ -132,6 +132,9 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                         markerRes = { markerResState.value }
                     )
                 }
+                EditEventScreenType.FOURTH -> {
+                    EditEventScreen4()
+                }
                 else -> {
 
                 }
@@ -194,7 +197,8 @@ private fun NavigationBox(
 enum class EditEventScreenType(val num: Int) {
     FIRST(1),
     SECOND(2),
-    THIRD(3)
+    THIRD(3),
+    FOURTH(4)
 }
 
 @OrbitInternal

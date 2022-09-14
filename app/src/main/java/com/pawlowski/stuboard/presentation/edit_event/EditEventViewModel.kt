@@ -36,6 +36,7 @@ class EditEventViewModel @Inject constructor(
             state.copy(currentPage = when(state.currentPage) {
                 EditEventScreenType.FIRST -> { EditEventScreenType.SECOND }
                 EditEventScreenType.SECOND -> { EditEventScreenType.THIRD }
+                EditEventScreenType.THIRD -> { EditEventScreenType.FOURTH }
                 else -> {state.currentPage}
             })
         }
@@ -45,8 +46,9 @@ class EditEventViewModel @Inject constructor(
     override fun moveToPreviousPage() = intent {
         reduce {
             state.copy(currentPage = when(state.currentPage) {
-                EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
                 EditEventScreenType.SECOND -> { EditEventScreenType.FIRST }
+                EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
+                EditEventScreenType.FOURTH -> { EditEventScreenType.THIRD }
                 else -> {state.currentPage}
             })
         }
