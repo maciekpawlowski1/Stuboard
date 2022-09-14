@@ -77,6 +77,10 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.positionOnMap
     }
 
+    val markerResState = derivedStateOf {
+        uiState.value.markerDrawableRes
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -124,7 +128,8 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                         onCountryChange = { viewModel.changeCountryInput(it) },
                         onPlaceNameChange = { viewModel.changePlaceNameInput(it) },
                         onStreetChange = { viewModel.changeStreetInput(it) },
-                        positionOnMap = { positionOnMapState.value }
+                        positionOnMap = { positionOnMapState.value },
+                        markerRes = { markerResState.value }
                     )
                 }
                 else -> {

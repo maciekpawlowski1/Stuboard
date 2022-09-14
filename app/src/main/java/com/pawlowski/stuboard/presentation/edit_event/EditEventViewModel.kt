@@ -84,7 +84,12 @@ class EditEventViewModel @Inject constructor(
                     set(category, isSelected)
                 }
                 set(category.filterType, newMap?: mapOf())
-            })
+            },
+            markerDrawableRes = if(category is FilterModel.Category)
+                state.markerDrawableRes //TODO: get new marker drawable from some use case
+            else
+                state.markerDrawableRes
+            )
         }
     }
 

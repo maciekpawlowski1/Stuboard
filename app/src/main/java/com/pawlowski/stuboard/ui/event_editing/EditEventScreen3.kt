@@ -38,7 +38,8 @@ fun EditEventScreen3(
     onStreetChange: (String) -> Unit = {},
     onCountryChange: (String) -> Unit = {},
     onPlaceNameChange: (String) -> Unit = {},
-    positionOnMap: () -> LatLng? = { null }
+    positionOnMap: () -> LatLng? = { null },
+    markerRes: () -> Int? = { null }
 )
 {
     Column(modifier = Modifier
@@ -48,7 +49,8 @@ fun EditEventScreen3(
             MapPreview(
                 modifier = Modifier
                     .padding(bottom = 25.dp),
-                position = positionOnMap()
+                position = positionOnMap(),
+                markerRes = markerRes()
             )
             FloatingActionButton(
                 modifier = Modifier
