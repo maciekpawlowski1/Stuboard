@@ -2,17 +2,24 @@ package com.pawlowski.stuboard.ui.event_editing
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +35,7 @@ import com.pawlowski.stuboard.ui.theme.LighterMidGrey
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import kotlin.Exception
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditEventScreen3(
     city: () -> String = {""},
@@ -88,6 +96,8 @@ fun EditEventScreen3(
             cursorColor = Green,
             backgroundColor = Color.White
         )
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -96,7 +106,11 @@ fun EditEventScreen3(
             singleLine = true,
             onValueChange = { onCityChange(it) },
             colors = textFieldColors,
-            label = { Text(text = "Miasto") }
+            label = { Text(text = "Miasto") },
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -108,7 +122,11 @@ fun EditEventScreen3(
             singleLine = true,
             onValueChange = { onStreetChange(it) },
             colors = textFieldColors,
-            label = { Text(text = "Ulica i nr budynku") }
+            label = { Text(text = "Ulica i nr budynku") },
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -120,7 +138,11 @@ fun EditEventScreen3(
             singleLine = true,
             onValueChange = { onCountryChange(it) },
             colors = textFieldColors,
-            label = { Text(text = "Kraj") }
+            label = { Text(text = "Kraj") },
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -132,7 +154,9 @@ fun EditEventScreen3(
             singleLine = true,
             onValueChange = { onPlaceNameChange(it) },
             colors = textFieldColors,
-            label = { Text(text = "Nazwa miejsca (opcjonalnie)") }
+            label = { Text(text = "Nazwa miejsca (opcjonalnie)") },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
         )
         Spacer(modifier = Modifier.height(10.dp))
 

@@ -11,17 +11,22 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +43,7 @@ import com.pawlowski.stuboard.ui.theme.montserratFont
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditEventScreen1(
     tittleInput: () -> String = { "" },
@@ -125,14 +131,20 @@ fun EditEventScreen1(
             cursorColor = Green,
             backgroundColor = Color.White
         )
+        val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
             value = tittleInput(),
+            singleLine = true,
             onValueChange = onTittleInputChange,
             colors = textFieldColors,
-            label = { Text(text = "Tytuł wydarzenia (max. 35 znaków)") }
+            label = { Text(text = "Tytuł wydarzenia (max. 35 znaków)") },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+            })
         )
 
         Spacer(modifier = Modifier.height(30.dp))
