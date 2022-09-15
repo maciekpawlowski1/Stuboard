@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,10 @@ import org.orbitmvi.orbit.syntax.ContainerContext
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>()) {
+
+    BackHandler {
+        viewModel.moveToPreviousPage()
+    }
     val uiState = viewModel.container.stateFlow.collectAsState()
     val currentScreenState = derivedStateOf {
         uiState.value.currentPage
@@ -221,7 +226,12 @@ private fun NavigationBox(
                     .align(Alignment.CenterEnd),
                 onClick = { onNextClick() },
             ) {
-                Text(text = "Przejdź dalej", color = Green)
+                val text =
+                    if(currentScreenNum != allScreensCount)
+                        "Przejdź dalej"
+                else
+                    "Zobacz podgląd"
+                Text(text = text, color = Green)
             }
 
         }
