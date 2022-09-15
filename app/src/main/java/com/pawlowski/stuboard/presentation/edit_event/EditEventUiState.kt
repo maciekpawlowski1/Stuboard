@@ -21,4 +21,7 @@ data class EditEventUiState(
     val organisationSearchText: String = "",
     val selectedOrganisation: Organisation? = null,
     val suggestedOrganisations: List<Organisation.Existing> = listOf(),
+    val description: String = "",
+    val site: String = "",
+    val facebookSite: String = "",
 )

@@ -40,6 +40,7 @@ class EditEventViewModel @Inject constructor(
                 EditEventScreenType.FIRST -> { EditEventScreenType.SECOND }
                 EditEventScreenType.SECOND -> { EditEventScreenType.THIRD }
                 EditEventScreenType.THIRD -> { EditEventScreenType.FOURTH }
+                EditEventScreenType.FOURTH -> { EditEventScreenType.FIFTH }
                 else -> {state.currentPage}
             })
         }
@@ -52,6 +53,7 @@ class EditEventViewModel @Inject constructor(
                 EditEventScreenType.SECOND -> { EditEventScreenType.FIRST }
                 EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
                 EditEventScreenType.FOURTH -> { EditEventScreenType.THIRD }
+                EditEventScreenType.FIFTH -> { EditEventScreenType.FOURTH }
                 else -> {state.currentPage}
             })
         }
@@ -137,6 +139,30 @@ class EditEventViewModel @Inject constructor(
     override fun changeSelectedOrganisation(organisation: Organisation) = intent {
         reduce {
             state.copy(selectedOrganisation = organisation)
+        }
+    }
+
+    override fun changeDescriptionInput(newValue: String) = intent {
+        reduce {
+            state.copy(
+                description = newValue,
+            )
+        }
+    }
+
+    override fun changeSiteInput(newValue: String) = intent {
+        reduce {
+            state.copy(
+                site = newValue,
+            )
+        }
+    }
+
+    override fun changeFacebookSiteInput(newValue: String) = intent {
+        reduce {
+            state.copy(
+                facebookSite = newValue,
+            )
         }
     }
 

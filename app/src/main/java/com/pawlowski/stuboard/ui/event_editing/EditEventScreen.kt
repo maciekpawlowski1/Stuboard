@@ -90,6 +90,18 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.selectedOrganisation
     }
 
+    val descriptionState = derivedStateOf {
+        uiState.value.description
+    }
+
+    val websiteState = derivedStateOf {
+        uiState.value.site
+    }
+
+    val facebookSiteState = derivedStateOf {
+        uiState.value.facebookSite
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -150,8 +162,15 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                         onOrganisationSelected = { viewModel.changeSelectedOrganisation(it) }
                     )
                 }
-                else -> {
-
+                EditEventScreenType.FIFTH -> {
+                    EditEventScreen5(
+                        descriptionInput = { descriptionState.value },
+                        facebookSiteInput = { facebookSiteState.value},
+                        siteInput = { websiteState.value },
+                        onDescriptionInputChange = { viewModel.changeDescriptionInput(it) },
+                        onSiteInputChange = { viewModel.changeSiteInput(it) },
+                        onFacebookSiteInputChange = { viewModel.changeFacebookSiteInput(it) }
+                    )
                 }
             }
         }
@@ -213,7 +232,8 @@ enum class EditEventScreenType(val num: Int) {
     FIRST(1),
     SECOND(2),
     THIRD(3),
-    FOURTH(4)
+    FOURTH(4),
+    FIFTH(5),
 }
 
 @OrbitInternal
@@ -234,6 +254,9 @@ private fun EditEventScreenPreview() {
         override fun changePlaceNameInput(newValue: String) {}
         override fun changeOrganisationSearchInput(newValue: String) {}
         override fun changeSelectedOrganisation(organisation: Organisation) {}
+        override fun changeDescriptionInput(newValue: String) {}
+        override fun changeSiteInput(newValue: String) {}
+        override fun changeFacebookSiteInput(newValue: String) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {
