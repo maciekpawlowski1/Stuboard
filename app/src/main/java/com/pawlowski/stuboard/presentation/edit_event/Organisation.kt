@@ -9,5 +9,5 @@ sealed class Organisation {
 
     data class Custom(
         val tittle: String
-    )
+    ): Organisation()
 }

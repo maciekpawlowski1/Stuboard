@@ -14,10 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pawlowski.stuboard.presentation.edit_event.EditEventSingleEvent
-import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
-import com.pawlowski.stuboard.presentation.edit_event.EditEventViewModel
-import com.pawlowski.stuboard.presentation.edit_event.IEditEventViewModel
+import com.pawlowski.stuboard.presentation.edit_event.*
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.register_screen.swappingTransitionSpec
 import com.pawlowski.stuboard.ui.theme.Green
@@ -89,6 +86,10 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
         uiState.value.suggestedOrganisations
     }
 
+    val selectedOrganisationState = derivedStateOf {
+        uiState.value.selectedOrganisation
+    }
+
     Column {
         AnimatedContent(
             modifier = Modifier
@@ -144,7 +145,9 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                     EditEventScreen4(
                         organisationSearchInput = { organisationSearchInputState.value },
                         onOrganisationSearchInputChange = { viewModel.changeOrganisationSearchInput(it) },
-                        suggestedOrganisations = { suggestedOrganisationsState.value }
+                        suggestedOrganisations = { suggestedOrganisationsState.value },
+                        selectedOrganisation = { selectedOrganisationState.value },
+                        onOrganisationSelected = { viewModel.changeSelectedOrganisation(it) }
                     )
                 }
                 else -> {
@@ -230,6 +233,7 @@ private fun EditEventScreenPreview() {
         override fun changeCityInput(newValue: String) {}
         override fun changePlaceNameInput(newValue: String) {}
         override fun changeOrganisationSearchInput(newValue: String) {}
+        override fun changeSelectedOrganisation(organisation: Organisation) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

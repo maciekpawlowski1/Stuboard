@@ -16,4 +16,5 @@ interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEv
     fun changeCityInput(newValue: String)
     fun changePlaceNameInput(newValue: String)
     fun changeOrganisationSearchInput(newValue: String)
+    fun changeSelectedOrganisation(organisation: Organisation)
 }

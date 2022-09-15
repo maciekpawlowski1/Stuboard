@@ -134,6 +134,12 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    override fun changeSelectedOrganisation(organisation: Organisation) = intent {
+        reduce {
+            state.copy(selectedOrganisation = organisation)
+        }
+    }
+
     private fun handlePositionUpdates() = intent(registerIdling = false) {
         repeatOnSubscription {
             positionUpdatesFlow.collectLatest {

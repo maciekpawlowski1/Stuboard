@@ -1,5 +1,7 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,13 +23,16 @@ import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.LightGray
+import com.pawlowski.stuboard.ui.theme.Orange
 import com.pawlowski.stuboard.ui.theme.montserratFont
 
 @Composable
 fun EditEventScreen4(
     organisationSearchInput: () -> String = {""},
     onOrganisationSearchInputChange: (String) -> Unit = {},
-    suggestedOrganisations: () -> List<Organisation.Existing> = { listOf() }
+    suggestedOrganisations: () -> List<Organisation.Existing> = { listOf() },
+    selectedOrganisation: () -> Organisation? = { null },
+    onOrganisationSelected: (Organisation) -> Unit = {}
 )
 {
     Column(
@@ -90,8 +96,9 @@ fun EditEventScreen4(
                     organisationTittle = it.tittle,
                     organisationImageUrl = it.imageUrl,
                     onCardClick = {
-
-                    }
+                        onOrganisationSelected(it)
+                    },
+                    isSelected = { it == selectedOrganisation() }
                 )
             }
             item {
@@ -103,9 +110,14 @@ fun EditEventScreen4(
                     fontSize = 14.sp,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
+                val searchText = organisationSearchInput()
                 OrganisationCard(
                     modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp),
-                    organisationTittle = "Organiz"
+                    organisationTittle = searchText,
+                    onCardClick = {
+                        onOrganisationSelected(Organisation.Custom(searchText))
+                    },
+                    isSelected = { selectedOrganisation() is Organisation.Custom }
                 )
             }
         }
@@ -120,15 +132,29 @@ private fun OrganisationCard(
     modifier: Modifier = Modifier,
     organisationImageUrl: String? = null,
     organisationTittle: String = "",
-    onCardClick: () -> Unit = {}
+    onCardClick: () -> Unit = {},
+    isSelected: () -> Boolean = { false }
 )
 {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(55.dp)
+            .border(
+                BorderStroke(
+                    if(isSelected())
+                        1.dp
+                    else
+                        0.dp,
+                    if(isSelected())
+                        Orange
+                    else
+                        Color.Transparent
+                )
+            )
             .clickable { onCardClick() },
-        elevation = 7.dp
+        elevation = 7.dp,
+        shape = RectangleShape
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(modifier = Modifier.width(15.dp))
