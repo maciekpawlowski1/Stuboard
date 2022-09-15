@@ -19,6 +19,7 @@ object NavRoutes
     const val ACCOUNT = "Account"
     const val MY_EVENTS = "MyEvents"
     const val EDIT_EVENT = "EditEvent"
+    const val PUBLISHING_STATUS = "PublishStatus"
 }
 
 data class BasicRoute(val fullRoute: String, val basicRoute: String)

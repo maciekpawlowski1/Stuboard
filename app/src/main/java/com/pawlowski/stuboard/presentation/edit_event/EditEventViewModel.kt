@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
@@ -185,6 +186,11 @@ class EditEventViewModel @Inject constructor(
     private fun emitNewPositionRefreshInQueue()
     {
         positionUpdatesFlow.tryEmit(Unit)
+    }
+
+    override fun validateAndMoveToPublishing() = intent {
+        //TODO: Validate
+        postSideEffect(EditEventSingleEvent.NavigateToPublishing)
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")

@@ -30,11 +30,26 @@ import org.orbitmvi.orbit.syntax.ContainerContext
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>()) {
+fun EditEventScreen(
+    viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>(),
+    onNavigateToEventPublishingScreen: () -> Unit = {}
+) {
 
     BackHandler {
         viewModel.moveToPreviousPage()
     }
+
+
+    LaunchedEffect(true) {
+        viewModel.container.sideEffectFlow.collect { event ->
+            when(event) {
+                is EditEventSingleEvent.NavigateToPublishing -> {
+                    onNavigateToEventPublishingScreen()
+                }
+            }
+        }
+    }
+
     val uiState = viewModel.container.stateFlow.collectAsState()
     val currentScreenState = derivedStateOf {
         uiState.value.currentPage
@@ -174,7 +189,8 @@ fun EditEventScreen(viewModel: IEditEventViewModel = hiltViewModel<EditEventView
                         siteInput = { websiteState.value },
                         onDescriptionInputChange = { viewModel.changeDescriptionInput(it) },
                         onSiteInputChange = { viewModel.changeSiteInput(it) },
-                        onFacebookSiteInputChange = { viewModel.changeFacebookSiteInput(it) }
+                        onFacebookSiteInputChange = { viewModel.changeFacebookSiteInput(it) },
+                        onMoveToPublishingClick = { viewModel.validateAndMoveToPublishing() }
                     )
                 }
             }
@@ -267,6 +283,7 @@ private fun EditEventScreenPreview() {
         override fun changeDescriptionInput(newValue: String) {}
         override fun changeSiteInput(newValue: String) {}
         override fun changeFacebookSiteInput(newValue: String) {}
+        override fun validateAndMoveToPublishing() {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

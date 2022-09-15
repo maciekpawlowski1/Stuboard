@@ -187,4 +187,9 @@ class AppModule {
     @Singleton
     @Provides
     fun getEventsForMapScreenUseCase(eventsRepository: EventsRepository) = GetEventsForMapScreenUseCase(eventsRepository::getEventsForMapScreen)
+
+    @Singleton
+    @Provides
+    fun getEventPublishingStatusUseCase(eventsRepository: EventsRepository) = GetEventPublishingStatusUseCase(eventsRepository::getEventPublishingStatus)
+
 }

@@ -20,4 +20,5 @@ interface IEditEventViewModel: ContainerHost<EditEventUiState, EditEventSingleEv
     fun changeDescriptionInput(newValue: String)
     fun changeSiteInput(newValue: String)
     fun changeFacebookSiteInput(newValue: String)
+    fun validateAndMoveToPublishing()
 }

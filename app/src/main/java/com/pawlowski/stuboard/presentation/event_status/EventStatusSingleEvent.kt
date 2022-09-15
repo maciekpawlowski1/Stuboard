@@ -1,0 +1,3 @@
+package com.pawlowski.stuboard.presentation.event_status
+
+sealed interface EventStatusSingleEvent

@@ -6,10 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -37,6 +34,7 @@ fun EditEventScreen5(
     onSiteInputChange: (String) -> Unit = {},
     facebookSiteInput: () -> String = { "" },
     onFacebookSiteInputChange: (String) -> Unit = {},
+    onMoveToPublishingClick: () -> Unit = {}
 )
 {
     Column(modifier = Modifier
@@ -134,7 +132,19 @@ fun EditEventScreen5(
             })
         )
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Button(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth(),
+            onClick = { onMoveToPublishingClick() },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Green)
+        ) {
+            Text(text = "Przejdź do publikacji", color = Color.White)
+            Spacer(modifier = Modifier.width(10.dp))
+            Icon(painter = painterResource(id = R.drawable.send_icon), contentDescription = "", tint = Color.White)
+        }
     }
 }
 
