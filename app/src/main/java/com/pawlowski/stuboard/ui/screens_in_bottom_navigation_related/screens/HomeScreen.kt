@@ -191,7 +191,7 @@ fun CategoriesRow(
         {
             CategoryCard(
                 modifier = Modifier.padding(start = 10.dp),
-                imageId = it.categoryDrawable,
+                imageId = it.realImageDrawableId,
                 tittle = it.tittle
             )
             {

@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.ui.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.data.mappers.CategoryHandler
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
 import com.pawlowski.stuboard.ui.models.*
@@ -96,9 +97,9 @@ object PreviewUtils {
         FilterModel.Place.RealPlace("Warszawa"),
         FilterModel.Place.RealPlace("Sosnowiec"),
         FilterModel.Place.Online,
-        FilterModel.Category("Koncerty", R.drawable.concerts_category_image),
-        FilterModel.Category("Naukowe", R.drawable.learning_category_image),
-        FilterModel.Category("Sportowe", R.drawable.sports_category_image),
+        CategoryHandler.getCategoryById(1),
+        CategoryHandler.getCategoryById(2),
+        CategoryHandler.getCategoryById(3),
         FilterModel.EntryPrice.Free,
     )
 

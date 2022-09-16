@@ -219,7 +219,7 @@ private fun CategoriesRow(
                 icon = {
                     Icon(
                         modifier = Modifier.padding(3.dp),
-                        painter = painterResource(id = it.first.categoryDrawable),
+                        painter = painterResource(id = it.first.iconDrawableId),
                         contentDescription = ""
                     )
                 },

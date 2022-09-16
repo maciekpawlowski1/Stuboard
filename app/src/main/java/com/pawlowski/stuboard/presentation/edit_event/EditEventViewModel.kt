@@ -5,6 +5,8 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.data.mappers.CategoryHandler
+import com.pawlowski.stuboard.data.mappers.toFullEventEntity
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
@@ -219,7 +221,10 @@ class EditEventViewModel @Inject constructor(
     {
         return mapOf(
             Pair(FilterType.CATEGORY, mapOf(
-                Pair(FilterModel.Category("Koncerty", R.drawable.guitar_icon), false),
+                Pair(CategoryHandler.getCategoryById(1), false),
+                Pair(CategoryHandler.getCategoryById(2), false),
+                Pair(CategoryHandler.getCategoryById(3), false),
+                Pair(CategoryHandler.getCategoryById(4), false),
             )),
             Pair(FilterType.ACCESS, mapOf(
                 Pair(FilterModel.Access.EVERYBODY, false),

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.data.mappers.CategoryHandler
 import com.pawlowski.stuboard.presentation.filters.*
 import com.pawlowski.stuboard.ui.components.FilterLabelBox
 import com.pawlowski.stuboard.ui.theme.Green
@@ -396,14 +397,14 @@ fun FiltersScreenPreview() {
         override val uiState: StateFlow<FiltersUiState> = MutableStateFlow(FiltersUiState(
                 searchText = "",
                 selectedFilters = listOf(
-                    FilterModel.Category("Sportowe", R.drawable.sports_category_image),
+                    CategoryHandler.getCategoryById(1),
                     FilterModel.Place.Online
                 ),
                 suggestedFilters = mapOf(
                     Pair(FilterType.CATEGORY,
                     listOf(
-                        FilterModel.Category("Naukowe", R.drawable.learning_category_image),
-                        FilterModel.Category("Koncerty", R.drawable.concerts_category_image)
+                        CategoryHandler.getCategoryById(2),
+                        CategoryHandler.getCategoryById(3)
                     )
                     ),
                     Pair(FilterType.PLACE,

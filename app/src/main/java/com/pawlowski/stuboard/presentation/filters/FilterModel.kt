@@ -4,12 +4,18 @@ import java.text.DecimalFormat
 
 sealed class FilterModel(val tittle: String, val filterType: FilterType)
 {
-    data class Category(private val _tittle: String, val categoryDrawable: Int): FilterModel(_tittle, FilterType.CATEGORY)
+    data class Category(private val _tittle: String,
+                        val categoryId: Int,
+                        val realImageDrawableId: Int,
+                        val iconDrawableId: Int,
+                        val markerDrawableId: Int,
+                        val selectedMarkerDrawableId: Int
+                        ): FilterModel(_tittle, FilterType.CATEGORY)
 
-    sealed class Place(private val _tittle: String): FilterModel(_tittle, FilterType.PLACE)
+    sealed class Place(tittle: String): FilterModel(tittle, FilterType.PLACE)
     {
-        object Online: Place(_tittle = "Online")
-        data class RealPlace(val city: String): Place(_tittle = city)
+        object Online: Place(tittle = "Online")
+        data class RealPlace(val city: String): Place(tittle = city)
     }
 
     sealed class EntryPrice(tittle: String): FilterModel(tittle, FilterType.ENTRY_PRICE)
