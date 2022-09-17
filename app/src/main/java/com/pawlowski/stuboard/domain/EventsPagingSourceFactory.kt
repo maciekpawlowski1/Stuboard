@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.domain
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.pawlowski.stuboard.data.mappers.toEventItemForPreviewList
 import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
@@ -19,8 +20,10 @@ class EventsPagingSourceFactory @Inject constructor(
         val position = params.key ?: START_PAGE_INDEX
 
         return try {
-            val response = eventsService.loadItemPreviews(position, params.loadSize)
-            val events = response.getOrThrow()
+            val response = eventsService.loadItems(position, params.loadSize)
+            println(response.message())
+            println(response.raw().toString())
+            val events = response.body()!!.toEventItemForPreviewList()
             val nextKey = if(events.isEmpty())
                 null
             else
@@ -41,6 +44,11 @@ class EventsPagingSourceFactory @Inject constructor(
         catch (exception: HttpException)
         {
             return LoadResult.Error(exception)
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+            return LoadResult.Error(e)
         }
     }
 

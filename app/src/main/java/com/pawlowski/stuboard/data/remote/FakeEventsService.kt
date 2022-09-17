@@ -5,11 +5,11 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicInteger
 
-class FakeEventsService: EventsService {
+class FakeEventsService {
     private val fakeNumbers = (1..100).toList()
     private val tryCount = AtomicInteger(0)
 
-    override suspend fun loadItemPreviews(
+    suspend fun loadItems(
         page: Int,
         pageSize: Int
     ): Result<List<EventItemForPreview>> {
@@ -40,4 +40,6 @@ class FakeEventsService: EventsService {
         else
             Result.success(listOf())
     }
+
+
 }

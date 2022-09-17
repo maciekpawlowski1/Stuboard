@@ -16,6 +16,7 @@ import com.pawlowski.stuboard.data.local.IFiltersDao
 import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDatabase
+import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.domain.auth.AccountsRepository
 import com.pawlowski.stuboard.domain.auth.IAccountsRepository
@@ -24,6 +25,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -45,9 +48,9 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun eventsRepository(): EventsRepository
+    fun eventsRepository(eventsRepository: EventsRepositoryImpl): EventsRepository
     {
-        return FakeEventsRepositoryImpl(FakeEventsService())
+        return eventsRepository
     }
 
     @Singleton
@@ -101,6 +104,19 @@ class AppModule {
     @Provides
     fun editingEventsDao(database: EditingEventsDatabase): EditingEventsDao = database.editingEventsDao()
 
+    @Singleton
+    @Provides
+    fun retrofit(appContext: Context): Retrofit
+    {
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(appContext.getString(R.string.base_url))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun eventsService(retrofit: Retrofit): EventsService = retrofit.create(EventsService::class.java)
 
     @Named("SIGN_IN")
     @Provides

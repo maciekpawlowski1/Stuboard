@@ -3,10 +3,33 @@ package com.pawlowski.stuboard.data.mappers
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
+import com.pawlowski.stuboard.data.remote.models.EventsResponse
+import com.pawlowski.stuboard.data.remote.models.EventsResponseItem
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
+import com.pawlowski.stuboard.ui.models.EventItemForPreview
+
+fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
+{
+    return this.map {
+        it.toEventItemForPreview()
+    }
+}
+
+fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
+    return EventItemForPreview(
+        tittle = this.name,
+        imageUrl = this.thumbnail,
+        dateDisplayString = this.startDate,
+        place = if(this.online)
+            "Online"
+        else
+            this.city?:"",
+    )
+}
+
 
 fun EditEventUiState.toFullEventEntity(): FullEventEntity
 {
