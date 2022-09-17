@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
+import com.pawlowski.stuboard.data.mappers.toEventItemWithDetails
 import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
@@ -37,8 +38,15 @@ class EventsRepositoryImpl @Inject constructor(
         emit(firstEmit)
     }
 
-    override fun getEventDetails(eventId: String): Flow<EventDetailsResult?> {
-        TODO("Not yet implemented")
+    override fun getEventDetails(eventId: String): Flow<EventDetailsResult?> = flow {
+        try {
+           val response = eventsService.loadItemById(eventId)
+            emit(EventDetailsResult(isFresh = true,
+                event = response.body()!!.toEventItemWithDetails()))
+        }
+        catch (e: Exception) {
+
+        }
     }
 
     override fun getEventResultStream(filters: List<FilterModel>): Flow<PagingData<EventItemForPreview>> {

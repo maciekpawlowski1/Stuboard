@@ -37,7 +37,7 @@ data class EventsResponseItem(
     @SerializedName("registration")
     val registration: Boolean,
     @SerializedName("shortDescription")
-    val shortDescription: String?,
+    val shortDescription: String,
     @SerializedName("startDate")
     val startDate: String,
     @SerializedName("studentGovernmentId")

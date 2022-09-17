@@ -10,6 +10,7 @@ import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 
 fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
 {
@@ -31,6 +32,20 @@ fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     )
 }
 
+
+fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
+    return EventItemWithDetails(
+        tittle = this.name,
+        imageUrl = this.thumbnail,
+        dateDisplay = this.startDate,
+        place = if(this.online)
+            "Online"
+        else
+            this.city?:"",
+        description = this.shortDescription,
+        price = 0.0f,
+    )
+}
 
 fun EditEventUiState.toFullEventEntity(): FullEventEntity
 {
