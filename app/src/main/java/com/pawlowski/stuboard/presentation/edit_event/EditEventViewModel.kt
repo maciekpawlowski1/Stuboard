@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.mappers.CategoryHandler
+import com.pawlowski.stuboard.data.mappers.OrganisationHandler
 import com.pawlowski.stuboard.data.mappers.toFullEventEntity
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
@@ -250,16 +251,8 @@ class EditEventViewModel @Inject constructor(
     private fun initialExistingOrganisations(): List<Organisation.Existing>
     {
         return listOf(
-            Organisation.Existing(
-                id = 1,
-                tittle = "Akademia Górniczo-Hutnicza",
-                imageUrl = null
-            ),
-            Organisation.Existing(
-                id = 2,
-                tittle = "Klub Studio",
-                imageUrl = null
-            )
+            OrganisationHandler.getExistingOrganisationById(1)!!,
+            OrganisationHandler.getExistingOrganisationById(2)!!,
         )
     }
 

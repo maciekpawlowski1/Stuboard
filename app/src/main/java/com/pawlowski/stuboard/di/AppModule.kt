@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.di
 import android.app.Application
 import android.content.Context
 import android.location.Geocoder
+import androidx.room.Room
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
@@ -13,6 +14,8 @@ import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.data.remote.FakeEventsService
 import com.pawlowski.stuboard.data.local.IFiltersDao
 import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
+import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
+import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDatabase
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.domain.auth.AccountsRepository
 import com.pawlowski.stuboard.domain.auth.IAccountsRepository
@@ -86,6 +89,18 @@ class AppModule {
 
     @Provides
     fun geocoder(appContext: Context) = Geocoder(appContext)
+
+    @Singleton
+    @Provides
+    fun editingEventsDatabase(appContext: Context): EditingEventsDatabase {
+        return Room.databaseBuilder(appContext, EditingEventsDatabase::class.java, "EditingEventsDatabase")
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun editingEventsDao(database: EditingEventsDatabase): EditingEventsDao = database.editingEventsDao()
+
 
     @Named("SIGN_IN")
     @Provides

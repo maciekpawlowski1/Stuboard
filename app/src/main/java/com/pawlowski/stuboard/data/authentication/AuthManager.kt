@@ -16,12 +16,16 @@ class AuthManager @Inject constructor(
 
 
     override fun isSignedIn(): Boolean {
+
         return firebaseAuth.currentUser != null
     }
 
     override suspend fun signInWithPassword(mail: String, password: String): Resource<FirebaseUser> {
+
         return try {
             val user = firebaseAuth.signInWithEmailAndPassword(mail, password).await()?.user
+            println("token: ${firebaseAuth.currentUser?.getIdToken(true)?.await()?.token}")
+
             if(user != null)
                 Resource.Success(user)
             else

@@ -2,8 +2,9 @@ package com.pawlowski.stuboard.data.mappers
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.pawlowski.stuboard.data.local.FullEventEntity
+import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
+import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 
@@ -32,8 +33,16 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         streetAndNumber = streetAndNumber,
         country = country,
         placeName = placeName,
-        position = positionOnMap,
-        organisation = selectedOrganisation,
+        latitude = positionOnMap?.latitude,
+        longitude = positionOnMap?.longitude,
+        organisationId = if(selectedOrganisation is Organisation.Existing)
+            selectedOrganisation.id
+        else
+            -1,
+        customOrganisationTittle = if(selectedOrganisation is Organisation.Custom)
+            selectedOrganisation.tittle
+        else
+            null,
         description = description,
         site = site,
         facebookSite = facebookSite,
