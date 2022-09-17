@@ -14,7 +14,7 @@ class EventDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ): ViewModel(), IEventDetailsViewModel {
 
-    private val eventId = savedStateHandle.get<String>("eventId")!!.toInt()
+    private val eventId = savedStateHandle.get<String>("eventId")!!
 
     private val eventResult = getEventDetailsUseCase(eventId)
     private val isRefreshing = eventResult.map { it == null || !it.isFresh }

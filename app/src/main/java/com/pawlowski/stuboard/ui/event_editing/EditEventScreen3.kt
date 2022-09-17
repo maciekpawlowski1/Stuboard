@@ -178,7 +178,7 @@ private fun MapPreview(modifier: Modifier = Modifier, position: LatLng? = null, 
                 .fillMaxWidth()
                 .height((screenWidth / 1.5).dp),
             markers = listOf(
-                EventMarker(it, markerRes?:R.drawable.naukowe_marker_icon, "", -1)
+                EventMarker(it, markerRes?:R.drawable.naukowe_marker_icon, "", "-1")
             ),
             disableAllGestures = true,
             moveCameraToMarkersBound = false,

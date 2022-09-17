@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
-    onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {},
+    onNavigateToEventDetailsScreen: (eventId: String) -> Unit = {},
     onNavigateToFiltersScreen: () -> Unit = {},
     viewModel: ISearchViewModel = hiltViewModel<SearchViewModel>(),
     onNavigateToMapScreen: () -> Unit = {}

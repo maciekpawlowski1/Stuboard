@@ -1,7 +1,7 @@
 package com.pawlowski.stuboard.ui.models
 
 data class EventItemForPreview(
-                     val eventId: Int = 0,
+                     val eventId: String = "",
                      val tittle: String = "",
                      val place: String = "",
                      val dateDisplayString: String = "",

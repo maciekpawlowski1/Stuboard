@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventsRepository {
     fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>>
-    fun getEventDetails(eventId: Int): Flow<EventDetailsResult?>
+    fun getEventDetails(eventId: String): Flow<EventDetailsResult?>
     fun getEventResultStream(filters: List<FilterModel>): Flow<PagingData<EventItemForPreview>>
     suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>>
     fun getEventPublishingStatus(): Flow<EventPublishState>

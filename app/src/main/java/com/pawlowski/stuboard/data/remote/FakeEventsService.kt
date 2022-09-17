@@ -29,7 +29,7 @@ class FakeEventsService {
         return if(startIndex <= 100)
             Result.success(fakeNumbers.subList(startIndex, endIndex).map {
             EventItemForPreview(
-                eventId = it,
+                eventId = it.toString(),
                 tittle = "Wydarzenie nr $it",
                 place = "Kraków, Reymonta $it",
                 dateDisplayString = "$it września",

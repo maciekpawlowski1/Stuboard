@@ -65,7 +65,7 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         emit(thirdEmit)
     }
 
-    override fun getEventDetails(eventId: Int): Flow<EventDetailsResult?> = flow {
+    override fun getEventDetails(eventId: String): Flow<EventDetailsResult?> = flow {
         emit(null)
         delay(2000)
         emit(EventDetailsResult(event = PreviewUtils.defaultFullEvent, isFresh = true))

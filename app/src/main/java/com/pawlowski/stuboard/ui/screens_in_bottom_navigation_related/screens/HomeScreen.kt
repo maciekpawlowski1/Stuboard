@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit = {},
-    onNavigateToEventDetailScreen: (eventId: Int) -> Unit = {},
+    onNavigateToEventDetailScreen: (eventId: String) -> Unit = {},
     onNavigateToMapScreen: () -> Unit = {},
     preview: Boolean = false,
     viewModel: IHomeViewModel = hiltViewModel<HomeViewModel>()
@@ -347,7 +347,7 @@ fun EventsRow(
     modifier: Modifier = Modifier,
     eventItemsForPreview: List<EventItemForPreview>,
     isLoading: Boolean = false,
-    onEventCardClick: (eventId: Int) -> Unit
+    onEventCardClick: (eventId: String) -> Unit
 ) {
     val eventsToDisplay = remember(eventItemsForPreview) {
         //If empty, generates empty event to display loading effect

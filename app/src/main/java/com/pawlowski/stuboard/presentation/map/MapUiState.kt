@@ -10,7 +10,7 @@ sealed class MapUiState(
     data class Loading(private val _currentFilters: List<FilterModel>): MapUiState(_currentFilters)
     data class Success(
         val events: List<EventItemForMapScreen>,
-        val selectedEventId: Int = -1,
+        val selectedEventId: String = "-1",
         val markers: List<EventMarker> = listOf(),
         private val _currentFilters: List<FilterModel>
     ): MapUiState(_currentFilters)

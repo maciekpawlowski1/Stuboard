@@ -6,5 +6,5 @@ data class EventMarker(
     val position: LatLng,
     val iconId: Int,
     val eventTittle: String,
-    val eventId: Int
+    val eventId: String
 )

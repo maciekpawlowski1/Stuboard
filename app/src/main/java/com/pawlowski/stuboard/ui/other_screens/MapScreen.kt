@@ -42,15 +42,17 @@ import com.pawlowski.stuboard.ui.theme.Orange
 import com.pawlowski.stuboard.ui.theme.montserratFont
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MapScreen(
     preview: Boolean = false,
     onNavigateBack: () -> Unit = {},
-    onNavigateToEventDetailsScreen: (eventId: Int) -> Unit = {},
+    onNavigateToEventDetailsScreen: (eventId: String) -> Unit = {},
     viewModel: IMapMviViewModel = hiltViewModel<MapMviViewModel>()
 ) {
     BackHandler(onBack = onNavigateBack)
@@ -163,7 +165,7 @@ fun EventsPager(
     pagerState: PagerState = rememberPagerState(),
     events: List<EventItemForMapScreen>,
     isLoading: Boolean = false,
-    onEventCardClick: (eventId: Int) -> Unit = {},
+    onEventCardClick: (eventId: String) -> Unit = {},
     onPageChanged: (pageIndex: Int) -> Unit = {},
 ) {
     HorizontalPager(

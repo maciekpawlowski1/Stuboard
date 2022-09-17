@@ -62,7 +62,7 @@ class MapMviViewModel @Inject constructor(
                                 _currentFilters = state.currentFilters,
                                 markers = calculateMarkersFromEvents(
                                     events = data,
-                                    selectedEventId = data.getOrNull(0)?.eventId?: kotlin.run { -1 }
+                                    selectedEventId = data.getOrNull(0)?.eventId?: kotlin.run { "-1" }
                                 )
                             )
                         }?: kotlin.run {
@@ -83,7 +83,7 @@ class MapMviViewModel @Inject constructor(
 
     }
 
-    private fun calculateMarkersFromEvents(events: List<EventItemForMapScreen>, selectedEventId: Int): List<EventMarker> {
+    private fun calculateMarkersFromEvents(events: List<EventItemForMapScreen>, selectedEventId: String): List<EventMarker> {
         return events.map {
             EventMarker(
                 position = it.position,
@@ -102,7 +102,7 @@ class MapMviViewModel @Inject constructor(
             when(val currentState = state) {
                 is MapUiState.Success -> {
                     val currentEvents = currentState.events
-                    val newEventId = currentEvents.getOrNull(index)?.eventId?: kotlin.run { -1 }
+                    val newEventId = currentEvents.getOrNull(index)?.eventId?: kotlin.run { "-1" }
                     currentState.copy(selectedEventId = newEventId, markers = calculateMarkersFromEvents(currentEvents, newEventId))
                 }
                 else -> {currentState}
@@ -122,7 +122,7 @@ class MapMviViewModel @Inject constructor(
         }
     }
 
-    override fun onEventSelected(eventId: Int) = intent {
+    override fun onEventSelected(eventId: String) = intent {
         reduce {
             when(val currentState = state) {
                 is MapUiState.Success -> {

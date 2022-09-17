@@ -37,7 +37,7 @@ class EventsRepositoryImpl @Inject constructor(
         emit(firstEmit)
     }
 
-    override fun getEventDetails(eventId: Int): Flow<EventDetailsResult?> {
+    override fun getEventDetails(eventId: String): Flow<EventDetailsResult?> {
         TODO("Not yet implemented")
     }
 

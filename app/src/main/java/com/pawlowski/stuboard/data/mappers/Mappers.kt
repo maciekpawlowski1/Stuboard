@@ -20,6 +20,7 @@ fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
 
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     return EventItemForPreview(
+        eventId = id,
         tittle = this.name,
         imageUrl = this.thumbnail,
         dateDisplayString = this.startDate,
