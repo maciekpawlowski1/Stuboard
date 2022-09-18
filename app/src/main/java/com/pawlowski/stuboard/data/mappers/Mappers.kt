@@ -11,6 +11,8 @@ import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
 {
@@ -19,12 +21,27 @@ fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
     }
 }
 
+fun offsetDateTimeToLocalFormattedTime(offsetDateTimeString: String): String
+{
+    return try {
+        val format = DateTimeFormatter.ofPattern("dd.MM.u HH:mm")
+        val offset = OffsetDateTime.now().offset
+        OffsetDateTime.parse(offsetDateTimeString).withOffsetSameInstant(offset).format(format)
+    }
+    catch (e: Exception)
+    {
+        ""
+    }
+}
+
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
+    val startDate = offsetDateTimeToLocalFormattedTime(this.startDate)
+
     return EventItemForPreview(
         eventId = id,
         tittle = this.name,
         imageUrl = this.thumbnail,
-        dateDisplayString = this.startDate,
+        dateDisplayString = startDate,
         place = if(this.online)
             "Online"
         else
