@@ -14,7 +14,7 @@ interface EditingEventsDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertEvent(event: FullEventEntity)
+    suspend fun upsertEvent(event: FullEventEntity): Long
 
     @Delete
     suspend fun deleteEvent(event: FullEventEntity)

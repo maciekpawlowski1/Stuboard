@@ -3,8 +3,11 @@ package com.pawlowski.stuboard.domain
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
+import com.pawlowski.stuboard.data.mappers.toEditEventUiState
 import com.pawlowski.stuboard.data.mappers.toEventItemWithDetails
+import com.pawlowski.stuboard.data.mappers.toFullEventEntity
 import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
@@ -20,6 +23,7 @@ import javax.inject.Inject
 
 class EventsRepositoryImpl @Inject constructor(
     private val eventsService: EventsService,
+    private val eventsDao: EditingEventsDao
 ): EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = flow {
         val firstEmit = listOf(
@@ -72,15 +76,15 @@ class EventsRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun saveEditingEvent(editEventUiState: EditEventUiState) {
-        TODO("Not yet implemented")
+    override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {
+        return eventsDao.upsertEvent(editEventUiState.toFullEventEntity())
     }
 
     override fun getAllEditingEvents(): Flow<List<FullEventEntity>> {
-        TODO("Not yet implemented")
+        return eventsDao.getAllEvents()
     }
 
-    override suspend fun getEditingEventStateFromEditingEvent(eventId: Int): EditEventUiState {
-        TODO("Not yet implemented")
+    override suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState {
+       return eventsDao.getEvent(eventId.toInt()).toEditEventUiState()
     }
 }

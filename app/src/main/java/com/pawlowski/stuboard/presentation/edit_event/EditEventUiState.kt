@@ -6,6 +6,7 @@ import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
 
 data class EditEventUiState(
+    val eventId: Int = 0,
     val currentPage: EditEventScreenType = EditEventScreenType.FIRST,
     val tittleInput: String = "",
     val sinceTime: Long? = null,

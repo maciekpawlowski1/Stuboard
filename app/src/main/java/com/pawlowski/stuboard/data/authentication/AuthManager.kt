@@ -24,7 +24,7 @@ class AuthManager @Inject constructor(
 
         return try {
             val user = firebaseAuth.signInWithEmailAndPassword(mail, password).await()?.user
-            println("token: ${firebaseAuth.currentUser?.getIdToken(true)?.await()?.token}")
+            //println("token: ${firebaseAuth.currentUser?.getIdToken(true)?.await()?.token}")
 
             if(user != null)
                 Resource.Success(user)

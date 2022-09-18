@@ -2,14 +2,15 @@ package com.pawlowski.stuboard.presentation.edit_event
 
 import android.location.Address
 import android.location.Geocoder
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.mappers.CategoryHandler
 import com.pawlowski.stuboard.data.mappers.OrganisationHandler
-import com.pawlowski.stuboard.data.mappers.toFullEventEntity
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
+import com.pawlowski.stuboard.presentation.use_cases.RestoreEditEventStateUseCase
+import com.pawlowski.stuboard.presentation.use_cases.SaveEditingEventUseCase
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,13 @@ import javax.inject.Inject
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
     private val geocoder: Geocoder,
+    private val saveEditingEventUseCase: SaveEditingEventUseCase,
+    private val restoreEditEventStateUseCase: RestoreEditEventStateUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ): IEditEventViewModel, ViewModel() {
+
+    val eventId: Int? = savedStateHandle.get<String>("editEventId")?.toInt()
+
     override val container: Container<EditEventUiState, EditEventSingleEvent> = container(
         EditEventUiState(
             categories = initialCategories(),
@@ -49,6 +56,7 @@ class EditEventViewModel @Inject constructor(
             })
         }
         emitNewPositionRefreshInQueue()
+        saveEvent()
     }
 
     override fun moveToPreviousPage() = intent {
@@ -62,6 +70,7 @@ class EditEventViewModel @Inject constructor(
             })
         }
         emitNewPositionRefreshInQueue()
+        saveEvent()
     }
 
     override fun changeTittleInput(newValue: String) = intent {
@@ -256,7 +265,30 @@ class EditEventViewModel @Inject constructor(
         )
     }
 
+    private fun saveNewOrRestoreEvent() = intent {
+        eventId?.let {
+            val restoredState = restoreEditEventStateUseCase(it.toLong())
+            reduce {
+                restoredState
+            }
+
+        }?: kotlin.run {
+            val id = saveEditingEventUseCase(EditEventUiState())
+            reduce {
+                state.copy(eventId = id.toInt())
+            }
+        }
+    }
+
+    private fun saveEvent() = intent {
+        if(state.eventId != 0)
+        {
+            saveEditingEventUseCase(state)
+        }
+    }
+
     init {
+        saveNewOrRestoreEvent()
         handlePositionUpdates()
     }
 

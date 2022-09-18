@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.data.mappers
 
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
@@ -21,7 +22,7 @@ fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
     }
 }
 
-fun offsetDateTimeToLocalFormattedTime(offsetDateTimeString: String): String
+fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String): String
 {
     return try {
         val format = DateTimeFormatter.ofPattern("dd.MM.u HH:mm")
@@ -35,7 +36,7 @@ fun offsetDateTimeToLocalFormattedTime(offsetDateTimeString: String): String
 }
 
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
-    val startDate = offsetDateTimeToLocalFormattedTime(this.startDate)
+    val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
 
     return EventItemForPreview(
         eventId = id,
@@ -51,16 +52,49 @@ fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
 
 
 fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
+    val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
+    val endDate = offsetDateTimeStringToLocalFormattedTimeString(this.endDate)
+
+    val categories = tags?.mapNotNull {
+        it?.id?.let { categoryId ->
+            CategoryHandler.getCategoryById(categoryId)
+        }
+    }?: listOf()
+
     return EventItemWithDetails(
         tittle = this.name,
         imageUrl = this.thumbnail,
-        dateDisplay = this.startDate,
+        dateDisplay = startDate,
         place = if(this.online)
             "Online"
         else
             this.city?:"",
         description = this.shortDescription,
         price = 0.0f,
+        categoriesDrawablesId = categories.map { it.iconDrawableId }
+    )
+}
+
+fun FullEventEntity.toEditEventUiState(): EditEventUiState
+{
+    //TODO: map other fields
+    return EditEventUiState(
+        tittleInput = this.tittle,
+        eventId = this.id,
+        toTime = this.toTime,
+        sinceTime = this.sinceTime,
+        city = this.city,
+        country = this.country,
+        isOnline = this.isOnline,
+        streetAndNumber = this.streetAndNumber,
+        placeName = this.placeName,
+        positionOnMap = if(latitude != null && longitude != null)
+            LatLng(this.latitude, this.longitude)
+        else
+            null,
+        description = this.description,
+        site = this.site,
+        facebookSite = this.facebookSite
     )
 }
 
@@ -81,6 +115,7 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
 
 
     return FullEventEntity(
+        id = eventId,
         tittle = tittleInput,
         sinceTime = sinceTime,
         toTime = toTime,

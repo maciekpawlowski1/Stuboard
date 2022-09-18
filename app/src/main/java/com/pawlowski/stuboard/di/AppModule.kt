@@ -223,4 +223,15 @@ class AppModule {
     @Provides
     fun getEventPublishingStatusUseCase(eventsRepository: EventsRepository) = GetEventPublishingStatusUseCase(eventsRepository::getEventPublishingStatus)
 
+    @Singleton
+    @Provides
+    fun saveEditingEventUseCase(eventsRepository: EventsRepository) = SaveEditingEventUseCase(eventsRepository::saveEditingEvent)
+
+    @Singleton
+    @Provides
+    fun restoreEditEventStateUseCase(eventsRepository: EventsRepository) = RestoreEditEventStateUseCase(eventsRepository::getEditingEventStateFromEditingEvent)
+
+    @Singleton
+    @Provides
+    fun getAllEditingEventsUseCase(eventsRepository: EventsRepository) = GetAllEditingEventsUseCase(eventsRepository::getAllEditingEvents)
 }

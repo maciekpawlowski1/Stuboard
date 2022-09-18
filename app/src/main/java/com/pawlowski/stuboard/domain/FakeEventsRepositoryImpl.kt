@@ -96,17 +96,20 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         emit(EventPublishState.EDITING)
     }
 
-    override suspend fun saveEditingEvent(editEventUiState: EditEventUiState) {
+    override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {
         TODO("Not yet implemented")
     }
+
 
     override fun getAllEditingEvents(): Flow<List<FullEventEntity>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getEditingEventStateFromEditingEvent(eventId: Int): EditEventUiState {
+    override suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState {
         TODO("Not yet implemented")
     }
+
+
 
 
 }
