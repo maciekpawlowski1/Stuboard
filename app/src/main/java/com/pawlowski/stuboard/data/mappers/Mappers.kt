@@ -36,6 +36,8 @@ fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String)
     }
 }
 
+
+
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
 
@@ -47,7 +49,7 @@ fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
         place = if(this.online)
             "Online"
         else
-            this.city?:"",
+            this.city,
     )
 }
 
@@ -95,7 +97,7 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
         place = if(this.online)
             "Online"
         else
-            this.city?:"",
+            this.city,
         description = this.shortDescription,
         price = 0.0f,
         categoriesDrawablesId = categories.map { it.iconDrawableId }
@@ -124,6 +126,11 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
             ""
     }?:""
 
+    val suggestedOrganisations = OrganisationHandler.getAllExistingOrganisations()
+        .filter {
+            organisationSearchText.isEmpty() || it.tittle.contains(organisationSearchText)
+        }
+
     val filters = this.filtersJson.toFilterModelList(Gson())
     val groupedFilters = filters?.groupBy {
         it.filterType
@@ -139,6 +146,12 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
             .toMap()
     }
 
+    val markerDrawableRes = groupedFilters?.get(FilterType.CATEGORY)?.firstOrNull()?.let {
+        (it as FilterModel.Category).markerDrawableId
+    }
+
+
+
     return EditEventUiState(
         tittleInput = this.tittle,
         eventId = this.id,
@@ -153,13 +166,37 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
             LatLng(this.latitude, this.longitude)
         else
             null,
+        markerDrawableRes = markerDrawableRes,
         description = this.description,
         site = this.site,
         facebookSite = this.facebookSite,
         selectedOrganisation = organisation,
         organisationSearchText = organisationSearchText,
-        categories = categories
+        categories = categories,
+        suggestedOrganisations = suggestedOrganisations,
+        imageUrl = imageUrl
     )
+}
+
+
+fun FullEventEntity.isFree(): Boolean
+{
+    return try {
+        val filters = this.filtersJson.toFilterModelList(Gson())
+        val groupedFilters = filters?.groupBy {
+            it.filterType
+        }
+        val isFree = groupedFilters?.get(FilterType.ENTRY_PRICE)
+            ?.filterIsInstance<FilterModel.EntryPrice>()
+            ?.firstOrNull() == FilterModel.EntryPrice.Free
+
+        isFree
+    }
+    catch (e: Exception)
+    {
+        false
+    }
+
 }
 
 fun EditEventUiState.toFullEventEntity(): FullEventEntity
@@ -201,7 +238,8 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         description = description,
         site = site,
         facebookSite = facebookSite,
-        filtersJson = categoriesJson
+        filtersJson = categoriesJson,
+        imageUrl = imageUrl
     )
 }
 

@@ -19,5 +19,13 @@ object OrganisationHandler {
             else -> null
         }
     }
+
+    fun getAllExistingOrganisations(): List<Organisation.Existing>
+    {
+        return listOf(
+            getExistingOrganisationById(1)!!,
+            getExistingOrganisationById(2)!!,
+        )
+    }
 }
 

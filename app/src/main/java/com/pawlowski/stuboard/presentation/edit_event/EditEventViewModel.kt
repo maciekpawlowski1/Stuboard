@@ -35,7 +35,12 @@ class EditEventViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
 ): IEditEventViewModel, ViewModel() {
 
-    val eventId: Int? = savedStateHandle.get<String>("editEventId")?.toInt()
+    val eventId: Int? = savedStateHandle.get<String>("editEventId")?.let {
+        if(it == "new")
+            null
+        else
+            it
+    }?.toInt()
 
     override val container: Container<EditEventUiState, EditEventSingleEvent> = container(
         EditEventUiState(
@@ -61,16 +66,24 @@ class EditEventViewModel @Inject constructor(
     }
 
     override fun moveToPreviousPage() = intent {
-        reduce {
-            state.copy(currentPage = when(state.currentPage) {
-                EditEventScreenType.SECOND -> { EditEventScreenType.FIRST }
-                EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
-                EditEventScreenType.FOURTH -> { EditEventScreenType.THIRD }
-                EditEventScreenType.FIFTH -> { EditEventScreenType.FOURTH }
-                else -> {state.currentPage}
-            })
+        if(state.currentPage == EditEventScreenType.FIRST)
+        {
+            postSideEffect(EditEventSingleEvent.NavigateBack)
         }
-        emitNewPositionRefreshInQueue()
+        else
+        {
+            reduce {
+                state.copy(currentPage = when(state.currentPage) {
+                    EditEventScreenType.SECOND -> { EditEventScreenType.FIRST }
+                    EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
+                    EditEventScreenType.FOURTH -> { EditEventScreenType.THIRD }
+                    EditEventScreenType.FIFTH -> { EditEventScreenType.FOURTH }
+                    else -> {state.currentPage}
+                })
+            }
+            emitNewPositionRefreshInQueue()
+        }
+
         saveEvent()
     }
 
@@ -236,10 +249,7 @@ class EditEventViewModel @Inject constructor(
 
     private fun initialExistingOrganisations(): List<Organisation.Existing>
     {
-        return listOf(
-            OrganisationHandler.getExistingOrganisationById(1)!!,
-            OrganisationHandler.getExistingOrganisationById(2)!!,
-        )
+        return OrganisationHandler.getAllExistingOrganisations()
     }
 
     private fun saveNewOrRestoreEvent() = intent {

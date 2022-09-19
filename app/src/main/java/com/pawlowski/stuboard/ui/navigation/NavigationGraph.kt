@@ -123,6 +123,9 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
                 {
                     launchSingleTop = true
                 }
+            },
+            onNavigateBack = {
+                navController.popBackStack()
             })
         }
 

@@ -32,7 +32,8 @@ import org.orbitmvi.orbit.syntax.ContainerContext
 @Composable
 fun EditEventScreen(
     viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>(),
-    onNavigateToEventPublishingScreen: () -> Unit = {}
+    onNavigateToEventPublishingScreen: () -> Unit = {},
+    onNavigateBack: () -> Unit = {}
 ) {
 
     BackHandler {
@@ -45,6 +46,9 @@ fun EditEventScreen(
             when(event) {
                 is EditEventSingleEvent.NavigateToPublishing -> {
                     onNavigateToEventPublishingScreen()
+                }
+                is EditEventSingleEvent.NavigateBack -> {
+                    onNavigateBack()
                 }
             }
         }

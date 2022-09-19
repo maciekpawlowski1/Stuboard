@@ -25,4 +25,5 @@ data class EditEventUiState(
     val description: String = "",
     val site: String = "",
     val facebookSite: String = "",
+    val imageUrl: String? = null,
 )

@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.presentation.my_events
 
 import androidx.lifecycle.ViewModel
+import com.pawlowski.stuboard.data.mappers.isFree
 import com.pawlowski.stuboard.presentation.use_cases.GetAllEditingEventsUseCase
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +32,7 @@ class MyEventsViewModel @Inject constructor(
                                 "${it.city}, ${it.streetAndNumber}"
                             else
                                 "",
+                            isFree = it.isFree()
                         ),
                         EventPublishState.EDITING
                     )

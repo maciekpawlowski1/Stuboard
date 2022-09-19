@@ -2,8 +2,6 @@ package com.pawlowski.stuboard.data.local.editing_events
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.android.gms.maps.model.LatLng
-import com.pawlowski.stuboard.presentation.edit_event.Organisation
 
 
 @Entity(tableName = "editing_events")
@@ -25,4 +23,5 @@ data class FullEventEntity(
     val description: String = "",
     val site: String = "",
     val facebookSite: String = "",
+    val imageUrl: String?
 )

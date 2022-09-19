@@ -23,7 +23,7 @@ fun RootComposable(onNavigateToLoginScreen: () -> Unit)
             val currentRoute = navBackStackEntry?.destination?.route
             if(currentRoute == NavRoutes.MY_EVENTS)
             {
-                FloatingActionButton(onClick = { navController.navigate(NavRoutes.EDIT_EVENT)
+                FloatingActionButton(onClick = { navController.navigate("${NavRoutes.EDIT_EVENT}/new")
                 {
                     launchSingleTop = true
                 }}, backgroundColor = Green) {
