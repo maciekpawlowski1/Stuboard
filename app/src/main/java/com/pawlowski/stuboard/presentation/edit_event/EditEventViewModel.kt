@@ -231,7 +231,7 @@ class EditEventViewModel @Inject constructor(
 
     override fun validateAndMoveToPublishing() = intent {
         //TODO: Validate
-        postSideEffect(EditEventSingleEvent.NavigateToPublishing)
+        postSideEffect(EditEventSingleEvent.NavigateToPublishing(state.eventId))
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")

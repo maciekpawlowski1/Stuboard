@@ -91,7 +91,7 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         return Resource.Success(PreviewUtils.defaultEventItemsForMap)
     }
 
-    override fun getEventPublishingStatus(): Flow<EventPublishState> = flow {
+    override fun getEventPublishingStatus(eventId: Int): Flow<EventPublishState> = flow {
         delay(2000)
         emit(EventPublishState.EDITING)
     }

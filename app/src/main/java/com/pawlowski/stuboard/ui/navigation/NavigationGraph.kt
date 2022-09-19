@@ -118,8 +118,8 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
             })
         )
         {
-            EditEventScreen(onNavigateToEventPublishingScreen = {
-                navController.navigate(NavRoutes.PUBLISHING_STATUS)
+            EditEventScreen(onNavigateToEventPublishingScreen = { eventId ->
+                navController.navigate("${NavRoutes.PUBLISHING_STATUS}/$eventId")
                 {
                     launchSingleTop = true
                 }
@@ -129,7 +129,11 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
             })
         }
 
-        composable(route = NavRoutes.PUBLISHING_STATUS)
+        composable(route = "${NavRoutes.PUBLISHING_STATUS}/{editEventId}",
+        arguments = listOf(navArgument("editEventId")
+        {
+            NavType.StringType
+        }))
         {
             EventPublishStatusScreen(onNavigateBack = {
                 navController.popBackStack()

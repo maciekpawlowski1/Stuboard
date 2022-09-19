@@ -17,7 +17,7 @@ interface EventsRepository {
     fun getEventDetails(eventId: String): Flow<EventDetailsResult?>
     fun getEventResultStream(filters: List<FilterModel>): Flow<PagingData<EventItemForPreview>>
     suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>>
-    fun getEventPublishingStatus(): Flow<EventPublishState>
+    fun getEventPublishingStatus(eventId: Int): Flow<EventPublishState>
     suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long
     fun getAllEditingEvents(): Flow<List<FullEventEntity>>
     suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState

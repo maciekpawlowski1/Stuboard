@@ -32,7 +32,7 @@ import org.orbitmvi.orbit.syntax.ContainerContext
 @Composable
 fun EditEventScreen(
     viewModel: IEditEventViewModel = hiltViewModel<EditEventViewModel>(),
-    onNavigateToEventPublishingScreen: () -> Unit = {},
+    onNavigateToEventPublishingScreen: (String) -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
 
@@ -45,7 +45,7 @@ fun EditEventScreen(
         viewModel.container.sideEffectFlow.collect { event ->
             when(event) {
                 is EditEventSingleEvent.NavigateToPublishing -> {
-                    onNavigateToEventPublishingScreen()
+                    onNavigateToEventPublishingScreen(event.eventId.toString())
                 }
                 is EditEventSingleEvent.NavigateBack -> {
                     onNavigateBack()

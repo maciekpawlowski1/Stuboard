@@ -86,8 +86,16 @@ class EventsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getEventPublishingStatus(): Flow<EventPublishState> {
-        TODO("Not yet implemented")
+    override fun getEventPublishingStatus(eventId:Int): Flow<EventPublishState> = flow {
+        val event = eventsDao.getEvent(eventId)
+        val emitValue = when(event.publishingStatus) {
+            0 -> EventPublishState.EDITING
+            1 -> EventPublishState.WAITING_TO_PUBLISH
+            2 -> EventPublishState.PUBLISHED
+            3 -> EventPublishState.CANCELED
+            else -> EventPublishState.EDITING
+        }
+        emit(emitValue)
     }
 
     override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {

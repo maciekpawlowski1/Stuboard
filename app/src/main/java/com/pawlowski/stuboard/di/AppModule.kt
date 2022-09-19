@@ -97,6 +97,7 @@ class AppModule {
     @Provides
     fun editingEventsDatabase(appContext: Context): EditingEventsDatabase {
         return Room.databaseBuilder(appContext, EditingEventsDatabase::class.java, "EditingEventsDatabase")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
