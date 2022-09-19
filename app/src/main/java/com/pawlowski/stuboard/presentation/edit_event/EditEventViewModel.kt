@@ -5,6 +5,7 @@ import android.location.Geocoder
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.mappers.CategoryHandler
 import com.pawlowski.stuboard.data.mappers.EditEventInitialCategories
 import com.pawlowski.stuboard.data.mappers.OrganisationHandler
@@ -111,16 +112,30 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    override fun changeImageUri(imageUri: String) = intent {
+        reduce {
+            state.copy(imageUrl = imageUri)
+        }
+    }
+
     override fun changeCategorySelection(category: FilterModel, isSelected: Boolean) = intent {
         reduce {
-            state.copy(categories = state.categories.toMutableMap().apply {
+            val newCategories = state.categories.toMutableMap().apply {
                 val newMap = get(category.filterType)?.toMutableMap()?.apply {
                     set(category, isSelected)
                 }
                 set(category.filterType, newMap?: mapOf())
-            },
+            }
+            state.copy(categories = newCategories,
             markerDrawableRes = if(category is FilterModel.Category)
-                state.markerDrawableRes //TODO: get new marker drawable from some use case
+            {
+                //TODO: Check error if nothing selected
+                val mainCategory = newCategories[FilterType.CATEGORY]?.filter { it.value }?.keys?.firstOrNull()
+                mainCategory?.let {
+                    (mainCategory as FilterModel.Category).markerDrawableId
+                }?: R.drawable.concert_marker_icon
+
+            }
             else
                 state.markerDrawableRes
             )

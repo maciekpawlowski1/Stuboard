@@ -27,12 +27,13 @@ class MyEventsViewModel @Inject constructor(
                     Pair(
                         EventItemForPreview(
                             eventId = it.id.toString(),
-                            tittle = it.tittle,
+                            tittle = it.tittle.ifEmpty { "Bez nazwy" },
                             place = if(it.city.isNotEmpty() && it.streetAndNumber.isNotEmpty())
                                 "${it.city}, ${it.streetAndNumber}"
                             else
                                 "",
-                            isFree = it.isFree()
+                            isFree = it.isFree(),
+                            imageUrl = it.imageUrl?:""
                         ),
                         EventPublishState.EDITING
                     )

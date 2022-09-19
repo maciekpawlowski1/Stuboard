@@ -51,7 +51,9 @@ fun EditEventScreen1(
     sinceTime: Long? = null,
     toTime: Long? = null,
     onSinceTimeChange: (Long) -> Unit = {},
-    onToTimeChange: (Long) -> Unit = {}
+    onToTimeChange: (Long) -> Unit = {},
+    onImageUriChange: (String) -> Unit = {},
+    imageUrl: () -> String = {""}
 ) {
     val context = LocalContext.current
     val isImageSelected = true
@@ -62,18 +64,19 @@ fun EditEventScreen1(
 
 
 
-        var imageUri by remember {
-            mutableStateOf<Uri?>(null)
-        }
-        val bitmap =  remember {
-            mutableStateOf<Bitmap?>(null)
-        }
+
+//        val bitmap =  remember {
+//            mutableStateOf<Bitmap?>(null)
+//        }
 
         val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {
                 // use the cropped image
-                imageUri = result.uriContent
-                bitmap.value = getBitmapFromUri(imageUri, context)
+                val uri = result.uriContent
+                uri?.let {
+                    onImageUriChange(it.toString())
+                }
+//                bitmap.value = getBitmapFromUri(uri, context)
             } else {
                 // an error occurred cropping
                 val exception = result.error
@@ -94,7 +97,7 @@ fun EditEventScreen1(
                         .padding(bottom = 25.dp)
                         .fillMaxWidth()
                         .height((screenWidth / 1.5).dp),
-                    model = bitmap.value,
+                    model = imageUrl(),
                     contentDescription = "",
                     contentScale = ContentScale.FillBounds
                 )

@@ -70,6 +70,10 @@ fun EditEventScreen(
         uiState.value.toTime
     }
 
+    val imageUrlState = derivedStateOf {
+        uiState.value.imageUrl
+    }
+
     val categoriesState = derivedStateOf {
         uiState.value.categories
     }
@@ -147,7 +151,9 @@ fun EditEventScreen(
                         sinceTime = sinceTimeState.value,
                         toTime = toTimeState.value,
                         onSinceTimeChange = { viewModel.changeSinceTime(it) },
-                        onToTimeChange = { viewModel.changeToTime(it) }
+                        onToTimeChange = { viewModel.changeToTime(it) },
+                        onImageUriChange = { viewModel.changeImageUri(it) },
+                        imageUrl = { imageUrlState.value?:"" }
                     )
                 }
                 EditEventScreenType.SECOND -> {
@@ -288,6 +294,7 @@ private fun EditEventScreenPreview() {
         override fun changeSiteInput(newValue: String) {}
         override fun changeFacebookSiteInput(newValue: String) {}
         override fun validateAndMoveToPublishing() {}
+        override fun changeImageUri(imageUri: String) {}
 
         override val container: Container<EditEventUiState, EditEventSingleEvent> =
             object : Container<EditEventUiState, EditEventSingleEvent> {

@@ -13,7 +13,6 @@ import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -252,10 +251,11 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         placeName = placeName,
         latitude = positionOnMap?.latitude,
         longitude = positionOnMap?.longitude,
-        organisationId = if(selectedOrganisation is Organisation.Existing)
-            selectedOrganisation.id
-        else
-            -1,
+        organisationId = when (selectedOrganisation) {
+            null -> null
+            is Organisation.Existing -> selectedOrganisation.id
+            else -> -1
+        },
         customOrganisationTittle = if(selectedOrganisation is Organisation.Custom)
             selectedOrganisation.tittle
         else
