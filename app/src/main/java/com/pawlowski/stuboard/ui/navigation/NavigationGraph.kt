@@ -105,10 +105,18 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
         {
             MyEventsScreen(onNavigateBack = {
                 navController.popBackStack()
+            },
+            onNavigateToEventPreview = { eventId ->
+                navController.navigate("${NavRoutes.EDIT_EVENT}/$eventId")
             })
         }
 
-        composable(route= NavRoutes.EDIT_EVENT)
+        composable(route= "${NavRoutes.EDIT_EVENT}/{editEventId}",
+            arguments = listOf(navArgument("editEventId")
+            {
+                NavType.StringType
+            })
+        )
         {
             EditEventScreen(onNavigateToEventPublishingScreen = {
                 navController.navigate(NavRoutes.PUBLISHING_STATUS)

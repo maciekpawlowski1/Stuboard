@@ -7,7 +7,7 @@ data class EventsResponseItem(
     @SerializedName("background")
     val background: String?,
     @SerializedName("city")
-    val city: String?,
+    val city: String,
     @SerializedName("endDate")
     val endDate: String,
     @SerializedName("facebook")

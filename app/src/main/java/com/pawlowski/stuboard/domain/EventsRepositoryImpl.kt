@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
 import com.pawlowski.stuboard.data.mappers.toEditEventUiState
+import com.pawlowski.stuboard.data.mappers.toEventItemForMapScreenList
 import com.pawlowski.stuboard.data.mappers.toEventItemWithDetails
 import com.pawlowski.stuboard.data.mappers.toFullEventEntity
 import com.pawlowski.stuboard.data.remote.EventsService
@@ -15,6 +16,7 @@ import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
+import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import kotlinx.coroutines.flow.Flow
@@ -69,7 +71,19 @@ class EventsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
-        TODO("Not yet implemented")
+        return try {
+            val result = eventsService.loadItems(1, 100)
+            if(result.code() == 200)
+            {
+                Resource.Success(result.body()!!.toEventItemForMapScreenList())
+            }
+            else
+                Resource.Error(message = UiText.StaticText(result.message()))
+        }
+        catch (e: Exception)
+        {
+            Resource.Error(message = UiText.StaticText(e.localizedMessage?:"Error occurred"))
+        }
     }
 
     override fun getEventPublishingStatus(): Flow<EventPublishState> {

@@ -10,6 +10,7 @@ import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
+import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import java.time.OffsetDateTime
@@ -50,10 +51,36 @@ fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     )
 }
 
+fun EventsResponse.toEventItemForMapScreenList(): List<EventItemForMapScreen>
+{
+    return this.mapNotNull {
+        it.toEventItemForMapScreen()
+    }
+}
+
+fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
+{
+    if(latitude == null || longitude == null)
+        return null
+
+    val category = CategoryHandler.getCategoryById(tags?.getOrNull(0)?.id?:-1)
+    return EventItemForMapScreen(
+        eventId = id,
+        tittle = name,
+        place = city,
+        dateDisplayString = offsetDateTimeStringToLocalFormattedTimeString(startDate),
+        position = LatLng(latitude, longitude),
+        imageUrl = thumbnail,
+        mainCategoryDrawableId = category.markerDrawableId,
+        mainCategoryDrawableIdWhenSelected = category.selectedMarkerDrawableId,
+        isFree = tickets == 0
+    )
+}
 
 fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
     val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
     val endDate = offsetDateTimeStringToLocalFormattedTimeString(this.endDate)
+
 
     val categories = tags?.mapNotNull {
         it?.id?.let { categoryId ->
@@ -78,6 +105,40 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
 fun FullEventEntity.toEditEventUiState(): EditEventUiState
 {
     //TODO: map other fields
+
+    val organisation = organisationId?.let {
+        if(it != -1)
+        {
+            OrganisationHandler.getExistingOrganisationById(it)
+        }
+        else
+            Organisation.Custom(customOrganisationTittle?:"")
+    }
+
+    val organisationSearchText = organisationId?.let {
+        if(it == -1)
+        {
+            customOrganisationTittle
+        }
+        else
+            ""
+    }?:""
+
+    val filters = this.filtersJson.toFilterModelList(Gson())
+    val groupedFilters = filters?.groupBy {
+        it.filterType
+    }
+    val categories = EditEventInitialCategories.initialCategories.mapValues {
+        it.value
+            .toMutableMap()
+            .apply {
+                groupedFilters?.get(it.key)?.forEach { selectedFilter ->
+                    put(selectedFilter, true)
+                }
+            }
+            .toMap()
+    }
+
     return EditEventUiState(
         tittleInput = this.tittle,
         eventId = this.id,
@@ -94,7 +155,10 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
             null,
         description = this.description,
         site = this.site,
-        facebookSite = this.facebookSite
+        facebookSite = this.facebookSite,
+        selectedOrganisation = organisation,
+        organisationSearchText = organisationSearchText,
+        categories = categories
     )
 }
 

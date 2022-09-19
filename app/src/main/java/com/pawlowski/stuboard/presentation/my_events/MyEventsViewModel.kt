@@ -22,9 +22,19 @@ class MyEventsViewModel @Inject constructor(
     private fun observeMyEvents() = intent(registerIdling = false) {
         getAllEditingEventsUseCase().collectLatest {
             reduce {
-                MyEventsUiState.Success(it.map {
-                    Pair(EventItemForPreview(tittle = it.tittle), EventPublishState.WAITING_TO_PUBLISH)
-                }.toMap())
+                MyEventsUiState.Success(it.associate {
+                    Pair(
+                        EventItemForPreview(
+                            eventId = it.id.toString(),
+                            tittle = it.tittle,
+                            place = if(it.city.isNotEmpty() && it.streetAndNumber.isNotEmpty())
+                                "${it.city}, ${it.streetAndNumber}"
+                            else
+                                "",
+                        ),
+                        EventPublishState.EDITING
+                    )
+                })
             }
         }
     }

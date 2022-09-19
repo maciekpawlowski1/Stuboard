@@ -32,13 +32,12 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.annotation.OrbitInternal
 import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
-fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: () -> Unit = {}, viewModel: IMyEventsViewModel = hiltViewModel<MyEventsViewModel>()) {
+fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: (eventId: String) -> Unit = {}, viewModel: IMyEventsViewModel = hiltViewModel<MyEventsViewModel>()) {
     val uiState = viewModel.container.stateFlow.collectAsState()
 
     val isLoadingState = derivedStateOf {
@@ -94,7 +93,7 @@ fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: ()
                     EventPublishState.CANCELED -> { Color.Red }
                 })
                 {
-                    onNavigateToEventPreview()
+                    onNavigateToEventPreview(it.first.eventId)
                 }
             }
         }
