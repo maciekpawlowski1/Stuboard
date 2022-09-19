@@ -13,8 +13,10 @@ import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
 {
@@ -22,6 +24,8 @@ fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
         it.toEventItemForPreview()
     }
 }
+
+
 
 fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String): String
 {
@@ -36,6 +40,20 @@ fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String)
     }
 }
 
+fun offsetDateTimeStringToLocalLong(offsetDateTimeString: String?): Long?
+{
+    return try {
+        offsetDateTimeString?.let {
+            val offset = OffsetDateTime.now().offset
+            val offsetTime = OffsetDateTime.parse(offsetDateTimeString).withOffsetSameInstant(offset)
+            Date.from(offsetTime.toInstant()).time
+        }
+    }
+    catch (e: Exception)
+    {
+        null
+    }
+}
 
 
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
@@ -155,8 +173,8 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
     return EditEventUiState(
         tittleInput = this.tittle,
         eventId = this.id,
-        toTime = this.toTime,
-        sinceTime = this.sinceTime,
+        toTime = offsetDateTimeStringToLocalLong(this.toTime),
+        sinceTime = offsetDateTimeStringToLocalLong(this.sinceTime),
         city = this.city,
         country = this.country,
         isOnline = this.isOnline,
@@ -213,13 +231,20 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
     val categoriesJson = selectedFilters.toJson(gson)
 
 
+    val offset = OffsetDateTime.now().offset
+    val startTime = sinceTime?.let {
+        Date(it).toInstant().atOffset(offset)
+    }.toString()
 
+    val endTime = toTime?.let {
+        Date(it).toInstant().atOffset(offset)
+    }.toString()
 
     return FullEventEntity(
         id = eventId,
         tittle = tittleInput,
-        sinceTime = sinceTime,
-        toTime = toTime,
+        sinceTime = startTime,
+        toTime = endTime,
         isOnline = isOnline,
         city = city,
         streetAndNumber = streetAndNumber,
@@ -239,7 +264,7 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         site = site,
         facebookSite = facebookSite,
         filtersJson = categoriesJson,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
     )
 }
 

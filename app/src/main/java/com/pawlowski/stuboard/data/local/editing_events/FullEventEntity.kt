@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 data class FullEventEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val tittle: String = "",
-    val sinceTime: Long? = null,
-    val toTime: Long? = null,
+    val sinceTime: String? = null,
+    val toTime: String? = null,
     val filtersJson: String = "",
     val isOnline: Boolean = true,
     val city: String = "",
