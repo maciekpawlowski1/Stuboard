@@ -2,13 +2,11 @@ package com.pawlowski.stuboard.ui.event_editing
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -37,7 +35,12 @@ import org.orbitmvi.orbit.annotation.OrbitInternal
 import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
-fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: (eventId: String) -> Unit = {}, viewModel: IMyEventsViewModel = hiltViewModel<MyEventsViewModel>()) {
+fun MyEventsScreen(
+    onNavigateBack: () -> Unit = {},
+    onNavigateToEditEvent: (eventId: String) -> Unit = {},
+    onNavigateToEventPreview: (eventId: String) -> Unit = {},
+    viewModel: IMyEventsViewModel = hiltViewModel<MyEventsViewModel>(),
+) {
     val uiState = viewModel.container.stateFlow.collectAsState()
 
     val isLoadingState = derivedStateOf {
@@ -84,7 +87,15 @@ fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: (e
 
         LazyVerticalGrid(columns = GridCells.Fixed(2))
         {
-
+            item(span = { GridItemSpan(2) }) {
+                if(isLoadingState.value)
+                {
+                    CircularProgressIndicator(
+                        color = Green,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
             items(eventsState.value.toList()) {
                 EventCardWithDotIndicator(event = it.first, indicatorColor = when(it.second) {
                     EventPublishState.EDITING -> { Orange }
@@ -93,7 +104,10 @@ fun MyEventsScreen(onNavigateBack: () -> Unit = {}, onNavigateToEventPreview: (e
                     EventPublishState.CANCELED -> { Color.Red }
                 })
                 {
-                    onNavigateToEventPreview(it.first.eventId)
+                    if(it.second == EventPublishState.EDITING)
+                        onNavigateToEditEvent(it.first.eventId)
+                    else
+                        onNavigateToEventPreview(it.first.eventId)
                 }
             }
         }
@@ -141,9 +155,11 @@ fun MyEventsScreenPreview() {
                 override val sideEffectFlow: Flow<MyEventsSingleEvent>
                     get() = TODO("Not yet implemented")
                 override val stateFlow: StateFlow<MyEventsUiState> =
-                    MutableStateFlow(MyEventsUiState.Success(
-                        PreviewUtils.defaultEventPreviews.associateWith { EventPublishState.WAITING_TO_PUBLISH }
-                    ))
+                    MutableStateFlow(
+                        MyEventsUiState.Success(
+                            PreviewUtils.defaultEventPreviews.associateWith { EventPublishState.WAITING_TO_PUBLISH }
+                        )
+                    )
 
                 override suspend fun orbit(orbitIntent: suspend ContainerContext<MyEventsUiState, MyEventsSingleEvent>.() -> Unit) {
                     TODO("Not yet implemented")

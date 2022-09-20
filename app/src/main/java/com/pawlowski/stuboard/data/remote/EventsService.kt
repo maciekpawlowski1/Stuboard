@@ -8,7 +8,16 @@ import retrofit2.http.*
 
 interface EventsService {
     @GET("/api/Events/GetAll")
-    suspend fun loadItems(@Query("PageNumber") page: Int, @Query("PageSize") pageSize: Int, @Query("IsOnline") isOnline: Boolean? = null): Response<EventsResponse>
+    suspend fun loadItems(
+        @Query("PageNumber") page: Int,
+        @Query("PageSize") pageSize: Int,
+        @Query("IsOnline") isOnline: Boolean? = null,
+        @Query("Citys") citiesFilters: List<String>? = null,
+        @Query("TagsID") tagsFiltersIds: List<Int>? = null,
+        @Query("Start") startTime: String? = null,
+        @Query("End") endTime: String? = null,
+        @Query("IsRegistration") isRegistration: Boolean? = null,
+    ): Response<EventsResponse>
 
     @GET("api/Events/getbyid/{id}")
     suspend fun loadItemById(@Path("id") eventId: String): Response<EventsResponseItem>

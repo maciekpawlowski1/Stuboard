@@ -28,7 +28,21 @@ class EventsPagingSourceFactory @Inject constructor(
                 false
             else
                 null
-            val response = eventsService.loadItems(position, params.loadSize, isOnline = isOnline)
+
+            val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
+            val isRegistration = if(selectedRegistrationItems.isNotEmpty())
+                selectedRegistrationItems.filterIsInstance<FilterModel.Registration.RegistrationNeeded>().isNotEmpty()
+            else
+                null
+
+            val response = eventsService.loadItems(
+                page = position,
+                pageSize = params.loadSize,
+                isOnline = isOnline,
+                citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }.ifEmpty { null },
+                tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }.ifEmpty { null },
+                isRegistration = isRegistration
+            )
             println(response.message())
             println(response.raw().toString())
             val events = response.body()!!.toEventItemForPreviewList()
