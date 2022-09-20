@@ -5,10 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
-import com.pawlowski.stuboard.data.mappers.toEditEventUiState
-import com.pawlowski.stuboard.data.mappers.toEventItemForMapScreenList
-import com.pawlowski.stuboard.data.mappers.toEventItemWithDetails
-import com.pawlowski.stuboard.data.mappers.toFullEventEntity
+import com.pawlowski.stuboard.data.mappers.*
 import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
@@ -22,6 +19,7 @@ import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -112,5 +110,15 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState {
        return eventsDao.getEvent(eventId.toInt()).toEditEventUiState()
+    }
+
+    override fun getEditingEventPreview(eventId: Int): Flow<EventItemForPreview> {
+        return eventsDao.observeEvent(eventId).map { it.toEventItemForPreview() }
+    }
+
+    override suspend fun publishEvent(eventId: String): Resource<Boolean> {
+
+        // eventsService.addNewEvent()
+        TODO()
     }
 }

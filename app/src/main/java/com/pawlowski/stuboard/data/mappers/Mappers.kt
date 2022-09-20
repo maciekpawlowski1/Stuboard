@@ -4,8 +4,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
+import com.pawlowski.stuboard.data.remote.models.EventAddModel
 import com.pawlowski.stuboard.data.remote.models.EventsResponse
 import com.pawlowski.stuboard.data.remote.models.EventsResponseItem
+import com.pawlowski.stuboard.data.remote.models.Tag
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
@@ -119,6 +121,59 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
         price = 0.0f,
         categoriesDrawablesId = categories.map { it.iconDrawableId }
     )
+}
+
+fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
+{
+    return EventItemForPreview(
+        eventId = id.toString(),
+        tittle = tittle.ifEmpty { "Bez nazwy" },
+        place = if(city.isNotEmpty() && streetAndNumber.isNotEmpty())
+            "$city, $streetAndNumber"
+        else
+            "",
+        isFree = isFree(),
+        imageUrl = imageUrl?:""
+    )
+}
+
+fun FullEventEntity.toEventAddModel(): EventAddModel?
+{
+    return try {
+        val filters = this.filtersJson.toFilterModelList(Gson())
+        val groupedFilters = filters?.groupBy { it.filterType }
+        val tags = groupedFilters?.get(FilterType.CATEGORY)?.map {
+            val category = (it as FilterModel.Category)
+            Tag(id = category.categoryId, name = category.tittle)
+        }
+
+
+
+        EventAddModel(
+            name = tittle,
+            background = imageUrl,
+            thumbnail = imageUrl,
+            latitude = latitude,
+            longitude = longitude,
+            online = isOnline,
+            registration = groupedFilters?.get(FilterType.REGISTRATION)?.firstOrNull() == FilterModel.Registration.RegistrationNeeded,
+            shortDescription = description,
+            startDate = sinceTime!!,
+            endDate = toTime!!,
+            tags = tags,
+            tickets = groupedFilters?.get(FilterType.ENTRY_PRICE)?.firstOrNull() == FilterModel.EntryPrice.Paid,
+            website = site,
+            facebook = facebookSite,
+            language = null, //TODO
+            city = city,
+            location = placeName
+        )
+    }
+    catch (e: Exception)
+    {
+        null
+    }
+
 }
 
 fun FullEventEntity.toEditEventUiState(): EditEventUiState

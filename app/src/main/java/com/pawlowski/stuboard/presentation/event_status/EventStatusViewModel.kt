@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.presentation.event_status
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.pawlowski.stuboard.presentation.use_cases.GetEditingEventPreviewUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEventPublishingStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EventStatusViewModel @Inject constructor(
     private val getEventPublishingStatusUseCase: GetEventPublishingStatusUseCase,
+    private val getEditingEventPreviewUseCase: GetEditingEventPreviewUseCase,
     private val savedStateHandle: SavedStateHandle,
 ): IEventStatusViewModel, ViewModel() {
     private val eventId: Int = savedStateHandle.get<String>("editEventId")?.toInt()!!
@@ -33,8 +35,19 @@ class EventStatusViewModel @Inject constructor(
         }
     }
 
+    private fun handleEventItemForPreview() = intent(registerIdling = false) {
+        repeatOnSubscription {
+            getEditingEventPreviewUseCase(eventId).collectLatest {
+                reduce {
+                    state.copy(eventPreview = it)
+                }
+            }
+        }
+    }
+
     init {
         handleEventPublishStatus()
+        handleEventItemForPreview()
     }
 
 }

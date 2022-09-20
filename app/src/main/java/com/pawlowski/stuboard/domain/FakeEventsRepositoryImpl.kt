@@ -109,7 +109,9 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         TODO("Not yet implemented")
     }
 
-
+    override fun getEditingEventPreview(eventId: Int): Flow<EventItemForPreview> {
+        TODO("Not yet implemented")
+    }
 
 
 }
