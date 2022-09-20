@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.*
 import com.pawlowski.stuboard.data.authentication.AuthManager
@@ -17,6 +18,8 @@ import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDatabase
 import com.pawlowski.stuboard.data.remote.EventsService
+import com.pawlowski.stuboard.data.remote.image_storage.FirebaseStorageManager
+import com.pawlowski.stuboard.data.remote.image_storage.IImageUploadManager
 import com.pawlowski.stuboard.domain.*
 import com.pawlowski.stuboard.domain.auth.AccountsRepository
 import com.pawlowski.stuboard.domain.auth.IAccountsRepository
@@ -142,6 +145,20 @@ class AppModule {
                 .build())
         .setAutoSelectEnabled(true)
         .build()
+
+    @Singleton
+    @Provides
+    fun firebaseStorage(): FirebaseStorage
+    {
+        return FirebaseStorage.getInstance()
+    }
+
+    @Singleton
+    @Provides
+    fun imageUploadManager(firebaseStorageManager: FirebaseStorageManager): IImageUploadManager
+    {
+        return firebaseStorageManager
+    }
 
 
     @Singleton

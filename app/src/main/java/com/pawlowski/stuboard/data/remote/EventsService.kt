@@ -14,5 +14,5 @@ interface EventsService {
     suspend fun loadItemById(@Path("id") eventId: String): Response<EventsResponseItem>
 
     @POST("api/Events")
-    suspend fun addNewEvent(@Body event: EventAddModel): Response<String>
+    suspend fun addNewEvent(@Body event: EventAddModel, @Header("Authorization") token: String): Response<String>
 }

@@ -1,12 +1,18 @@
 package com.pawlowski.stuboard.domain
 
+import android.net.Uri
+import android.util.Log
+import android.webkit.URLUtil
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.gson.Gson
+import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
 import com.pawlowski.stuboard.data.mappers.*
 import com.pawlowski.stuboard.data.remote.EventsService
+import com.pawlowski.stuboard.data.remote.image_storage.IImageUploadManager
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
@@ -25,7 +31,9 @@ import javax.inject.Inject
 
 class EventsRepositoryImpl @Inject constructor(
     private val eventsService: EventsService,
-    private val eventsDao: EditingEventsDao
+    private val eventsDao: EditingEventsDao,
+    private val imageUploadManager: IImageUploadManager,
+    private val authManager: IAuthManager
 ): EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = flow {
         val firstEmit = listOf(
@@ -73,7 +81,7 @@ class EventsRepositoryImpl @Inject constructor(
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
         return try {
             val result = eventsService.loadItems(1, 100)
-            if(result.code() == 200)
+            if(result.isSuccessful)
             {
                 Resource.Success(result.body()!!.toEventItemForMapScreenList())
             }
@@ -86,16 +94,8 @@ class EventsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getEventPublishingStatus(eventId:Int): Flow<EventPublishState> = flow {
-        val event = eventsDao.getEvent(eventId)
-        val emitValue = when(event.publishingStatus) {
-            0 -> EventPublishState.EDITING
-            1 -> EventPublishState.WAITING_TO_PUBLISH
-            2 -> EventPublishState.PUBLISHED
-            3 -> EventPublishState.CANCELED
-            else -> EventPublishState.EDITING
-        }
-        emit(emitValue)
+    override fun getEventPublishingStatus(eventId:Int): Flow<EventPublishState>  {
+        return eventsDao.observeEvent(eventId).map { it.publishingStatus.toPublishingStatus() }
     }
 
     override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {
@@ -116,9 +116,47 @@ class EventsRepositoryImpl @Inject constructor(
         return eventsDao.observeEvent(eventId).map { it.toEventItemForPreview() }
     }
 
-    override suspend fun publishEvent(eventId: String): Resource<Boolean> {
+    override suspend fun publishEvent(eventId: Int): Resource<Boolean> {
+        return withContext(Dispatchers.IO) {
+            return@withContext try {
+                val event = eventsDao.getEvent(eventId)
 
-        // eventsService.addNewEvent()
-        TODO()
+                val downloadImageResult = if(URLUtil.isFileUrl(event.imageUrl) || URLUtil.isContentUrl(event.imageUrl))
+                {
+                    imageUploadManager.uploadNewImage(Uri.parse(event.imageUrl), authManager.getCurrentUser()!!.uid)
+                }
+                else
+                {
+                    //File already uploaded
+                    Resource.Success(event.imageUrl)
+                }
+
+                if(downloadImageResult is Resource.Success)
+                {
+                    val downloadUrl = downloadImageResult.data!!
+                    val newEvent = event.copy(imageUrl = downloadUrl)
+                    val token = authManager.getApiToken()!!
+                    val eventAddModel = newEvent.toEventAddModel()!!
+                    val response = eventsService.addNewEvent(eventAddModel, token = "Bearer $token")
+                    if(response.isSuccessful)
+                    {
+                        eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1))
+                        println("Success of adding event")
+                        Resource.Success(true)
+                    }
+                    else
+                    {
+                        Resource.Error(UiText.StaticText(response.message()))
+                    }
+                }
+                else
+                    Resource.Error(downloadImageResult.message?:UiText.StaticText("Error"))
+            } catch (e: Exception)
+            {
+                e.printStackTrace()
+                Resource.Error(UiText.StaticText(e.localizedMessage?:"Error"))
+            }
+        }
+
     }
 }

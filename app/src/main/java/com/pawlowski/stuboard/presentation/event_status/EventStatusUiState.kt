@@ -5,5 +5,6 @@ import com.pawlowski.stuboard.ui.models.EventItemForPreview
 
 data class EventStatusUiState(
     val eventPreview: EventItemForPreview? = null,
-    val publishState: EventPublishState? = null
+    val publishState: EventPublishState? = null,
+    val isRequestInProgress: Boolean = false,
 )

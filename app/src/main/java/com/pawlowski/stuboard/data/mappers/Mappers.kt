@@ -12,6 +12,7 @@ import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
+import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
@@ -133,7 +134,11 @@ fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
         else
             "",
         isFree = isFree(),
-        imageUrl = imageUrl?:""
+        imageUrl = imageUrl?:"",
+        dateDisplayString = if(sinceTime != null)
+            offsetDateTimeStringToLocalFormattedTimeString(sinceTime)
+        else
+            ""
     )
 }
 
@@ -164,9 +169,10 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             tickets = groupedFilters?.get(FilterType.ENTRY_PRICE)?.firstOrNull() == FilterModel.EntryPrice.Paid,
             website = site,
             facebook = facebookSite,
-            language = null, //TODO
+            language = "Polski", //TODO: Add selecting language
             city = city,
-            location = placeName
+            location = placeName,
+
         )
     }
     catch (e: Exception)
@@ -174,6 +180,17 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
         null
     }
 
+}
+
+fun Int.toPublishingStatus(): EventPublishState
+{
+    return when(this) {
+        0 -> EventPublishState.EDITING
+        1 -> EventPublishState.WAITING_TO_PUBLISH
+        2 -> EventPublishState.PUBLISHED
+        3 -> EventPublishState.CANCELED
+        else -> EventPublishState.EDITING
+    }
 }
 
 fun FullEventEntity.toEditEventUiState(): EditEventUiState
@@ -246,7 +263,8 @@ fun FullEventEntity.toEditEventUiState(): EditEventUiState
         organisationSearchText = organisationSearchText,
         categories = categories,
         suggestedOrganisations = suggestedOrganisations,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        publishingStatus = publishingStatus.toPublishingStatus()
     )
 }
 
@@ -320,6 +338,7 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         facebookSite = facebookSite,
         filtersJson = categoriesJson,
         imageUrl = imageUrl,
+        publishingStatus = publishingStatus.ordinal
     )
 }
 

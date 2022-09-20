@@ -2,12 +2,16 @@ package com.pawlowski.stuboard.presentation.event_status
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.pawlowski.stuboard.domain.EventsRepository
+import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.use_cases.GetEditingEventPreviewUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEventPublishingStatusUseCase
+import com.pawlowski.stuboard.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
@@ -17,6 +21,7 @@ import javax.inject.Inject
 class EventStatusViewModel @Inject constructor(
     private val getEventPublishingStatusUseCase: GetEventPublishingStatusUseCase,
     private val getEditingEventPreviewUseCase: GetEditingEventPreviewUseCase,
+    private val eventsRepository: EventsRepository,
     private val savedStateHandle: SavedStateHandle,
 ): IEventStatusViewModel, ViewModel() {
     private val eventId: Int = savedStateHandle.get<String>("editEventId")?.toInt()!!
@@ -40,6 +45,25 @@ class EventStatusViewModel @Inject constructor(
             getEditingEventPreviewUseCase(eventId).collectLatest {
                 reduce {
                     state.copy(eventPreview = it)
+                }
+            }
+        }
+    }
+
+    override fun publishEvent() = intent {
+        if(!state.isRequestInProgress)
+        {
+            reduce {
+                state.copy(isRequestInProgress = true)
+            }
+            val result = eventsRepository.publishEvent(eventId)
+            reduce {
+                state.copy(isRequestInProgress = false)
+            }
+            if(result is Resource.Error)
+            {
+                result.message?.let {
+                    postSideEffect(EventStatusSingleEvent.ShowErrorToast(it))
                 }
             }
         }

@@ -113,9 +113,11 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         TODO("Not yet implemented")
     }
 
-    override suspend fun publishEvent(eventId: String): Resource<Boolean> {
+    override suspend fun publishEvent(eventId: Int): Resource<Boolean> {
         TODO("Not yet implemented")
     }
+
+
 
 
 }

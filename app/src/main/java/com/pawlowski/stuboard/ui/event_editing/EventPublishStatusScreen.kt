@@ -1,17 +1,20 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +54,20 @@ fun EventPublishStatusScreen(
     val eventPreviewState = derivedStateOf {
         uiState.value.eventPreview
     }
+    val isRequestInProgressState = derivedStateOf {
+        uiState.value.isRequestInProgress
+    }
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        viewModel.container.sideEffectFlow.collect { event ->
+            when(event) {
+                is EventStatusSingleEvent.ShowErrorToast -> {
+                    Toast.makeText(context, event.text.asString(context), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState()),
@@ -90,10 +107,17 @@ fun EventPublishStatusScreen(
                 else -> ""
             },
             showPublishButton = publishStateValue == EventPublishState.EDITING,
-            isLoading = publishStateValue == null
+            isLoading = publishStateValue == null,
+            onPublishClick = { viewModel.publishEvent() },
+            isRequestInProgress = { isRequestInProgressState.value }
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+        if(isRequestInProgressState.value)
+        {
+            CircularProgressIndicator(color = Green, modifier = Modifier.size(40.dp))
+        }
+        Spacer(modifier = Modifier.height(30.dp))
         Text(
             text = "Podgląd wydarzenia:",
             fontFamily = montserratFont,
@@ -106,7 +130,7 @@ fun EventPublishStatusScreen(
 }
 
 @Composable
-fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: String, showPublishButton: Boolean, isLoading: Boolean = false)
+fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: String, showPublishButton: Boolean, isLoading: Boolean = false, onPublishClick: () -> Unit = {}, isRequestInProgress: () -> Boolean = {false})
 {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -114,7 +138,9 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
         {
             Row(modifier = Modifier.fillMaxWidth(0.9f), verticalAlignment = Alignment.CenterVertically) {
-                Card(shape = CircleShape, modifier = Modifier.size(50.dp).myLoadingEffect(isLoading), backgroundColor = statusColor) {
+                Card(shape = CircleShape, modifier = Modifier
+                    .size(50.dp)
+                    .myLoadingEffect(isLoading), backgroundColor = statusColor) {
 
                 }
                 Spacer(modifier = Modifier.width(15.dp))
@@ -130,9 +156,9 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
                 )
             }
 
-            if(!isLoading && showPublishButton)
+            if(!isLoading && showPublishButton && !isRequestInProgress())
             {
-                TextButton(modifier = Modifier.align(Alignment.BottomEnd),onClick = { /*TODO*/ }) {
+                TextButton(modifier = Modifier.align(Alignment.BottomEnd),onClick = { onPublishClick() }) {
                     Text(text = "Opublikuj", color = Green)
                 }
             }
@@ -146,6 +172,10 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
 fun EventPublishStatusScreenPreview()
 {
     EventPublishStatusScreen(viewModel = object : IEventStatusViewModel {
+        override fun publishEvent() {
+            TODO("Not yet implemented")
+        }
+
         override val container: Container<EventStatusUiState, EventStatusSingleEvent> = object : Container<EventStatusUiState, EventStatusSingleEvent> {
             override val settings: Container.Settings
                 get() = TODO("Not yet implemented")

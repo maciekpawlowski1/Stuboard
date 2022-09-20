@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.presentation.edit_event
 import com.google.android.gms.maps.model.LatLng
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
+import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
 
 data class EditEventUiState(
@@ -26,4 +27,5 @@ data class EditEventUiState(
     val site: String = "",
     val facebookSite: String = "",
     val imageUrl: String? = null,
+    val publishingStatus: EventPublishState = EventPublishState.EDITING
 )
