@@ -19,8 +19,10 @@ import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class EventsRepositoryImpl @Inject constructor(
@@ -99,7 +101,9 @@ class EventsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {
-        return eventsDao.upsertEvent(editEventUiState.toFullEventEntity())
+        return withContext(Dispatchers.IO) {
+            eventsDao.upsertEvent(editEventUiState.toFullEventEntity())
+        }
     }
 
     override fun getAllEditingEvents(): Flow<List<FullEventEntity>> {

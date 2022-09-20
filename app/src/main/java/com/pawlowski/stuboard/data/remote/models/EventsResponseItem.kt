@@ -47,7 +47,7 @@ data class EventsResponseItem(
     @SerializedName("thumbnail")
     val thumbnail: String,
     @SerializedName("tickets")
-    val tickets: Int,
+    val tickets: Boolean,
     @SerializedName("upvotes")
     val upvotes: Int?,
     @SerializedName("website")

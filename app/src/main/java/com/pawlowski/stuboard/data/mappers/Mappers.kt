@@ -92,7 +92,7 @@ fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
         imageUrl = thumbnail,
         mainCategoryDrawableId = category.markerDrawableId,
         mainCategoryDrawableIdWhenSelected = category.selectedMarkerDrawableId,
-        isFree = tickets == 0
+        isFree = !tickets
     )
 }
 
