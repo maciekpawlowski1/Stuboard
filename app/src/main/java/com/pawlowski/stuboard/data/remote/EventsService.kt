@@ -8,7 +8,7 @@ import retrofit2.http.*
 
 interface EventsService {
     @GET("/api/Events/GetAll")
-    suspend fun loadItems(@Query("PageNumber") page: Int, @Query("PageSize") pageSize: Int): Response<EventsResponse>
+    suspend fun loadItems(@Query("PageNumber") page: Int, @Query("PageSize") pageSize: Int, @Query("IsOnline") isOnline: Boolean? = null): Response<EventsResponse>
 
     @GET("api/Events/getbyid/{id}")
     suspend fun loadItemById(@Path("id") eventId: String): Response<EventsResponseItem>

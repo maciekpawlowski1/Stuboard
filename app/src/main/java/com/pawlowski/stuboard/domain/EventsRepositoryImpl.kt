@@ -80,7 +80,7 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
         return try {
-            val result = eventsService.loadItems(1, 100)
+            val result = eventsService.loadItems(1, 100, isOnline = false)
             if(result.isSuccessful)
             {
                 Resource.Success(result.body()!!.toEventItemForMapScreenList())

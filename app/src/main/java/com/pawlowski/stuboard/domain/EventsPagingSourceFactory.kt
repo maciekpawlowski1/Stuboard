@@ -20,7 +20,15 @@ class EventsPagingSourceFactory @Inject constructor(
         val position = params.key ?: START_PAGE_INDEX
 
         return try {
-            val response = eventsService.loadItems(position, params.loadSize)
+            val isOnlineSelected = filters.filterIsInstance<FilterModel.Place.Online>().isNotEmpty()
+            val isRealPlaceSelected = filters.filterIsInstance<FilterModel.Place.RealPlace>().isNotEmpty()
+            val isOnline = if(isOnlineSelected && !isRealPlaceSelected)
+                true
+            else if(!isOnlineSelected && isRealPlaceSelected)
+                false
+            else
+                null
+            val response = eventsService.loadItems(position, params.loadSize, isOnline = isOnline)
             println(response.message())
             println(response.raw().toString())
             val events = response.body()!!.toEventItemForPreviewList()
