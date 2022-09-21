@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.di
 
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import android.location.Geocoder
 import androidx.room.Room
@@ -74,6 +75,12 @@ class AppModule {
     fun filtersDao(suggestedFiltersProvider: ISuggestedFiltersProvider): IFiltersDao
     {
         return InMemoryFiltersDao(suggestedFiltersProvider)
+    }
+
+    @Provides
+    fun contentResolver(appContext: Context): ContentResolver
+    {
+        return appContext.contentResolver
     }
 
     @Singleton

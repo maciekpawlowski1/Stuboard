@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeUiAction
@@ -295,8 +297,13 @@ fun EventCard(
                     .width(150.dp)
                     .height(100.dp)
                     .myLoadingEffect(isLoading),
-                model = eventItemForPreview.imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(eventItemForPreview.imageUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "",
+                error = painterResource(id = R.drawable.image_placeholder),
+                placeholder = painterResource(id = R.drawable.image_placeholder),
                 contentScale = ContentScale.FillBounds
             )
 
