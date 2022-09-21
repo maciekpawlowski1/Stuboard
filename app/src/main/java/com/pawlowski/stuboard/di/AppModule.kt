@@ -12,7 +12,6 @@ import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.*
 import com.pawlowski.stuboard.data.authentication.AuthManager
 import com.pawlowski.stuboard.data.authentication.IAuthManager
-import com.pawlowski.stuboard.data.remote.FakeEventsService
 import com.pawlowski.stuboard.data.local.IFiltersDao
 import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
@@ -44,9 +43,9 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun preferencesRepository(): PreferencesRepository
+    fun preferencesRepository(preferencesRepository: PreferencesRepository): IPreferencesRepository
     {
-        return FakePreferencesRepositoryImpl()
+        return preferencesRepository
     }
 
     @Singleton
@@ -163,7 +162,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun getPreferredCategoriesUseCase(preferencesRepository: PreferencesRepository) = GetPreferredCategoriesUseCase(preferencesRepository::getCategoriesInPreferredOrder)
+    fun getPreferredCategoriesUseCase(preferencesRepository: IPreferencesRepository) = GetPreferredCategoriesUseCase(preferencesRepository::getCategoriesInPreferredOrder)
 
     @Singleton
     @Provides

@@ -78,7 +78,7 @@ fun HomeScreen(
                         markers = PreviewUtils.defaultMarkers,
                         moveCameraToMarkersBound = true,
                         zoomButtonsEnabled = false,
-                        disableAllGestures = true
+                        disableAllGestures = true,
                     )
 
                     //To make on the map clickable effect
@@ -244,8 +244,8 @@ fun CategoryCard(
     onCardClick: () -> Unit
 ) {
     Card(shape = RoundedCornerShape(8.dp), modifier = modifier
-        .width(115.dp)
-        .height(75.dp)
+        .requiredWidth(115.dp)
+        .requiredHeight(75.dp)
         .clickable {
             onCardClick.invoke()
         }
