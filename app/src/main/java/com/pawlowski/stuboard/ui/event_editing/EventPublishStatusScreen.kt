@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.ui.event_editing
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,9 +45,15 @@ import org.orbitmvi.orbit.syntax.ContainerContext
 @Composable
 fun EventPublishStatusScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateBackToMyEvents: () -> Unit = {},
     viewModel: IEventStatusViewModel = hiltViewModel<EventStatusViewModel>()
 )
 {
+
+    BackHandler {
+        viewModel.onBackPressed()
+    }
+
     val uiState = viewModel.container.stateFlow.collectAsState()
     val publishStatusState = derivedStateOf {
         uiState.value.publishState
@@ -64,6 +71,12 @@ fun EventPublishStatusScreen(
                 is EventStatusSingleEvent.ShowErrorToast -> {
                     Toast.makeText(context, event.text.asString(context), Toast.LENGTH_LONG).show()
                 }
+                is EventStatusSingleEvent.NavigateBack -> {
+                    onNavigateBack()
+                }
+                is EventStatusSingleEvent.NavigateBackToMyEvents -> {
+                    onNavigateBackToMyEvents()
+                }
             }
         }
     }
@@ -76,7 +89,7 @@ fun EventPublishStatusScreen(
         Spacer(modifier = Modifier.height(5.dp))
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart)
         {
-            IconButton(onClick = { onNavigateBack() }) {
+            IconButton(onClick = { viewModel.onBackPressed() }) {
                 Icon(painter = painterResource(id = R.drawable.arrow_back2_icon), contentDescription = "")
             }
             Text(
@@ -172,9 +185,8 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
 fun EventPublishStatusScreenPreview()
 {
     EventPublishStatusScreen(viewModel = object : IEventStatusViewModel {
-        override fun publishEvent() {
-            TODO("Not yet implemented")
-        }
+        override fun publishEvent() {}
+        override fun onBackPressed() {}
 
         override val container: Container<EventStatusUiState, EventStatusSingleEvent> = object : Container<EventStatusUiState, EventStatusSingleEvent> {
             override val settings: Container.Settings

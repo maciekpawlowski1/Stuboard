@@ -148,6 +148,9 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
         {
             EventPublishStatusScreen(onNavigateBack = {
                 navController.popBackStack()
+            },
+            onNavigateBackToMyEvents = {
+                navController.popBackStack(route= NavRoutes.MY_EVENTS, inclusive = false)
             })
         }
 

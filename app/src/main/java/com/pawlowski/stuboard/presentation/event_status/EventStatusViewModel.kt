@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.pawlowski.stuboard.domain.EventsRepository
 import com.pawlowski.stuboard.domain.models.Resource
+import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.presentation.use_cases.GetEditingEventPreviewUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEventPublishingStatusUseCase
 import com.pawlowski.stuboard.presentation.utils.UiText
@@ -65,6 +66,24 @@ class EventStatusViewModel @Inject constructor(
                 result.message?.let {
                     postSideEffect(EventStatusSingleEvent.ShowErrorToast(it))
                 }
+            }
+        }
+    }
+
+    override fun onBackPressed() = intent {
+        if(state.isRequestInProgress)
+        {
+            postSideEffect(EventStatusSingleEvent.ShowErrorToast(UiText.StaticText("Wait, request in progress!")))
+        }
+        else
+        {
+            if(state.publishState == EventPublishState.EDITING)
+            {
+                postSideEffect(EventStatusSingleEvent.NavigateBack)
+            }
+            else
+            {
+                postSideEffect(EventStatusSingleEvent.NavigateBackToMyEvents)
             }
         }
     }

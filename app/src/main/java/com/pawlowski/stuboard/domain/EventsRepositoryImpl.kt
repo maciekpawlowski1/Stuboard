@@ -218,6 +218,9 @@ class EventsRepositoryImpl @Inject constructor(
                 val myEvents = myEventsResult.body()!!.toFullEventEntitiesList()
                 eventsDao.runTransaction {
                     val currentEvents = eventsDao.getAllEvents().first()
+                    currentEvents.forEach {
+                        println(it.remoteEventId)
+                    }
                     val idsMap = currentEvents.associate { Pair(it.remoteEventId, it.id) }
                     myEvents.forEach {
                         eventsDao.upsertEvent(it.copy(id = idsMap.getOrDefault(it.remoteEventId!!, 0)))
