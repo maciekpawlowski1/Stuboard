@@ -417,9 +417,7 @@ fun FiltersScreenPreview() {
                     Pair(FilterType.ENTRY_PRICE,
                         listOf(
                             FilterModel.EntryPrice.Free,
-                            FilterModel.EntryPrice.MaxPrice(25.0),
-                            FilterModel.EntryPrice.MaxPrice(50.0),
-                            FilterModel.EntryPrice.MaxPrice(100.0)
+                            FilterModel.EntryPrice.Paid
                         )
                     ),
                 )

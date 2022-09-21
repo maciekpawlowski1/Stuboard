@@ -18,6 +18,8 @@ import com.pawlowski.stuboard.data.local.InMemoryFiltersDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDatabase
 import com.pawlowski.stuboard.data.remote.EventsService
+import com.pawlowski.stuboard.data.remote.EventsServiceFiltersRequestAdapter
+import com.pawlowski.stuboard.data.remote.IEventsServiceFiltersRequestAdapter
 import com.pawlowski.stuboard.data.remote.image_storage.FirebaseStorageManager
 import com.pawlowski.stuboard.data.remote.image_storage.IImageUploadManager
 import com.pawlowski.stuboard.domain.*
@@ -75,6 +77,13 @@ class AppModule {
     fun filtersDao(suggestedFiltersProvider: ISuggestedFiltersProvider): IFiltersDao
     {
         return InMemoryFiltersDao(suggestedFiltersProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun eventsServiceFiltersRequestAdapter(eventsServiceFiltersRequestAdapter: EventsServiceFiltersRequestAdapter): IEventsServiceFiltersRequestAdapter
+    {
+        return eventsServiceFiltersRequestAdapter
     }
 
     @Provides

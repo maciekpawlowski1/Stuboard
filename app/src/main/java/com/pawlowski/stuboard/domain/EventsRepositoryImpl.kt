@@ -10,6 +10,7 @@ import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
 import com.pawlowski.stuboard.data.mappers.*
 import com.pawlowski.stuboard.data.remote.EventsService
+import com.pawlowski.stuboard.data.remote.EventsServiceFiltersRequestAdapter
 import com.pawlowski.stuboard.data.remote.image_storage.IImageUploadManager
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
@@ -31,7 +32,8 @@ class EventsRepositoryImpl @Inject constructor(
     private val eventsService: EventsService,
     private val eventsDao: EditingEventsDao,
     private val imageUploadManager: IImageUploadManager,
-    private val authManager: IAuthManager
+    private val authManager: IAuthManager,
+    private val eventsServiceFiltersRequestAdapter: EventsServiceFiltersRequestAdapter,
 ): EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = channelFlow {
         val firstEmit = listOf(
@@ -108,7 +110,7 @@ class EventsRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = {
                 EventsPagingSourceFactory(
-                    eventsService = eventsService,
+                    eventsService = eventsServiceFiltersRequestAdapter,
                     filters = filters
                 )
             }
@@ -118,18 +120,11 @@ class EventsRepositoryImpl @Inject constructor(
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
         return try {
             //println(authManager.getApiToken())
-            val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
-            val isRegistration = if(selectedRegistrationItems.isNotEmpty())
-                selectedRegistrationItems.filterIsInstance<FilterModel.Registration.RegistrationNeeded>().isNotEmpty()
-            else
-                null
-            val result = eventsService.loadItems(
-                1,
-                100,
-                isOnline = false,
-                isRegistration = isRegistration,
-                citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }.ifEmpty { null },
-                tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }.ifEmpty { null },
+
+            val result = eventsServiceFiltersRequestAdapter.loadItems(
+                page = 1,
+                pageSize = 100,
+                filters = filters,
             )
             if(result.isSuccessful)
             {

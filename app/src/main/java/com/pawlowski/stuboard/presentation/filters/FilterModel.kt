@@ -1,8 +1,9 @@
 package com.pawlowski.stuboard.presentation.filters
 
-import java.text.DecimalFormat
+import com.pawlowski.stuboard.data.mappers.dateFormatter
+import java.time.OffsetDateTime
 
-sealed class FilterModel(val tittle: String, val filterType: FilterType)
+sealed class FilterModel(open val tittle: String, val filterType: FilterType)
 {
     data class Category(private val _tittle: String,
                         val categoryId: Int,
@@ -22,7 +23,6 @@ sealed class FilterModel(val tittle: String, val filterType: FilterType)
     {
         object Free: EntryPrice(tittle = "Za darmo")
         object Paid: EntryPrice(tittle = "Płatne")
-        data class MaxPrice(val maxPrice: Double): EntryPrice("<${DecimalFormat("#.##").format(maxPrice)} zł")
     }
 
     sealed class Other(tittle: String): FilterModel(tittle, FilterType.OTHER)
@@ -44,17 +44,30 @@ sealed class FilterModel(val tittle: String, val filterType: FilterType)
         object RegistrationNeeded: Registration("Wymaga rejestracji")
     }
 
-    sealed class Time(tittle: String)
+    sealed class Time(tittle: String): FilterModel(tittle, FilterType.TIME)
     {
-        sealed class MaxTimeFilter() //TODO
+        sealed class MaxTimeFilter(override val tittle: String, val maxTime: OffsetDateTime): Time(tittle)
+        {
+            object Today: MaxTimeFilter("Dzisiaj", OffsetDateTime.now().plusDays(1))
+            object Next2Days: MaxTimeFilter("Następne 2 dni", OffsetDateTime.now().plusDays(2))
+            object Next7Days: MaxTimeFilter("Ten tydzień", OffsetDateTime.now().plusDays(7))
+            object Next14Days: MaxTimeFilter("Następne 2 tygodnie", OffsetDateTime.now().plusDays(14))
+            object Next30Days: MaxTimeFilter("Następne 30 dni", OffsetDateTime.now().plusDays(30))
+        }
 
-        data class CustomFromToTimeFilter(val fromTimestamp: Long?, val toTimestamp: Long?): Time(
+        data class CustomFromToTimeFilter(val fromTimestamp: OffsetDateTime?, val toTimestamp: OffsetDateTime?): Time(
             convertToString(fromTimestamp, toTimestamp))
         {
             companion object {
-                fun convertToString(fromTimestamp: Long?, toTimestamp: Long?): String
+                fun convertToString(fromTimestamp: OffsetDateTime?, toTimestamp: OffsetDateTime?): String
                 {
-                    TODO("NOT IMPLEMENTED YET")
+                    val fromString = fromTimestamp?.format(dateFormatter())
+                    val toString = toTimestamp?.format(dateFormatter())
+                    val middle = if(fromString == null || toTimestamp == null)
+                        ""
+                    else
+                        " - "
+                    return "$fromString$middle$toString"
                 }
             }
         }

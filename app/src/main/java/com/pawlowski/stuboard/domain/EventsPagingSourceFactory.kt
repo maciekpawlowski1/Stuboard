@@ -3,7 +3,7 @@ package com.pawlowski.stuboard.domain
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pawlowski.stuboard.data.mappers.toEventItemForPreviewList
-import com.pawlowski.stuboard.data.remote.EventsService
+import com.pawlowski.stuboard.data.remote.IEventsServiceFiltersRequestAdapter
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import okio.IOException
@@ -13,35 +13,17 @@ import javax.inject.Inject
 private const val START_PAGE_INDEX = 1
 
 class EventsPagingSourceFactory @Inject constructor(
-    private val eventsService: EventsService,
+    private val eventsService: IEventsServiceFiltersRequestAdapter,
     private val filters: List<FilterModel>
 ): PagingSource<Int, EventItemForPreview>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, EventItemForPreview> {
         val position = params.key ?: START_PAGE_INDEX
 
         return try {
-            val isOnlineSelected = filters.filterIsInstance<FilterModel.Place.Online>().isNotEmpty()
-            val isRealPlaceSelected = filters.filterIsInstance<FilterModel.Place.RealPlace>().isNotEmpty()
-            val isOnline = if(isOnlineSelected && !isRealPlaceSelected)
-                true
-            else if(!isOnlineSelected && isRealPlaceSelected)
-                false
-            else
-                null
-
-            val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
-            val isRegistration = if(selectedRegistrationItems.isNotEmpty())
-                selectedRegistrationItems.filterIsInstance<FilterModel.Registration.RegistrationNeeded>().isNotEmpty()
-            else
-                null
-
             val response = eventsService.loadItems(
                 page = position,
                 pageSize = params.loadSize,
-                isOnline = isOnline,
-                citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }.ifEmpty { null },
-                tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }.ifEmpty { null },
-                isRegistration = isRegistration
+                filters = filters,
             )
             println(response.message())
             println(response.raw().toString())

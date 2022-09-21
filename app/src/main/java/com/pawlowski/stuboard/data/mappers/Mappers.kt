@@ -27,12 +27,20 @@ fun EventsResponse.toEventItemForPreviewList(): List<EventItemForPreview>
     }
 }
 
+fun dateTimeFormatter(): DateTimeFormatter
+{
+    return DateTimeFormatter.ofPattern("dd.MM.u HH:mm")
+}
 
+fun dateFormatter(): DateTimeFormatter
+{
+    return DateTimeFormatter.ofPattern("dd.MM.u")
+}
 
 fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String): String
 {
     return try {
-        val format = DateTimeFormatter.ofPattern("dd.MM.u HH:mm")
+        val format = dateTimeFormatter()
         val offset = OffsetDateTime.now().offset
         OffsetDateTime.parse(offsetDateTimeString).withOffsetSameInstant(offset).format(format)
     }
