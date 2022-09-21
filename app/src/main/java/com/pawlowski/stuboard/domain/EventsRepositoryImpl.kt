@@ -12,6 +12,7 @@ import com.pawlowski.stuboard.data.mappers.*
 import com.pawlowski.stuboard.data.remote.EventsService
 import com.pawlowski.stuboard.data.remote.EventsServiceFiltersRequestAdapter
 import com.pawlowski.stuboard.data.remote.image_storage.IImageUploadManager
+import com.pawlowski.stuboard.data.remote.models.EventsResponse
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.edit_event.EditEventUiState
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsResult
@@ -21,11 +22,9 @@ import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 class EventsRepositoryImpl @Inject constructor(
@@ -51,40 +50,52 @@ class EventsRepositoryImpl @Inject constructor(
         )
         send(firstEmit)
         withContext(Dispatchers.IO) {
-            val incomingEventsJob = async {
-                eventsService.loadItems(1, 10)
-            }
-            val onlineEventsJob = async {
-                eventsService.loadItems(1, 10, isOnline = true)
-            }
-            val emitState = MutableStateFlow(firstEmit)
-            val jobs = listOf(incomingEventsJob, onlineEventsJob)
-            jobs.forEachIndexed { jobIndex, job ->
+            val emitsValueState = MutableStateFlow(firstEmit)
+            val requests: List<suspend () -> Response<EventsResponse>> = listOf(
+                { eventsService.loadItems(1, 10) },
+                { eventsService.loadItems(1, 10, isOnline = true) }
+            )
+            requests.forEachIndexed { index, request ->
                 launch {
-                    try {
-                        val response = job.await()
-                        if(response.isSuccessful)
+                    val result = try {
+                        request.invoke()
+                    }
+                    catch (e: Exception) {
+                        e.printStackTrace()
+                        ensureActive()
+                        try {
+                            //Try again
+                            request.invoke()
+                        }
+                        catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
+                    }
+
+                    result?.let {
+                        if(it.isSuccessful)
                         {
-                            val responseEvents = response.body()!!.toEventItemForPreviewList()
-                            emitState.update {
-                                it.mapIndexed { indexInState, homeEventTypeSuggestion ->
-                                    if(jobIndex == indexInState)
-                                        homeEventTypeSuggestion.copy(events = responseEvents, isLoading = false)
-                                    else
-                                        homeEventTypeSuggestion
+                            it.body()?.let { body ->
+                                val responseEvents = body.toEventItemForPreviewList()
+                                emitsValueState.update { prevState ->
+                                    prevState.mapIndexed { indexInState, suggestion ->
+                                        if(indexInState == index)
+                                        {
+                                            suggestion.copy(events = responseEvents, isLoading = false)
+                                        }
+                                        else
+                                            suggestion
+                                    }
                                 }
                             }
                         }
                     }
-                    catch (e: Exception)
-                    {
-
-                    }
-
                 }
             }
 
-            emitState.collectLatest {
+
+            emitsValueState.collectLatest {
                 send(it)
             }
         }
