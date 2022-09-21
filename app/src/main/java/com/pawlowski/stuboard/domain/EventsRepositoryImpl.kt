@@ -5,7 +5,6 @@ import android.webkit.URLUtil
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.google.gson.Gson
 import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
@@ -22,10 +21,9 @@ import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -35,7 +33,7 @@ class EventsRepositoryImpl @Inject constructor(
     private val imageUploadManager: IImageUploadManager,
     private val authManager: IAuthManager
 ): EventsRepository {
-    override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = flow {
+    override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = channelFlow {
         val firstEmit = listOf(
             HomeEventTypeSuggestion(
                 suggestionType = "Najwcześniej",
@@ -49,7 +47,46 @@ class EventsRepositoryImpl @Inject constructor(
                 suggestionFilters = listOf(FilterModel.Place.Online),
             )
         )
-        emit(firstEmit)
+        send(firstEmit)
+        withContext(Dispatchers.IO) {
+            val incomingEventsJob = async {
+                eventsService.loadItems(1, 10)
+            }
+            val onlineEventsJob = async {
+                eventsService.loadItems(1, 10, isOnline = true)
+            }
+            val emitState = MutableStateFlow(firstEmit)
+            val jobs = listOf(incomingEventsJob, onlineEventsJob)
+            jobs.forEachIndexed { jobIndex, job ->
+                launch {
+                    try {
+                        val response = job.await()
+                        if(response.isSuccessful)
+                        {
+                            val responseEvents = response.body()!!.toEventItemForPreviewList()
+                            emitState.update {
+                                it.mapIndexed { indexInState, homeEventTypeSuggestion ->
+                                    if(jobIndex == indexInState)
+                                        homeEventTypeSuggestion.copy(events = responseEvents, isLoading = false)
+                                    else
+                                        homeEventTypeSuggestion
+                                }
+                            }
+                        }
+                    }
+                    catch (e: Exception)
+                    {
+
+                    }
+
+                }
+            }
+
+            emitState.collectLatest {
+                send(it)
+            }
+        }
+
     }
 
     override fun getEventDetails(eventId: String): Flow<EventDetailsResult?> = flow {
