@@ -117,7 +117,9 @@ class FakeEventsRepositoryImpl(private val eventsService: FakeEventsService) : E
         TODO("Not yet implemented")
     }
 
-
+    override suspend fun refreshMyEvents(): Resource<Unit> {
+        TODO("Not yet implemented")
+    }
 
 
 }

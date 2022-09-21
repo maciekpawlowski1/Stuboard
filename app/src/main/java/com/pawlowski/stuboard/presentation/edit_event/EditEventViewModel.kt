@@ -231,6 +231,7 @@ class EditEventViewModel @Inject constructor(
 
     override fun validateAndMoveToPublishing() = intent {
         //TODO: Validate
+        saveEditingEventUseCase(state)
         postSideEffect(EditEventSingleEvent.NavigateToPublishing(state.eventId))
     }
 

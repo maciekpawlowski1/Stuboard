@@ -33,7 +33,7 @@ data class EventsResponseItem(
     @SerializedName("ownerID")
     val ownerID: String?,
     @SerializedName("published")
-    val published: Boolean?,
+    val published: Boolean,
     @SerializedName("registration")
     val registration: Boolean,
     @SerializedName("shortDescription")

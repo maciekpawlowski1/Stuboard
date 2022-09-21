@@ -80,6 +80,61 @@ fun EventsResponse.toEventItemForMapScreenList(): List<EventItemForMapScreen>
     }
 }
 
+fun EventsResponse.toFullEventEntitiesList(): List<FullEventEntity> {
+    return this.mapNotNull {
+        it.toFullEventEntity()
+    }
+}
+
+fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
+{
+    val categoryFilters = tags?.mapNotNull {
+        it?.id?.let { categoryId ->
+            CategoryHandler.getCategoryById(categoryId)
+        }
+    }?: listOf()
+
+    val registrationFilter = if(registration)
+        FilterModel.Registration.RegistrationNeeded
+    else
+        FilterModel.Registration.NoRegistrationNeeded
+
+    val priceFilter = if(tickets)
+        FilterModel.EntryPrice.Paid
+    else
+        FilterModel.EntryPrice.Free
+
+    val allFilters = listOf(
+        categoryFilters,
+        listOf(registrationFilter),
+        listOf(priceFilter)
+    ).flatMap(List<FilterModel>::toList)
+
+
+    return FullEventEntity(
+        id = 0,
+        tittle = name,
+        sinceTime = startDate,
+        toTime = endDate,
+        isOnline = online,
+        city = city,
+        streetAndNumber = "",
+        placeName = location?:"",
+        latitude = latitude,
+        longitude = longitude,
+        description = shortDescription,
+        site = website?:"",
+        facebookSite = facebook?:"",
+        imageUrl = thumbnail,
+        remoteEventId = id,
+        publishingStatus = if(published)
+            2
+        else
+            1,
+        filtersJson = allFilters.toJson(Gson())
+    )
+}
+
 fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
 {
     if(latitude == null || longitude == null)

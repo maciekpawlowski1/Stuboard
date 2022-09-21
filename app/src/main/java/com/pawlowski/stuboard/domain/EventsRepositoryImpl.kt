@@ -1,7 +1,6 @@
 package com.pawlowski.stuboard.domain
 
 import android.net.Uri
-import android.util.Log
 import android.webkit.URLUtil
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -24,6 +23,7 @@ import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -80,7 +80,20 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
         return try {
-            val result = eventsService.loadItems(1, 100, isOnline = false)
+            //println(authManager.getApiToken())
+            val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
+            val isRegistration = if(selectedRegistrationItems.isNotEmpty())
+                selectedRegistrationItems.filterIsInstance<FilterModel.Registration.RegistrationNeeded>().isNotEmpty()
+            else
+                null
+            val result = eventsService.loadItems(
+                1,
+                100,
+                isOnline = false,
+                isRegistration = isRegistration,
+                citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }.ifEmpty { null },
+                tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }.ifEmpty { null },
+            )
             if(result.isSuccessful)
             {
                 Resource.Success(result.body()!!.toEventItemForMapScreenList())
@@ -140,7 +153,7 @@ class EventsRepositoryImpl @Inject constructor(
                     val response = eventsService.addNewEvent(eventAddModel, token = "Bearer $token")
                     if(response.isSuccessful)
                     {
-                        eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1))
+                        eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1, remoteEventId = response.body()!!))
                         println("Success of adding event")
                         Resource.Success(true)
                     }
@@ -158,5 +171,32 @@ class EventsRepositoryImpl @Inject constructor(
             }
         }
 
+    }
+
+    override suspend fun refreshMyEvents(): Resource<Unit> {
+        return try {
+            val myEventsResult = eventsService.getMyEvents("Bearer ${authManager.getApiToken()!!}")
+            if(myEventsResult.isSuccessful)
+            {
+                val myEvents = myEventsResult.body()!!.toFullEventEntitiesList()
+                eventsDao.runTransaction {
+                    val currentEvents = eventsDao.getAllEvents().first()
+                    val idsMap = currentEvents.associate { Pair(it.remoteEventId, it.id) }
+                    myEvents.forEach {
+                        eventsDao.upsertEvent(it.copy(id = idsMap.getOrDefault(it.remoteEventId!!, 0)))
+                    }
+                }
+                Resource.Success(Unit)
+            }
+            else
+            {
+                println(myEventsResult.message())
+                Resource.Error(UiText.StaticText(myEventsResult.message()))
+            }
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Error(UiText.StaticText(e.localizedMessage?:"Refreshing events error"))
+        }
     }
 }

@@ -256,4 +256,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getEditingEventPreviewUseCase(eventsRepository: EventsRepository) = GetEditingEventPreviewUseCase(eventsRepository::getEditingEventPreview)
+
+    @Singleton
+    @Provides
+    fun refreshMyEventsUseCase(eventsRepository: EventsRepository) = RefreshMyEventsUseCase(eventsRepository::refreshMyEvents)
 }

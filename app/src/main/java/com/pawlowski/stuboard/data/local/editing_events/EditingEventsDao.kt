@@ -21,4 +21,10 @@ interface EditingEventsDao {
 
     @Delete
     suspend fun deleteEvent(event: FullEventEntity)
+
+    @Transaction
+    suspend fun runTransaction(action: suspend () -> Unit)
+    {
+        action()
+    }
 }

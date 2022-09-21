@@ -23,4 +23,5 @@ interface EventsRepository {
     suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState
     fun getEditingEventPreview(eventId: Int): Flow<EventItemForPreview>
     suspend fun publishEvent(eventId: Int): Resource<Boolean>
+    suspend fun refreshMyEvents(): Resource<Unit>
 }

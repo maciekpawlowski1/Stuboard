@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -10,6 +11,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,7 +42,7 @@ fun EditEventScreen(
         viewModel.moveToPreviousPage()
     }
 
-
+    val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { event ->
             when(event) {
@@ -49,6 +51,9 @@ fun EditEventScreen(
                 }
                 is EditEventSingleEvent.NavigateBack -> {
                     onNavigateBack()
+                }
+                is EditEventSingleEvent.ShowErrorToast -> {
+                    Toast.makeText(context, event.text.asString(context), Toast.LENGTH_LONG).show()
                 }
             }
         }
