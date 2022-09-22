@@ -218,7 +218,7 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun refreshMyEvents(): Resource<Unit> {
         return try {
-            val myEventsResult = eventsService.getMyEvents("Bearer ${authManager.getApiToken()!!}")
+            val myEventsResult = eventsService.getMyEvents(token = "Bearer ${authManager.getApiToken()!!}")
             if(myEventsResult.isSuccessful)
             {
                 val myEvents = myEventsResult.body()!!.toFullEventEntitiesList()

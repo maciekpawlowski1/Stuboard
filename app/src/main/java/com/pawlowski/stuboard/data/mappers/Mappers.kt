@@ -16,6 +16,7 @@ import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
+import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -32,17 +33,40 @@ fun dateTimeFormatter(): DateTimeFormatter
     return DateTimeFormatter.ofPattern("dd.MM.u HH:mm")
 }
 
+fun timeFormatter(): DateTimeFormatter
+{
+    return DateTimeFormatter.ofPattern("HH:mm")
+}
+
 fun dateFormatter(): DateTimeFormatter
 {
     return DateTimeFormatter.ofPattern("dd.MM.u")
 }
 
-fun offsetDateTimeStringToLocalFormattedTimeString(offsetDateTimeString: String): String
+fun OffsetDateTime.isSameDayAs(otherDate: OffsetDateTime): Boolean
+{
+    return this.dayOfMonth == otherDate.dayOfMonth &&
+            this.monthValue == otherDate.monthValue &&
+            this.year == otherDate.year
+}
+
+fun offsetDateTimeStringToLocalFormattedTimeStringForPreview(
+    offsetDateTimeStartDateString: String,
+    offsetDateTimeEndDateString: String
+): String
 {
     return try {
-        val format = dateTimeFormatter()
         val offset = OffsetDateTime.now().offset
-        OffsetDateTime.parse(offsetDateTimeString).withOffsetSameInstant(offset).format(format)
+        val startOffsetTime = OffsetDateTime.parse(offsetDateTimeStartDateString).withOffsetSameInstant(offset)
+        val endOffsetTime = OffsetDateTime.parse(offsetDateTimeEndDateString).withOffsetSameInstant(offset)
+        if(startOffsetTime.isSameDayAs(endOffsetTime))
+        {
+            "${startOffsetTime.format(dateTimeFormatter())} - ${endOffsetTime.format(timeFormatter())}"
+        }
+        else
+        {
+            "${startOffsetTime.format(dateFormatter())} - ${endOffsetTime.format(dateFormatter())}"
+        }
     }
     catch (e: Exception)
     {
@@ -67,7 +91,7 @@ fun offsetDateTimeStringToLocalLong(offsetDateTimeString: String?): Long?
 
 
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
-    val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
+    val startDate = offsetDateTimeStringToLocalFormattedTimeStringForPreview(this.startDate, this.endDate)
 
     return EventItemForPreview(
         eventId = id,
@@ -153,7 +177,7 @@ fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
         eventId = id,
         tittle = name,
         place = city,
-        dateDisplayString = offsetDateTimeStringToLocalFormattedTimeString(startDate),
+        dateDisplayString = offsetDateTimeStringToLocalFormattedTimeStringForPreview(startDate, endDate),
         position = LatLng(latitude, longitude),
         imageUrl = thumbnail,
         mainCategoryDrawableId = category.markerDrawableId,
@@ -163,8 +187,28 @@ fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
 }
 
 fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
-    val startDate = offsetDateTimeStringToLocalFormattedTimeString(this.startDate)
-    val endDate = offsetDateTimeStringToLocalFormattedTimeString(this.endDate)
+    val (dateText, hoursText) = try {
+        val localOffset = OffsetDateTime.now().offset
+        val offsetDateTimeStartDate = OffsetDateTime.parse(startDate).withOffsetSameInstant(localOffset)
+        val offsetDateTimeEndDate = OffsetDateTime.parse(endDate).withOffsetSameInstant(localOffset)
+        val (dateText, hoursText) = if(offsetDateTimeStartDate.isSameDayAs(offsetDateTimeEndDate))
+        {
+            val date = offsetDateTimeStartDate.format(dateFormatter())
+            val time = "${offsetDateTimeStartDate.format(timeFormatter())} - ${offsetDateTimeEndDate.format(
+                timeFormatter())}"
+            Pair(date, time)
+        }
+        else
+            Pair("${offsetDateTimeStartDate.format(dateTimeFormatter())} - ${offsetDateTimeEndDate.format(dateTimeFormatter())}","")
+
+        Pair(dateText, hoursText)
+    }
+    catch (e: Exception)
+    {
+        Pair("", "")
+    }
+
+
 
 
     val categories = tags?.mapNotNull {
@@ -176,14 +220,16 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
     return EventItemWithDetails(
         tittle = this.name,
         imageUrl = this.thumbnail,
-        dateDisplay = startDate,
+        dateDisplay = dateText,
+        hourDisplay = hoursText,
         place = if(this.online)
             "Online"
         else
-            this.city,
+            "${this.city}, ${this.location?:""}",
         description = this.shortDescription,
-        price = 0.0f,
-        categoriesDrawablesId = categories.map { it.iconDrawableId }
+        isFree = tickets,
+        categoriesDrawablesId = categories.map { it.iconDrawableId },
+        organisation = OrganisationItemForPreview(tittle = organization)
     )
 }
 
@@ -198,8 +244,8 @@ fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
             "",
         isFree = isFree(),
         imageUrl = imageUrl?:"",
-        dateDisplayString = if(sinceTime != null)
-            offsetDateTimeStringToLocalFormattedTimeString(sinceTime)
+        dateDisplayString = if(sinceTime != null && toTime != null)
+            offsetDateTimeStringToLocalFormattedTimeStringForPreview(sinceTime, toTime)
         else
             ""
     )

@@ -23,7 +23,11 @@ interface EventsService {
     suspend fun loadItemById(@Path("id") eventId: String): Response<EventsResponseItem>
 
     @GET("api/Events/GetMy")
-    suspend fun getMyEvents(@Header("Authorization") token: String): Response<EventsResponse>
+    suspend fun getMyEvents(
+        @Query("PageNumber") page: Int = 1,
+        @Query("PageSize") pageSize: Int = 100,
+        @Header("Authorization") token: String
+    ): Response<EventsResponse>
 
     @POST("api/Events")
     suspend fun addNewEvent(@Body event: EventAddModel, @Header("Authorization") token: String): Response<String>

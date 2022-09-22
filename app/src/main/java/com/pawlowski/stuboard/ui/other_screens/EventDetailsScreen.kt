@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsUiState
 import com.pawlowski.stuboard.presentation.event_details.EventDetailsViewModel
@@ -69,7 +71,12 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
                 .fillMaxWidth()
                 .height((screenWidth / 1.5).dp)
                 .myLoadingEffect(displayLoadingEffectState.value),
-                model = eventItemWithDetails.imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(eventItemWithDetails.imageUrl)
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(id = R.drawable.image_placeholder),
+                error = painterResource(id = R.drawable.image_placeholder),
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds
             )
@@ -100,17 +107,29 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
 
             Divider()
 
-            OrganisationRow(organisation = eventItemWithDetails.organisation, isLoading = displayLoadingEffectState.value)
+            if(eventItemWithDetails.organisation.tittle.isNotEmpty())
+            {
+                OrganisationRow(organisation = eventItemWithDetails.organisation, isLoading = displayLoadingEffectState.value)
 
-            Divider()
+                Divider()
+            }
 
-            CategoriesRow(categoriesDrawableIds = eventItemWithDetails.categoriesDrawablesId, isLoading = displayLoadingEffectState.value)
+            if(eventItemWithDetails.categoriesDrawablesId.isNotEmpty() || displayLoadingEffectState.value)
+            {
+                CategoriesRow(categoriesDrawableIds = eventItemWithDetails.categoriesDrawablesId, isLoading = displayLoadingEffectState.value)
+                Divider()
+            }
 
-            Divider()
 
-            PriceRow(price = eventItemWithDetails.price, isLoading = displayLoadingEffectState.value)
+            val isFree = eventItemWithDetails.isFree
+            if(isFree != null || displayLoadingEffectState.value)
+            {
+                PriceRow(isFree = isFree?:false, isLoading = displayLoadingEffectState.value)
 
-            Divider()
+                Divider()
+            }
+
+
 
             DescriptionRow(description = eventItemWithDetails.description, isLoading = displayLoadingEffectState.value)
 
@@ -177,15 +196,15 @@ private fun DescriptionRow(description: String, linesUntilOverflow: Int = 8, isL
 }
 
 @Composable
-private fun PriceRow(price: Float, isLoading: Boolean = false)
+private fun PriceRow(isFree: Boolean, isLoading: Boolean = false)
 {
-    val priceText = if(price == 0f)
+    val priceText = if(isFree)
     {
         "Udział jest darmowy"
     }
     else
-        "Udział kosztuje $price zł"
-    TableRow(header = "Cena:") {
+        "Udział jest płatny"
+    TableRow(header = "Koszt:") {
         Text(
             modifier = Modifier
                 .padding(horizontal = 10.dp)
@@ -271,18 +290,27 @@ private fun OrganisationRow(organisation: OrganisationItemForPreview, isLoading:
 {
     TableRow(header = "Organizator:") {
         Row(verticalAlignment = CenterVertically) {
-            Card(shape = CircleShape, modifier = Modifier
-                .padding(5.dp)
-                .height(42.dp)
-                .width(42.dp)
-            ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .myLoadingEffect(isLoading),
-                    model = organisation.logoImageUrl,
-                    contentDescription = "",
-                    contentScale = ContentScale.FillBounds
-                )
+            if(organisation.logoImageUrl.isNotEmpty())
+            {
+                Card(shape = CircleShape, modifier = Modifier
+                    .padding(5.dp)
+                    .height(42.dp)
+                    .width(42.dp)
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .myLoadingEffect(isLoading),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(organisation.logoImageUrl)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(id = R.drawable.image_placeholder),
+                        error = painterResource(id = R.drawable.image_placeholder),
+                        contentDescription = "",
+
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
             }
             Text(
                 modifier= Modifier

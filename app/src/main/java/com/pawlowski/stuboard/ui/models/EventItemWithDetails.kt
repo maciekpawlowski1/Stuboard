@@ -6,7 +6,7 @@ data class EventItemWithDetails(
     val hourDisplay: String = "",
     val place: String = "",
     val categoriesDrawablesId: List<Int> = listOf(),
-    val price: Float = -1.0f,
+    val isFree: Boolean? = null,
     val description: String = "",
     val imageUrl: String = "",
     val organisation: OrganisationItemForPreview = OrganisationItemForPreview()
