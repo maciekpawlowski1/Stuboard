@@ -33,4 +33,7 @@ interface EventsService {
 
     @POST("api/Events")
     suspend fun addNewEvent(@Body event: EventAddModel, @Header("Authorization") token: String): Response<String>
+
+    @DELETE("api/Events/{id}")
+    suspend fun deleteEvent(@Path("id") eventId: String, @Header("Authorization") token: String): Response<Unit>
 }

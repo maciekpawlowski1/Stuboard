@@ -122,7 +122,9 @@ fun EventPublishStatusScreen(
             showPublishButton = publishStateValue == EventPublishState.EDITING,
             isLoading = publishStateValue == null,
             onPublishClick = { viewModel.publishEvent() },
-            isRequestInProgress = { isRequestInProgressState.value }
+            isRequestInProgress = { isRequestInProgressState.value },
+            showCancelButton = { publishStateValue == EventPublishState.WAITING_TO_PUBLISH || publishStateValue == EventPublishState.PUBLISHED },
+            onCancelClick = { viewModel.cancelEvent() }
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -143,7 +145,7 @@ fun EventPublishStatusScreen(
 }
 
 @Composable
-fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: String, showPublishButton: Boolean, isLoading: Boolean = false, onPublishClick: () -> Unit = {}, isRequestInProgress: () -> Boolean = {false})
+fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: String, showPublishButton: Boolean, isLoading: Boolean = false, onPublishClick: () -> Unit = {}, isRequestInProgress: () -> Boolean = {false}, showCancelButton: () -> Boolean = {false}, onCancelClick: () -> Unit = {})
 {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -175,6 +177,12 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
                     Text(text = "Opublikuj", color = Green)
                 }
             }
+            else if(!isLoading && showCancelButton() && !isRequestInProgress())
+            {
+                TextButton(modifier = Modifier.align(Alignment.BottomEnd),onClick = { onCancelClick() }) {
+                    Text(text = "Anuluj wydarzenie", color = Color.Red)
+                }
+            }
         }
     }
 }
@@ -187,6 +195,7 @@ fun EventPublishStatusScreenPreview()
     EventPublishStatusScreen(viewModel = object : IEventStatusViewModel {
         override fun publishEvent() {}
         override fun onBackPressed() {}
+        override fun cancelEvent() {}
 
         override val container: Container<EventStatusUiState, EventStatusSingleEvent> = object : Container<EventStatusUiState, EventStatusSingleEvent> {
             override val settings: Container.Settings

@@ -224,6 +224,33 @@ class EventsRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun cancelEvent(eventId: Int): Resource<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val event = eventsDao.getEvent(eventId)
+                if(event.remoteEventId != null)
+                {
+                    val result = eventsService.deleteEvent(event.remoteEventId, "Bearer ${authManager.getApiToken()}")
+                    if(result.isSuccessful)
+                    {
+                        eventsDao.upsertEvent(event.copy(remoteEventId = null, publishingStatus = 0))
+                        Resource.Success(Unit)
+                    }
+                    else
+                        Resource.Error(UiText.StaticText(result.message()))
+                }
+                else
+                    Resource.Error(UiText.StaticText(""))
+            }catch (e: Exception)
+            {
+                e.printStackTrace()
+                Resource.Error(UiText.StaticText(e.localizedMessage?:"Wystąpił błąd"))
+            }
+
+
+        }
+    }
+
     override suspend fun refreshMyEvents(): Resource<Unit> {
         return try {
             val myEventsResult = eventsService.getMyEvents(token = "Bearer ${authManager.getApiToken()!!}")
@@ -232,10 +259,14 @@ class EventsRepositoryImpl @Inject constructor(
                 val myEvents = myEventsResult.body()!!.toFullEventEntitiesList()
                 eventsDao.runTransaction {
                     val currentEvents = eventsDao.getAllEvents().first()
-                    currentEvents.forEach {
-                        println(it.remoteEventId)
-                    }
                     val idsMap = currentEvents.associate { Pair(it.remoteEventId, it.id) }
+                    val myEventsRemoteKeys = myEvents.map { it.remoteEventId }
+                    currentEvents.forEach {
+                        if(!myEventsRemoteKeys.contains(it.remoteEventId))
+                        {
+                            eventsDao.upsertEvent(it.copy(publishingStatus = 0, remoteEventId = null))
+                        }
+                    }
                     myEvents.forEach {
                         eventsDao.upsertEvent(it.copy(id = idsMap.getOrDefault(it.remoteEventId!!, 0)))
                     }

@@ -5,4 +5,5 @@ import org.orbitmvi.orbit.ContainerHost
 interface IEventStatusViewModel: ContainerHost<EventStatusUiState, EventStatusSingleEvent> {
     fun publishEvent()
     fun onBackPressed()
+    fun cancelEvent()
 }

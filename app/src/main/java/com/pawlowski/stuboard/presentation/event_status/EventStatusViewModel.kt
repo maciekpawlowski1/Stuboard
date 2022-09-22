@@ -88,6 +88,26 @@ class EventStatusViewModel @Inject constructor(
         }
     }
 
+    override fun cancelEvent() = intent {
+        if(!state.isRequestInProgress)
+        {
+            reduce {
+                state.copy(isRequestInProgress = true)
+            }
+
+            val result = eventsRepository.cancelEvent(eventId)
+
+            if(result is Resource.Error)
+            {
+                postSideEffect(EventStatusSingleEvent.ShowErrorToast(result.message?:UiText.StaticText("Wystąpił błąd przy anulowaniu eventu")))
+            }
+
+            reduce {
+                state.copy(isRequestInProgress = false)
+            }
+        }
+    }
+
     init {
         handleEventPublishStatus()
         handleEventItemForPreview()
