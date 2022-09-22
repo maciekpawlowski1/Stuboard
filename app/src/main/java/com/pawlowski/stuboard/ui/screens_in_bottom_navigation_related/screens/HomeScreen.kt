@@ -70,7 +70,7 @@ fun HomeScreen(
             it.events
         }.mapNotNull {
             it.eventWithLocation?.toNotSelectedEventMarker()
-        }
+        }.distinct()
     }
     val cameraPositionState = rememberCameraPositionState()
     Surface {

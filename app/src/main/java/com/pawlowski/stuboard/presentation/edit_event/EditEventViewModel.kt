@@ -13,6 +13,8 @@ import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.presentation.use_cases.RestoreEditEventStateUseCase
 import com.pawlowski.stuboard.presentation.use_cases.SaveEditingEventUseCase
+import com.pawlowski.stuboard.presentation.use_cases.validation.ValidateEditEventUseCase
+import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreenType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,7 @@ class EditEventViewModel @Inject constructor(
     private val geocoder: Geocoder,
     private val saveEditingEventUseCase: SaveEditingEventUseCase,
     private val restoreEditEventStateUseCase: RestoreEditEventStateUseCase,
+    private val validateEditEventUseCase: ValidateEditEventUseCase,
     private val savedStateHandle: SavedStateHandle,
 ): IEditEventViewModel, ViewModel() {
 
@@ -230,9 +233,20 @@ class EditEventViewModel @Inject constructor(
     }
 
     override fun validateAndMoveToPublishing() = intent {
-        //TODO: Validate
         saveEditingEventUseCase(state)
-        postSideEffect(EditEventSingleEvent.NavigateToPublishing(state.eventId))
+        val validationResult = validateEditEventUseCase(state)
+        if(validationResult.first.isCorrect)
+            postSideEffect(EditEventSingleEvent.NavigateToPublishing(state.eventId))
+        else
+        {
+            validationResult.second?.let {
+                reduce {
+                    state.copy(currentPage = it)
+                }
+            }
+
+            postSideEffect(EditEventSingleEvent.ShowErrorToast(validationResult.first.errorMessage?:UiText.StaticText("Some fields are incorrect!")))
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
