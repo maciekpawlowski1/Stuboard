@@ -6,16 +6,19 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.pawlowski.stuboard.presentation.use_cases.GetEventsPagingStreamUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
+import com.pawlowski.stuboard.presentation.use_cases.UnselectAllFiltersUseCase
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val getSelectedFiltersUseCase: GetSelectedFiltersUseCase,
     private val getEventsPagingStreamUseCase: GetEventsPagingStreamUseCase,
+    private val unselectAllFiltersUseCase: UnselectAllFiltersUseCase,
 ): ViewModel(), ISearchViewModel {
     private val initialUiState = SearchUiState(listOf())
 
@@ -42,6 +45,11 @@ class SearchViewModel @Inject constructor(
         {
             is SearchUiAction.SaveScrollPosition -> {
                 _lastSavedScrollPosition.update { action.scrollPosition }
+            }
+            is SearchUiAction.UnselectAllFilters -> {
+                viewModelScope.launch {
+                    unselectAllFiltersUseCase()
+                }
             }
         }
     }

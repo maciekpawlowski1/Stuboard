@@ -70,15 +70,20 @@ fun SearchScreen(
                     .wrapContentHeight(), color = GrayGreen
             ) {
                 Column(modifier = Modifier.padding(vertical = 30.dp)) {
-                    SearchBarWithFilterValues(PaddingValues(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = 10.dp
-                    ),
+                    SearchBarWithFilterValues(
+                        PaddingValues(
+                            start = 20.dp,
+                            end = 20.dp,
+                            bottom = 10.dp
+                        ),
                         filters = selectedFiltersState.value.map { it.tittle },
                         onNavigateToFiltersScreen = {
                             onNavigateToFiltersScreen.invoke()
-                        })
+                        },
+                        onClearClick = {
+                            viewModel.onAction(SearchUiAction.UnselectAllFilters)
+                        }
+                    )
 
                     FiltersCard(
                         modifier = Modifier.align(CenterHorizontally),
