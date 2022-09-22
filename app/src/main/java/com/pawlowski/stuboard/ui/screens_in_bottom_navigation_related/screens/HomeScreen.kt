@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.data.mappers.toEventItemForPreview
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeUiAction
 import com.pawlowski.stuboard.presentation.home.HomeUiState
@@ -127,7 +128,11 @@ fun HomeScreen(
                     viewModel.onAction(HomeUiAction.ClearAllFiltersAndSelectFilters(it.suggestionFilters))
                     onNavigateToSearchScreen.invoke()
                 }
-                EventsRow(eventItemsForPreview = it.events, isLoading = it.isLoading)
+                EventsRow(
+                    eventItemsForPreview = it.events.mapNotNull { previewHolder ->
+                        previewHolder.eventWithLocation?.toEventItemForPreview() ?:previewHolder.eventWithoutLocation
+                    },
+                    isLoading = it.isLoading)
                 { eventId ->
                     onNavigateToEventDetailScreen.invoke(eventId)
                 }

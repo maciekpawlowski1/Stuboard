@@ -22,6 +22,7 @@ import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.presentation.utils.UiText
 import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
+import com.pawlowski.stuboard.ui.models.PreviewEventHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import retrofit2.Response
@@ -73,11 +74,16 @@ class EventsRepositoryImpl @Inject constructor(
                         }
                     }
 
-                    result?.let {
-                        if(it.isSuccessful)
+                    result?.let { res ->
+                        if(res.isSuccessful)
                         {
-                            it.body()?.let { body ->
-                                val responseEvents = body.toEventItemForPreviewList()
+                            res.body()?.let { body ->
+                                val responseEvents = body.map {
+                                    if(it.online)
+                                        PreviewEventHolder(eventWithoutLocation = it.toEventItemForPreview())
+                                    else
+                                        PreviewEventHolder(eventWithLocation = it.toEventItemForMapScreen())
+                                }
                                 emitsValueState.update { prevState ->
                                     prevState.mapIndexed { indexInState, suggestion ->
                                         if(indexInState == index)
