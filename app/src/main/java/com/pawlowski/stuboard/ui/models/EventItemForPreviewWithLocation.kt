@@ -2,7 +2,7 @@ package com.pawlowski.stuboard.ui.models
 
 import com.google.android.gms.maps.model.LatLng
 
-data class EventItemForMapScreen(
+data class EventItemForPreviewWithLocation(
     val eventId: String,
     val tittle: String,
     val place: String,

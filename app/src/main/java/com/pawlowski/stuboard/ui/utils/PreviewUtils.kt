@@ -39,7 +39,7 @@ object PreviewUtils {
     )
 
     val defaultEventItemsForMap = listOf(
-        EventItemForMapScreen(
+        EventItemForPreviewWithLocation(
             eventId = "1",
             position = LatLng(50.0601, 19.9438),
             tittle = "Juwenalia Krakowskie 2022", place = "Kraków, Rostafińskiego 38",
@@ -49,7 +49,7 @@ object PreviewUtils {
             mainCategoryDrawableIdWhenSelected = R.drawable.concert_selected_marker_icon,
             ),
 
-        EventItemForMapScreen(
+        EventItemForPreviewWithLocation(
             eventId = "2",
             position = LatLng(50.0621, 19.9394),
             tittle = "Warsztaty Bazy Danych AGH MySQL", place = "Online",
@@ -59,7 +59,7 @@ object PreviewUtils {
             mainCategoryDrawableIdWhenSelected = R.drawable.naukowe_selected_marker_icon,
         ),
 
-        EventItemForMapScreen(
+        EventItemForPreviewWithLocation(
             eventId = "3",
             position = LatLng(50.0722, 19.9461),
             tittle = "Neural networks workshop", place = "Kraków, Rynkowa 12",

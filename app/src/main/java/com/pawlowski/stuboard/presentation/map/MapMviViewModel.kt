@@ -5,7 +5,7 @@ import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.use_cases.GetEventsForMapScreenUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetSelectedFiltersUseCase
-import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
+import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.models.EventMarker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ class MapMviViewModel @Inject constructor(
 
     }
 
-    private fun calculateMarkersFromEvents(events: List<EventItemForMapScreen>, selectedEventId: String): List<EventMarker> {
+    private fun calculateMarkersFromEvents(events: List<EventItemForPreviewWithLocation>, selectedEventId: String): List<EventMarker> {
         return events.map {
             EventMarker(
                 position = it.position,

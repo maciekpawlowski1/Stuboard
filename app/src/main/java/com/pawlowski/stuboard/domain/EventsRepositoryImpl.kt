@@ -20,7 +20,7 @@ import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeEventTypeSuggestion
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
 import com.pawlowski.stuboard.presentation.utils.UiText
-import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
+import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -128,7 +128,7 @@ class EventsRepositoryImpl @Inject constructor(
         ).flow
     }
 
-    override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForMapScreen>> {
+    override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForPreviewWithLocation>> {
         return try {
             //println(authManager.getApiToken())
 

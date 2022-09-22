@@ -34,7 +34,7 @@ import com.pawlowski.stuboard.presentation.map.IMapMviViewModel
 import com.pawlowski.stuboard.presentation.map.MapMviViewModel
 import com.pawlowski.stuboard.presentation.map.MapSingleEvent
 import com.pawlowski.stuboard.presentation.map.MapUiState
-import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
+import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.LightGray
 import com.pawlowski.stuboard.ui.theme.MidGrey
@@ -163,7 +163,7 @@ fun MapScreen(
 fun EventsPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
-    events: List<EventItemForMapScreen>,
+    events: List<EventItemForPreviewWithLocation>,
     isLoading: Boolean = false,
     onEventCardClick: (eventId: String) -> Unit = {},
     onPageChanged: (pageIndex: Int) -> Unit = {},
@@ -279,7 +279,7 @@ fun FiltersHeader(
 }
 
 @Composable
-fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForMapScreen, isLoading: Boolean = false) {
+fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForPreviewWithLocation, isLoading: Boolean = false) {
     Card(
         modifier = modifier
             .width((LocalConfiguration.current.screenWidthDp - 30).dp)

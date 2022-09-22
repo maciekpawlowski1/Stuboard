@@ -13,7 +13,7 @@ import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
-import com.pawlowski.stuboard.ui.models.EventItemForMapScreen
+import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.models.EventItemForPreview
 import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
@@ -105,7 +105,7 @@ fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     )
 }
 
-fun EventsResponse.toEventItemForMapScreenList(): List<EventItemForMapScreen>
+fun EventsResponse.toEventItemForMapScreenList(): List<EventItemForPreviewWithLocation>
 {
     return this.mapNotNull {
         it.toEventItemForMapScreen()
@@ -167,13 +167,13 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
     )
 }
 
-fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
+fun EventsResponseItem.toEventItemForMapScreen(): EventItemForPreviewWithLocation?
 {
     if(latitude == null || longitude == null)
         return null
 
     val category = CategoryHandler.getCategoryById(tags?.getOrNull(0)?.id?:-1)
-    return EventItemForMapScreen(
+    return EventItemForPreviewWithLocation(
         eventId = id,
         tittle = name,
         place = "${this.city}, ${this.location?:""}",
