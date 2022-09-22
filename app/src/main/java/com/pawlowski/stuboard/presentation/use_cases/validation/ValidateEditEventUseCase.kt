@@ -27,6 +27,10 @@ class ValidateEditEventUseCase @Inject constructor() {
         {
             Pair(ValidationResult(false, UiText.StaticText("Data zakończenia wydarzenia jest wymagana!")), EditEventScreenType.FIRST)
         }
+        else if(editEventUiState.sinceTime > editEventUiState.toTime)
+        {
+            Pair(ValidationResult(false, UiText.StaticText("Data zakończenia wydarzenia musi być po dacie rozpoczęcia wydarzenia!")), EditEventScreenType.FIRST)
+        }
         else if(editEventUiState.imageUrl == null || editEventUiState.imageUrl.isEmpty())
         {
             Pair(ValidationResult(false, UiText.StaticText("Zdjęcie wydarzenia jest wymagane!")), EditEventScreenType.FIRST)
@@ -63,10 +67,9 @@ class ValidateEditEventUseCase @Inject constructor() {
         {
             Pair(ValidationResult(false, UiText.StaticText("Nie wykryto poprawnie położenia na mapie. Spróbuj zmienić pola adresu wydarzenia!")), EditEventScreenType.THIRD)
         }
-        else if(false)
+        else if(editEventUiState.selectedOrganisation == null)
         {
-            //Is organisation required?
-            Pair(ValidationResult(false), EditEventScreenType.FOURTH)
+            Pair(ValidationResult(false, UiText.StaticText("Organizator wydarzenia jest wymagany")), EditEventScreenType.FOURTH)
         }
         else if(editEventUiState.description.trim().isEmpty())
         {

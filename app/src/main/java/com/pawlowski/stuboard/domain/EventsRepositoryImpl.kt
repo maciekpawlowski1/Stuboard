@@ -5,6 +5,7 @@ import android.webkit.URLUtil
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.gson.Gson
 import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
@@ -199,6 +200,7 @@ class EventsRepositoryImpl @Inject constructor(
                     val newEvent = event.copy(imageUrl = downloadUrl)
                     val token = authManager.getApiToken()!!
                     val eventAddModel = newEvent.toEventAddModel()!!
+                    println(Gson().toJson(eventAddModel))
                     val response = eventsService.addNewEvent(eventAddModel, token = "Bearer $token")
                     if(response.isSuccessful)
                     {

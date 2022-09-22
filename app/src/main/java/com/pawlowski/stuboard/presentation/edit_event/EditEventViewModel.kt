@@ -59,7 +59,12 @@ class EditEventViewModel @Inject constructor(
         reduce {
             state.copy(currentPage = when(state.currentPage) {
                 EditEventScreenType.FIRST -> { EditEventScreenType.SECOND }
-                EditEventScreenType.SECOND -> { EditEventScreenType.THIRD }
+                EditEventScreenType.SECOND -> {
+                    if(state.isOnline)
+                        EditEventScreenType.FOURTH
+                    else
+                        EditEventScreenType.THIRD
+                }
                 EditEventScreenType.THIRD -> { EditEventScreenType.FOURTH }
                 EditEventScreenType.FOURTH -> { EditEventScreenType.FIFTH }
                 else -> {state.currentPage}
@@ -80,7 +85,12 @@ class EditEventViewModel @Inject constructor(
                 state.copy(currentPage = when(state.currentPage) {
                     EditEventScreenType.SECOND -> { EditEventScreenType.FIRST }
                     EditEventScreenType.THIRD -> { EditEventScreenType.SECOND }
-                    EditEventScreenType.FOURTH -> { EditEventScreenType.THIRD }
+                    EditEventScreenType.FOURTH -> {
+                        if(state.isOnline)
+                            EditEventScreenType.SECOND
+                        else
+                            EditEventScreenType.THIRD
+                    }
                     EditEventScreenType.FIFTH -> { EditEventScreenType.FOURTH }
                     else -> {state.currentPage}
                 })

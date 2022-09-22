@@ -24,6 +24,8 @@ data class EventAddModel(
     val name: String,
     @SerializedName("online")
     val online: Boolean,
+    @SerializedName("organization")
+    val organization: String? = null,
     @SerializedName("registration")
     val registration: Boolean,
     @SerializedName("shortDescription")

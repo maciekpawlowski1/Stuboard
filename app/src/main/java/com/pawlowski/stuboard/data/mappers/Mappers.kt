@@ -284,7 +284,9 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             language = "Not specified", //TODO: Add selecting language
             city = city,
             location = placeName.ifEmpty { streetAndNumber },
-
+            organization = organisationId?.let {
+                OrganisationHandler.getExistingOrganisationById(it)?.tittle
+            }?:customOrganisationTittle?:""
         )
     }
     catch (e: Exception)
