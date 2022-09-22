@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.mappers.toEventItemForPreview
 import com.pawlowski.stuboard.data.mappers.toNotSelectedEventMarker
@@ -71,6 +72,7 @@ fun HomeScreen(
             it.eventWithLocation?.toNotSelectedEventMarker()
         }
     }
+    val cameraPositionState = rememberCameraPositionState()
     Surface {
         LazyColumn() {
 
@@ -91,6 +93,7 @@ fun HomeScreen(
                         moveCameraToMarkersBound = true,
                         zoomButtonsEnabled = false,
                         disableAllGestures = true,
+                        cameraPositionState = cameraPositionState
                     )
 
                     //To make on the map clickable effect

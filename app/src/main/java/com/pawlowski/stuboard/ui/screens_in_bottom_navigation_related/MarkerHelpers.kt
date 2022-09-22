@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 
 @Composable
 fun CustomMapMarker(
@@ -22,7 +23,7 @@ fun CustomMapMarker(
         context, iconResourceId
     )
     Marker(
-        position = position,
+        state = MarkerState(position = position),
         title = title,
         icon = icon,
         onClick = { onClick.invoke() }
