@@ -13,7 +13,8 @@ class EventsServiceFiltersRequestAdapter @Inject constructor(
         pageSize: Int,
         filters: List<FilterModel>
     ): Response<EventsResponse> {
-        val isOnlineSelected = filters.filterIsInstance<FilterModel.Place.Online>().isNotEmpty()
+        val isOnlineSelected = filters.filterIsInstance<FilterModel.Place.Online>().isNotEmpty().takeUnless { !it }
+
 
         val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
         val isRegistration = if(selectedRegistrationItems.isNotEmpty())
@@ -46,6 +47,7 @@ class EventsServiceFiltersRequestAdapter @Inject constructor(
         val textFilter = filters.filterIsInstance<FilterModel.CustomTextFilter>()
             .map { it.customText }
             .firstOrNull()
+
 
         return eventsService.loadItems(
             page = page,
