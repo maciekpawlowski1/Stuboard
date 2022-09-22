@@ -91,17 +91,17 @@ fun offsetDateTimeStringToLocalLong(offsetDateTimeString: String?): Long?
 
 
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
-    val startDate = offsetDateTimeStringToLocalFormattedTimeStringForPreview(this.startDate, this.endDate)
+    val dateString = offsetDateTimeStringToLocalFormattedTimeStringForPreview(this.startDate, this.endDate)
 
     return EventItemForPreview(
         eventId = id,
         tittle = this.name,
         imageUrl = this.thumbnail,
-        dateDisplayString = startDate,
+        dateDisplayString = dateString,
         place = if(this.online)
             "Online"
         else
-            this.city,
+            "${this.city}, ${this.location?:""}",
     )
 }
 
@@ -176,7 +176,7 @@ fun EventsResponseItem.toEventItemForMapScreen(): EventItemForMapScreen?
     return EventItemForMapScreen(
         eventId = id,
         tittle = name,
-        place = city,
+        place = "${this.city}, ${this.location?:""}",
         dateDisplayString = offsetDateTimeStringToLocalFormattedTimeStringForPreview(startDate, endDate),
         position = LatLng(latitude, longitude),
         imageUrl = thumbnail,
@@ -238,10 +238,7 @@ fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
     return EventItemForPreview(
         eventId = id.toString(),
         tittle = tittle.ifEmpty { "Bez nazwy" },
-        place = if(city.isNotEmpty() && streetAndNumber.isNotEmpty())
-            "$city, $streetAndNumber"
-        else
-            "",
+        place = "$city, ${placeName.ifEmpty { streetAndNumber }}",
         isFree = isFree(),
         imageUrl = imageUrl?:"",
         dateDisplayString = if(sinceTime != null && toTime != null)
@@ -278,9 +275,9 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             tickets = groupedFilters?.get(FilterType.ENTRY_PRICE)?.firstOrNull() == FilterModel.EntryPrice.Paid,
             website = site,
             facebook = facebookSite,
-            language = "Polski", //TODO: Add selecting language
+            language = "Not specified", //TODO: Add selecting language
             city = city,
-            location = placeName,
+            location = placeName.ifEmpty { streetAndNumber },
 
         )
     }
@@ -304,8 +301,6 @@ fun Int.toPublishingStatus(): EventPublishState
 
 fun FullEventEntity.toEditEventUiState(): EditEventUiState
 {
-    //TODO: map other fields
-
     val organisation = organisationId?.let {
         if(it != -1)
         {
