@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,10 +31,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.presentation.filters.FilterModel
-import com.pawlowski.stuboard.presentation.map.IMapMviViewModel
-import com.pawlowski.stuboard.presentation.map.MapMviViewModel
-import com.pawlowski.stuboard.presentation.map.MapSingleEvent
-import com.pawlowski.stuboard.presentation.map.MapUiState
+import com.pawlowski.stuboard.presentation.map.*
 import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
 import com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.MyGoogleMap
 import com.pawlowski.stuboard.ui.theme.LightGray
@@ -44,14 +42,21 @@ import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import com.pawlowski.stuboard.ui.utils.myLoadingEffect
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.annotation.OrbitInternal
+import org.orbitmvi.orbit.syntax.ContainerContext
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MapScreen(
     preview: Boolean = false,
     onNavigateBack: () -> Unit = {},
+    onNavigateToFiltersScreen: () -> Unit = {},
     onNavigateToEventDetailsScreen: (eventId: String) -> Unit = {},
     viewModel: IMapMviViewModel = hiltViewModel<MapMviViewModel>()
 ) {
@@ -118,7 +123,8 @@ fun MapScreen(
 
         FiltersHeader(
             currentFiltersState.value,
-            onBackClick = { onNavigateBack.invoke() }
+            onBackClick = { onNavigateBack.invoke() },
+            onTuneFiltersClick = { onNavigateToFiltersScreen() }
         )
 
         Box(modifier = Modifier.fillMaxSize())
@@ -204,9 +210,9 @@ fun FiltersHeader(
     onTuneFiltersClick: () -> Unit = {}
 ) {
     val filtersText = if(filters.isEmpty())
-        "Loading..."
+        "Wszystkie wydarzenia"
     else if (filters.size == 1)
-        "Wydarzenia w ${filters[0].tittle}"
+        "Wydarzenia - ${filters[0].tittle}"
     else {
         val categoriesAppend = filters.map { it.tittle }.reduce { acc, s ->
             "$acc - $s"
@@ -352,16 +358,34 @@ fun PagerEventCard(modifier: Modifier = Modifier, event: EventItemForPreviewWith
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun MapScreenPreview() {
-//    MapScreen(preview = true, viewModel = object: IMapViewModel
-//    {
-//        override val uiState: StateFlow<MapUiState> = MutableStateFlow(
-//            MapUiState.Success(
-//                events = PreviewUtils.defaultEventItemsForMap,
-//                _currentFilters = PreviewUtils.defaultFilters
-//            )
-//        )
-//    })
-//}
+@OptIn(OrbitInternal::class)
+@Preview(showBackground = true)
+@Composable
+fun MapScreenPreview() {
+    MapScreen(preview = true, viewModel = object: IMapMviViewModel
+    {
+        override fun onPageChanged(index: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onEventSelected(eventId: String) {
+            TODO("Not yet implemented")
+        }
+
+        override val container: Container<MapUiState, MapSingleEvent> = object : Container<MapUiState, MapSingleEvent>
+        {
+            override val settings: Container.Settings
+                get() = TODO("Not yet implemented")
+            override val sideEffectFlow: Flow<MapSingleEvent>
+                get() = TODO("Not yet implemented")
+            override val stateFlow: StateFlow<MapUiState> = MutableStateFlow(MapUiState.Success(events = PreviewUtils.defaultEventItemsForMap, _currentFilters = listOf()))
+
+            override suspend fun orbit(orbitIntent: suspend ContainerContext<MapUiState, MapSingleEvent>.() -> Unit) {
+                TODO("Not yet implemented")
+            }
+
+        }
+
+
+    })
+}

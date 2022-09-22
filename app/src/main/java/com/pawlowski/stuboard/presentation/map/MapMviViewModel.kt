@@ -28,23 +28,18 @@ class MapMviViewModel @Inject constructor(
     override val container: Container<MapUiState, MapSingleEvent> = container(MapUiState.Loading(
         listOf()))
 
-    private val defaultPlaceFilter = FilterModel.Place.RealPlace("Kraków") //TODO: Change to choosing from preferences
+    private val defaultPlaceFilter = FilterModel.Place.RealPlace("Kraków") //Currently not used //TODO: Change to choosing from preferences
 
 
     private fun observeSelectedFilters() = intent(registerIdling = false) {
         val filtersFlow = getSelectedFiltersUseCase()
             .distinctUntilChanged()
-            .map { //If there's no place filters, than add default one
-                val filters = if(it.filterIsInstance<FilterModel.Place.RealPlace>().isEmpty())
-                {
-                    it.toMutableList().
-                    apply {
-                        add(0, defaultPlaceFilter)
-                        removeAll(it.filterIsInstance<FilterModel.Place.Online>()) //Remove online filters because they won't be on map
-                    }
+            .map { //Remove online filters
+                val filters = it.toMutableList().
+                apply {
+                    //add(0, defaultPlaceFilter)
+                    removeAll(it.filterIsInstance<FilterModel.Place.Online>()) //Remove online filters because they won't be on map
                 }
-                else
-                    it
 
                 return@map filters.sortedByDescending { filter -> filter is FilterModel.Place.RealPlace }
             }

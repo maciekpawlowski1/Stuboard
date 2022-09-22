@@ -77,6 +77,12 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
                 navController.popBackStack()
             }, onNavigateToEventDetailsScreen = { eventId ->
                 navController.navigate("${NavRoutes.EVENT_DETAILS.basicRoute}/${eventId}")
+            },
+            onNavigateToFiltersScreen = {
+                navController.navigate(NavRoutes.FILTERS)
+                {
+                    launchSingleTop = true
+                }
             })
 
         }
