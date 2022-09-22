@@ -169,7 +169,7 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
 
 fun EventsResponseItem.toEventItemForMapScreen(): EventItemForPreviewWithLocation?
 {
-    if(latitude == null || longitude == null)
+    if(latitude == null || longitude == null || (latitude == 0.0 && longitude == 0.0) || online)
         return null
 
     val category = CategoryHandler.getCategoryById(tags?.getOrNull(0)?.id?:-1)
@@ -286,6 +286,23 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
         null
     }
 
+}
+
+fun List<EventItemForPreviewWithLocation>.toEventItemForPreviewList(): List<EventItemForPreview>
+{
+    return this.map { it.toEventItemForPreview() }
+}
+
+fun EventItemForPreviewWithLocation.toEventItemForPreview(): EventItemForPreview
+{
+    return EventItemForPreview(
+        tittle = tittle,
+        dateDisplayString = dateDisplayString,
+        place = place,
+        isFree = isFree,
+        imageUrl = imageUrl,
+        eventId = eventId
+    )
 }
 
 fun Int.toPublishingStatus(): EventPublishState
