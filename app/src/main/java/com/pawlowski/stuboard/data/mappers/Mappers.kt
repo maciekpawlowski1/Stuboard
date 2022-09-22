@@ -13,10 +13,7 @@ import com.pawlowski.stuboard.presentation.edit_event.Organisation
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.filters.FilterType
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
-import com.pawlowski.stuboard.ui.models.EventItemForPreviewWithLocation
-import com.pawlowski.stuboard.ui.models.EventItemForPreview
-import com.pawlowski.stuboard.ui.models.EventItemWithDetails
-import com.pawlowski.stuboard.ui.models.OrganisationItemForPreview
+import com.pawlowski.stuboard.ui.models.*
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -164,6 +161,15 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
         else
             1,
         filtersJson = allFilters.toJson(Gson())
+    )
+}
+
+fun EventItemForPreviewWithLocation.toNotSelectedEventMarker(): EventMarker {
+    return EventMarker(
+        position = position,
+        iconId = mainCategoryDrawableId,
+        eventId = eventId,
+        eventTittle = tittle
     )
 }
 

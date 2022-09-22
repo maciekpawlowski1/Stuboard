@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.data.mappers.toEventItemForPreview
+import com.pawlowski.stuboard.data.mappers.toNotSelectedEventMarker
 import com.pawlowski.stuboard.presentation.filters.FilterModel
 import com.pawlowski.stuboard.presentation.home.HomeUiAction
 import com.pawlowski.stuboard.presentation.home.HomeUiState
@@ -62,6 +63,14 @@ fun HomeScreen(
     val categoriesState = derivedStateOf {
         uiState.value.preferredCategories
     }
+
+    val markersState = derivedStateOf {
+        suggestionsState.value.flatMap {
+            it.events
+        }.mapNotNull {
+            it.eventWithLocation?.toNotSelectedEventMarker()
+        }
+    }
     Surface {
         LazyColumn() {
 
@@ -78,7 +87,7 @@ fun HomeScreen(
                             .height(170.dp)
                             .fillMaxWidth(),
                         preview = preview,
-                        markers = PreviewUtils.defaultMarkers,
+                        markers = markersState.value,
                         moveCameraToMarkersBound = true,
                         zoomButtonsEnabled = false,
                         disableAllGestures = true,

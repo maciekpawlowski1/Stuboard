@@ -119,7 +119,7 @@ object PreviewUtils {
     )
 
     val defaultHomeEventsSuggestions = listOf(
-        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, events = defaultEventPreviews),
-        HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, events = defaultEventPreviews.filter { it.place.lowercase() == "online" })
+        HomeEventTypeSuggestion(suggestionType = "Najwcześniej", isLoading = false, events = defaultEventPreviews.map { PreviewEventHolder(it) }),
+        HomeEventTypeSuggestion(suggestionType = "Online", isLoading = false, events = defaultEventPreviews.filter { it.place.lowercase() == "online" }.map { PreviewEventHolder(it) })
     )
 }
