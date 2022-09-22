@@ -233,7 +233,7 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
         else
             "${this.city}, ${this.location?:""}",
         description = this.shortDescription,
-        isFree = tickets,
+        isFree = !tickets,
         categoriesDrawablesId = categories.map { it.iconDrawableId },
         organisation = OrganisationItemForPreview(tittle = organization)
     )

@@ -17,6 +17,8 @@ interface EventsService {
         @Query("Start") startTime: String? = null,
         @Query("End") endTime: String? = null,
         @Query("IsRegistration") isRegistration: Boolean? = null,
+        @Query("Tickets") tickets: Boolean? = null,
+        @Query("Text") textSearch: String? = null
     ): Response<EventsResponse>
 
     @GET("api/Events/getbyid/{id}")

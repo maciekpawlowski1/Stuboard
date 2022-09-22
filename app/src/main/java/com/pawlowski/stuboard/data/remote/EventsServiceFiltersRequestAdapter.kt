@@ -14,17 +14,15 @@ class EventsServiceFiltersRequestAdapter @Inject constructor(
         filters: List<FilterModel>
     ): Response<EventsResponse> {
         val isOnlineSelected = filters.filterIsInstance<FilterModel.Place.Online>().isNotEmpty()
-        val isRealPlaceSelected = filters.filterIsInstance<FilterModel.Place.RealPlace>().isNotEmpty()
-        val isOnline = if(isOnlineSelected && !isRealPlaceSelected)
-            true
-        else if(!isOnlineSelected && isRealPlaceSelected)
-            false
-        else
-            null
 
         val selectedRegistrationItems = filters.filterIsInstance<FilterModel.Registration>()
         val isRegistration = if(selectedRegistrationItems.isNotEmpty())
-            selectedRegistrationItems.filterIsInstance<FilterModel.Registration.RegistrationNeeded>().isNotEmpty()
+        {
+            val single = selectedRegistrationItems.singleOrNull()
+            single?.let {
+                it is FilterModel.Registration.RegistrationNeeded
+            }
+        }
         else
             null
 
@@ -38,14 +36,29 @@ class EventsServiceFiltersRequestAdapter @Inject constructor(
             }.toString()
         }
 
+        val tickets = filters
+            .filterIsInstance<FilterModel.EntryPrice>()
+            .map {
+                it is FilterModel.EntryPrice.Paid
+            }
+            .singleOrNull()
+
+        val textFilter = filters.filterIsInstance<FilterModel.CustomTextFilter>()
+            .map { it.customText }
+            .firstOrNull()
+
         return eventsService.loadItems(
             page = page,
             pageSize = pageSize,
-            isOnline = isOnline,
-            citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }.ifEmpty { null },
-            tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }.ifEmpty { null },
+            isOnline = isOnlineSelected,
+            citiesFilters = filters.filterIsInstance<FilterModel.Place.RealPlace>().map { it.city }
+                .ifEmpty { null },
+            tagsFiltersIds = filters.filterIsInstance<FilterModel.Category>().map { it.categoryId }
+                .ifEmpty { null },
             isRegistration = isRegistration,
-            endTime = maxTimeFilterString
+            endTime = maxTimeFilterString,
+            tickets = tickets,
+            textSearch = textFilter
         )
     }
 }
