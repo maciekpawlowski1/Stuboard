@@ -4,6 +4,8 @@ package com.pawlowski.stuboard.data.remote.models
 import com.google.gson.annotations.SerializedName
 
 data class EventAddModel(
+    @SerializedName("id")
+    val id: String? = null,
     @SerializedName("background")
     val background: String?,
     @SerializedName("city")
@@ -25,7 +27,7 @@ data class EventAddModel(
     @SerializedName("online")
     val online: Boolean,
     @SerializedName("organization")
-    val organization: String? = null,
+    val organization: String,
     @SerializedName("registration")
     val registration: Boolean,
     @SerializedName("shortDescription")

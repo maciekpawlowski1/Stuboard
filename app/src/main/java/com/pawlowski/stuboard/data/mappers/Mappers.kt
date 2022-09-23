@@ -286,7 +286,8 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             location = placeName.ifEmpty { streetAndNumber },
             organization = organisationId?.let {
                 OrganisationHandler.getExistingOrganisationById(it)?.tittle
-            }?:customOrganisationTittle?:""
+            }?:customOrganisationTittle?:"",
+            id = remoteEventId
         )
     }
     catch (e: Exception)

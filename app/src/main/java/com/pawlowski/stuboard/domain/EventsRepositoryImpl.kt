@@ -27,6 +27,7 @@ import com.pawlowski.stuboard.ui.models.PreviewEventHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import retrofit2.Response
+import java.util.*
 import javax.inject.Inject
 
 class EventsRepositoryImpl @Inject constructor(
@@ -197,13 +198,15 @@ class EventsRepositoryImpl @Inject constructor(
                 if(downloadImageResult is Resource.Success)
                 {
                     val downloadUrl = downloadImageResult.data!!
-                    val newEvent = event.copy(imageUrl = downloadUrl)
+                    val newEvent = event.copy(imageUrl = downloadUrl, remoteEventId = event.remoteEventId?:UUID.randomUUID().toString())
+                    eventsDao.upsertEvent(newEvent)
                     val token = authManager.getApiToken()!!
                     val eventAddModel = newEvent.toEventAddModel()!!
                     println(Gson().toJson(eventAddModel))
-                    val response = eventsService.addNewEvent(eventAddModel, token = "Bearer $token")
+                    val response = eventsService.addNewEvent(eventAddModel.copy(), token = "Bearer $token")
                     if(response.isSuccessful)
                     {
+                        println("New event id: ${response.body()!!}")
                         eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1, remoteEventId = response.body()!!))
                         println("Success of adding event")
                         Resource.Success(true)
@@ -233,7 +236,7 @@ class EventsRepositoryImpl @Inject constructor(
                     val result = eventsService.deleteEvent(event.remoteEventId, "Bearer ${authManager.getApiToken()}")
                     if(result.isSuccessful)
                     {
-                        eventsDao.upsertEvent(event.copy(remoteEventId = null, publishingStatus = 0))
+                        eventsDao.upsertEvent(event.copy(publishingStatus = 0))
                         Resource.Success(Unit)
                     }
                     else
