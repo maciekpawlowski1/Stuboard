@@ -143,10 +143,16 @@ fun HomeScreen(
                 EventsRow(
                     eventItemsForPreview = it.events.mapNotNull { previewHolder ->
                         previewHolder.eventWithLocation?.toEventItemForPreview() ?:previewHolder.eventWithoutLocation
+                    }.ifEmpty { if(it.isLoading)
+                        listOf()
+                      else
+                        null
                     },
-                    isLoading = it.isLoading)
+                    isLoading = it.isLoading
+                )
                 { eventId ->
-                    onNavigateToEventDetailScreen.invoke(eventId)
+                    if(eventId.isNotEmpty())
+                        onNavigateToEventDetailScreen.invoke(eventId)
                 }
             }
 
@@ -369,13 +375,13 @@ fun EventCard(
 @Composable
 fun EventsRow(
     modifier: Modifier = Modifier,
-    eventItemsForPreview: List<EventItemForPreview>,
+    eventItemsForPreview: List<EventItemForPreview>?,
     isLoading: Boolean = false,
     onEventCardClick: (eventId: String) -> Unit
 ) {
-    val eventsToDisplay = remember(eventItemsForPreview) {
+    val eventsToDisplay = remember(eventItemsForPreview, isLoading) {
         //If empty, generates empty event to display loading effect
-        eventItemsForPreview.ifEmpty {
+        eventItemsForPreview?.ifEmpty {
             listOf(
                 EventItemForPreview(),
                 EventItemForPreview(),
@@ -385,17 +391,20 @@ fun EventsRow(
     }
     LazyRow(modifier = modifier)
     {
-        items(eventsToDisplay)
-        {
-            EventCard(
-                modifier = Modifier.padding(start = 10.dp),
-                eventItemForPreview = it,
-                isLoading = isLoading
-            )
+        eventsToDisplay?.let {
+            items(eventsToDisplay)
             {
-                onEventCardClick.invoke(it.eventId)
+                EventCard(
+                    modifier = Modifier.padding(start = 10.dp),
+                    eventItemForPreview = it,
+                    isLoading = isLoading
+                )
+                {
+                    onEventCardClick.invoke(it.eventId)
+                }
             }
         }
+
     }
 }
 
