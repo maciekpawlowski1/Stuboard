@@ -198,7 +198,7 @@ class EventsRepositoryImpl @Inject constructor(
                 if(downloadImageResult is Resource.Success)
                 {
                     val downloadUrl = downloadImageResult.data!!
-                    val newEvent = event.copy(imageUrl = downloadUrl, remoteEventId = event.remoteEventId?:UUID.randomUUID().toString())
+                    val newEvent = event.copy(imageUrl = downloadUrl, remoteEventId = event.remoteEventId?:(UUID.randomUUID().toString()))
                     eventsDao.upsertEvent(newEvent)
                     val token = authManager.getApiToken()!!
                     val eventAddModel = newEvent.toEventAddModel()!!

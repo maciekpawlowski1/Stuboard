@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
@@ -26,16 +27,20 @@ class MyEventsViewModel @Inject constructor(
 
 
     private fun observeMyEvents() = intent(registerIdling = false) {
-        getAllEditingEventsUseCase().collectLatest {
-            reduce {
-                MyEventsUiState.Success(it.associate {
-                    Pair(
-                        it.toEventItemForPreview(),
-                        it.publishingStatus.toPublishingStatus()
-                    )
-                })
+        repeatOnSubscription {
+            getAllEditingEventsUseCase().collectLatest {
+                it.forEach { println(it.toString()) }
+                reduce {
+                    MyEventsUiState.Success(it.associate {
+                        Pair(
+                            it.toEventItemForPreview(),
+                            it.publishingStatus.toPublishingStatus()
+                        )
+                    })
+                }
             }
         }
+
     }
 
     private fun refreshMyEvents() = intent {
