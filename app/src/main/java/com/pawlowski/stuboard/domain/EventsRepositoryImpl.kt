@@ -206,7 +206,6 @@ class EventsRepositoryImpl @Inject constructor(
                     val response = eventsService.addNewEvent(eventAddModel.copy(), token = "Bearer $token")
                     if(response.isSuccessful)
                     {
-                        println("New event id: ${response.body()!!}")
                         eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1, remoteEventId = response.body()!!))
                         println("Success of adding event")
                         Resource.Success(true)

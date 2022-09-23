@@ -39,10 +39,10 @@ class ValidateEditEventUseCase @Inject constructor() {
         {
             Pair(ValidationResult(false, UiText.StaticText("Przynajmniej jedna główna kategoria jest wymagana!")), EditEventScreenType.SECOND)
         }
-        else if(!editEventUiState.categories[FilterType.ACCESS].isSomethingSelected())
+/*        else if(!editEventUiState.categories[FilterType.ACCESS].isSomethingSelected())
         {
             Pair(ValidationResult(false, UiText.StaticText("Nie wybrano elementu w kategorii dostępu!")), EditEventScreenType.SECOND)
-        }
+        }*/
         else if(!editEventUiState.categories[FilterType.REGISTRATION].isSomethingSelected())
         {
             Pair(ValidationResult(false, UiText.StaticText("Nie wybrano elementu w kategorii rejestracja!")), EditEventScreenType.SECOND)

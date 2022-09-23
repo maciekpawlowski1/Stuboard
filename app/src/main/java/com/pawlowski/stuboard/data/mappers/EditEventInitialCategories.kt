@@ -13,10 +13,10 @@ object EditEventInitialCategories {
                 Pair(CategoryHandler.getCategoryById(3), false),
                 Pair(CategoryHandler.getCategoryById(4), false),
             )),
-            Pair(FilterType.ACCESS, mapOf(
+/*            Pair(FilterType.ACCESS, mapOf(
                 Pair(FilterModel.Access.EVERYBODY, false),
                 Pair(FilterModel.Access.PROTECTED, false)
-            )),
+            )),*/
             Pair(FilterType.REGISTRATION, mapOf(
                 Pair(FilterModel.Registration.NoRegistrationNeeded, false),
                 Pair(FilterModel.Registration.RegistrationNeeded, false)
@@ -25,10 +25,10 @@ object EditEventInitialCategories {
                 Pair(FilterModel.EntryPrice.Free, false),
                 Pair(FilterModel.EntryPrice.Paid,false)
             )),
-            Pair(FilterType.OTHER, mapOf(
+/*            Pair(FilterType.OTHER, mapOf(
                 Pair(FilterModel.Other.Outside, false),
                 Pair(FilterModel.Other.Inside, false)
-            ))
+            ))*/
 
         )
     }

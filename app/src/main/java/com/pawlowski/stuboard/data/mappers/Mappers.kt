@@ -139,6 +139,7 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
         listOf(priceFilter)
     ).flatMap(List<FilterModel>::toList)
 
+    val selectedOrganisation = OrganisationHandler.getOrganisationByTittle(organization)
 
     return FullEventEntity(
         id = 0,
@@ -160,7 +161,15 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
             2
         else
             1,
-        filtersJson = allFilters.toJson(Gson())
+        filtersJson = allFilters.toJson(Gson()),
+        organisationId = if(selectedOrganisation is Organisation.Existing)
+            selectedOrganisation.id
+        else
+            -1,
+        customOrganisationTittle = if(selectedOrganisation is Organisation.Custom)
+            selectedOrganisation.tittle
+        else
+            null,
     )
 }
 
@@ -264,7 +273,9 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             Tag(id = category.categoryId, name = category.tittle)
         }
 
-
+        val organisation = organisationId?.let {
+            OrganisationHandler.getExistingOrganisationById(it)?.tittle
+        }?:customOrganisationTittle?:"" //TODO
 
         EventAddModel(
             name = tittle,
@@ -284,9 +295,7 @@ fun FullEventEntity.toEventAddModel(): EventAddModel?
             language = "Not specified", //TODO: Add selecting language
             city = city,
             location = placeName.ifEmpty { streetAndNumber },
-            organization = organisationId?.let {
-                OrganisationHandler.getExistingOrganisationById(it)?.tittle
-            }?:customOrganisationTittle?:"",
+            organization = organisation,
             id = remoteEventId
         )
     }
