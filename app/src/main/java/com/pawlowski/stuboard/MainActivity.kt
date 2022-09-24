@@ -3,16 +3,30 @@ package com.pawlowski.stuboard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
+import com.pawlowski.stuboard.presentation.activity.AppLoginState
+import com.pawlowski.stuboard.presentation.activity.MainViewModel
+import com.pawlowski.stuboard.ui.navigation.LoginRootComposable
+import com.pawlowski.stuboard.ui.navigation.RootComposable
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val activityViewModel by viewModels<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -22,22 +36,23 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+
+                    val startingLoginState by remember {
+                        mutableStateOf(activityViewModel.getLoginState())
+                    }
+                    LoginRootComposable(startingLoginState)
+                    //RootComposable()
+
                 }
             }
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
+        try {
+            val apiKey: String = System.getenv("APP_CENTER_KEY")?:getString(R.string.appCenterKey)
+            AppCenter.start(application, apiKey, Analytics::class.java, Crashes::class.java)
+        }
+        catch (e: Exception)
+        {}
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StuboardTheme {
-        Greeting("Android")
     }
 }

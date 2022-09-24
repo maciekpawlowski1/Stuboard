@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stuboard</string>
+    <string name="home">Home</string>
+    <string name="search">Szukaj</string>
+    <string name="search_for_events">Szukaj wydarzeń</string>
+    <string name="email_cannot_be_empty">To pole jest wymagane!</string>
+    <string name="email_is_incorrect">E-mail jest niepoprawny!</string>
+    <string name="password_cannot_be_empty">To pole jest wymagane!</string>
+    <string name="password_to_short">Hasło jest za krótkie!</string>
+    <string name="password_is_to_weak">Hasło jest za słabe!</string>
+    <string name="field_is_required">This field is required!</string>
+    <string name="passwords_are_not_the_same">Passwords are not the same!</string>
+    <string name="input_to_short">Your input is to short!</string>
+    <string name="account">Account</string>
+
+
+</resources>
