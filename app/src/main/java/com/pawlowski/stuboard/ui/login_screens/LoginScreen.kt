@@ -256,7 +256,9 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalDividerWithLabelInTheMiddle()
         Spacer(modifier = Modifier.height(10.dp))
-        ContinueAnonymousButton()
+        ContinueAnonymousButton(onClick = {
+            Toast.makeText(context, "Logowanie anonimowe będzie dostępne wkrótce!", Toast.LENGTH_LONG).show()
+        })
         Spacer(modifier = Modifier.height(10.dp))
 
 
@@ -336,14 +338,14 @@ fun LogInByGoogleButton(onClick: () -> Unit)
 }
 
 @Composable
-fun ContinueAnonymousButton()
+fun ContinueAnonymousButton(onClick: () -> Unit = {})
 {
     OutlinedButton(
         modifier = Modifier
             .padding(horizontal = 15.dp)
             .height(36.dp)
             .fillMaxWidth(),
-        onClick = { /*TODO*/ }
+        onClick = { onClick() }
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
