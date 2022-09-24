@@ -90,15 +90,18 @@ fun offsetDateTimeStringToLocalLong(offsetDateTimeString: String?): Long?
 fun EventsResponseItem.toEventItemForPreview(): EventItemForPreview {
     val dateString = offsetDateTimeStringToLocalFormattedTimeStringForPreview(this.startDate, this.endDate)
 
+    val place= if(this.online)
+        "Online"
+    else if(!location.isNullOrEmpty())
+        "${this.city}, ${this.location}"
+    else city
+
     return EventItemForPreview(
         eventId = id,
         tittle = this.name,
         imageUrl = this.thumbnail,
         dateDisplayString = dateString,
-        place = if(this.online)
-            "Online"
-        else
-            "${this.city}, ${this.location?:""}",
+        place = place,
     )
 }
 
@@ -190,7 +193,10 @@ fun EventsResponseItem.toEventItemForMapScreen(): EventItemForPreviewWithLocatio
     return EventItemForPreviewWithLocation(
         eventId = id,
         tittle = name,
-        place = "${this.city}, ${this.location?:""}",
+        place = if(!location.isNullOrEmpty())
+            "${this.city}, ${this.location}"
+        else
+            city,
         dateDisplayString = offsetDateTimeStringToLocalFormattedTimeStringForPreview(startDate, endDate),
         position = LatLng(latitude, longitude),
         imageUrl = thumbnail,
@@ -238,8 +244,10 @@ fun EventsResponseItem.toEventItemWithDetails(): EventItemWithDetails {
         hourDisplay = hoursText,
         place = if(this.online)
             "Online"
+        else if(!location.isNullOrEmpty())
+            "${this.city}, ${this.location}"
         else
-            "${this.city}, ${this.location?:""}",
+            city,
         description = this.shortDescription,
         isFree = !tickets,
         categoriesDrawablesId = categories.map { it.iconDrawableId },
@@ -254,8 +262,9 @@ fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
         tittle = tittle.ifEmpty { "Bez nazwy" },
         place = if(isOnline)
             "Online"
-        else
-            "$city, ${placeName.ifEmpty { streetAndNumber }}",
+        else if(placeName.isNotEmpty() || streetAndNumber.isNotEmpty())
+            "$city, ${placeName.ifEmpty { streetAndNumber }}"
+        else city,
         isFree = isFree(),
         imageUrl = imageUrl?:"",
         dateDisplayString = if(sinceTime != null && toTime != null)
