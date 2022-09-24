@@ -140,7 +140,6 @@ fun EventsResponseItem.toFullEventEntity(): FullEventEntity?
     ).flatMap(List<FilterModel>::toList)
 
     val selectedOrganisation = OrganisationHandler.getOrganisationByTittle(organization)
-
     return FullEventEntity(
         id = 0,
         tittle = name,
@@ -253,7 +252,10 @@ fun FullEventEntity.toEventItemForPreview(): EventItemForPreview
     return EventItemForPreview(
         eventId = id.toString(),
         tittle = tittle.ifEmpty { "Bez nazwy" },
-        place = "$city, ${placeName.ifEmpty { streetAndNumber }}",
+        place = if(isOnline)
+            "Online"
+        else
+            "$city, ${placeName.ifEmpty { streetAndNumber }}",
         isFree = isFree(),
         imageUrl = imageUrl?:"",
         dateDisplayString = if(sinceTime != null && toTime != null)
