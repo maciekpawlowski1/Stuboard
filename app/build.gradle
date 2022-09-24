@@ -118,8 +118,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     //App Center
-    implementation "com.microsoft.appcenter:appcenter-analytics:$appCenterSdkVersion"
-    implementation "com.microsoft.appcenter:appcenter-crashes:$appCenterSdkVersion"
+    //implementation "com.microsoft.appcenter:appcenter-analytics:$appCenterSdkVersion"
+    //implementation "com.microsoft.appcenter:appcenter-crashes:$appCenterSdkVersion"
 
     //Google Maps
     implementation "com.google.maps.android:maps-compose:2.7.0"

@@ -7,18 +7,12 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
-import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import com.pawlowski.stuboard.presentation.activity.MainViewModel
 import com.pawlowski.stuboard.ui.navigation.LoginRootComposable
-import com.pawlowski.stuboard.ui.navigation.RootComposable
 import com.pawlowski.stuboard.ui.theme.StuboardTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,12 +41,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        try {
+/*        try {
             val apiKey: String = System.getenv("APP_CENTER_KEY")?:getString(R.string.appCenterKey)
             AppCenter.start(application, apiKey, Analytics::class.java, Crashes::class.java)
         }
         catch (e: Exception)
-        {}
+        {}*/
 
     }
 }
