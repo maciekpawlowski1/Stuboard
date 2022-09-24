@@ -3,6 +3,7 @@ package com.pawlowski.stuboard
 import org.junit.Test
 
 import org.junit.Assert.*
+import java.time.OffsetDateTime
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,6 +13,10 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+//        val time = OffsetDateTime.parse("2022-10-17T21:23:09.906+00:00")
+//        println(time.toString())
+//        val offset = OffsetDateTime.now().offset
+//        println(time.withOffsetSameInstant(offset))
+        //println(offset)
     }
 }

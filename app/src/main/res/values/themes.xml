@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Stuboard" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/purple_700</item>
+    <style name="Theme.Stuboard" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/green</item>
+        <item name="md_color_button_text">@color/green</item>
     </style>
 </resources>
