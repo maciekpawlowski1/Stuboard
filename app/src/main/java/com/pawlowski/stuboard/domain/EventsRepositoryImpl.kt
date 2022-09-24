@@ -138,7 +138,7 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForPreviewWithLocation>> {
         return try {
-            //println(authManager.getApiToken())
+            println(authManager.getApiToken())
 
             val result = eventsServiceFiltersRequestAdapter.loadItems(
                 page = 1,
@@ -164,7 +164,16 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun saveEditingEvent(editEventUiState: EditEventUiState): Long {
         return withContext(Dispatchers.IO) {
-            eventsDao.upsertEvent(editEventUiState.toFullEventEntity())
+            val eventRemoteKey: String = try {
+                eventsDao.getEvent(editEventUiState.eventId).remoteEventId
+            }
+            catch (e: Exception)
+            {
+                ensureActive()
+                UUID.randomUUID().toString()
+            }
+
+            eventsDao.upsertEvent(editEventUiState.toFullEventEntity(eventRemoteKey))
         }
     }
 
@@ -198,7 +207,7 @@ class EventsRepositoryImpl @Inject constructor(
                 if(downloadImageResult is Resource.Success)
                 {
                     val downloadUrl = downloadImageResult.data!!
-                    val newEvent = event.copy(imageUrl = downloadUrl, remoteEventId = event.remoteEventId?:(UUID.randomUUID().toString()))
+                    val newEvent = event.copy(imageUrl = downloadUrl, remoteEventId = event.remoteEventId)
                     eventsDao.upsertEvent(newEvent)
                     val token = authManager.getApiToken()!!
                     val eventAddModel = newEvent.toEventAddModel()!!
@@ -230,19 +239,15 @@ class EventsRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val event = eventsDao.getEvent(eventId)
-                if(event.remoteEventId != null)
+                val result = eventsService.deleteEvent(event.remoteEventId, "Bearer ${authManager.getApiToken()}")
+                if(result.isSuccessful)
                 {
-                    val result = eventsService.deleteEvent(event.remoteEventId, "Bearer ${authManager.getApiToken()}")
-                    if(result.isSuccessful)
-                    {
-                        eventsDao.upsertEvent(event.copy(publishingStatus = 0))
-                        Resource.Success(Unit)
-                    }
-                    else
-                        Resource.Error(UiText.StaticText(result.message()))
+                    eventsDao.upsertEvent(event.copy(publishingStatus = 0))
+                    Resource.Success(Unit)
                 }
                 else
-                    Resource.Error(UiText.StaticText(""))
+                    Resource.Error(UiText.StaticText(result.message()))
+
             }catch (e: Exception)
             {
                 e.printStackTrace()
@@ -266,11 +271,11 @@ class EventsRepositoryImpl @Inject constructor(
                     currentEvents.forEach {
                         if(!myEventsRemoteKeys.contains(it.remoteEventId))
                         {
-                            eventsDao.upsertEvent(it.copy(publishingStatus = 0, remoteEventId = null))
+                            eventsDao.upsertEvent(it.copy(publishingStatus = 0))
                         }
                     }
                     myEvents.forEach {
-                        eventsDao.upsertEvent(it.copy(id = idsMap.getOrDefault(it.remoteEventId!!, 0)))
+                        eventsDao.upsertEvent(it.copy(id = idsMap.getOrDefault(it.remoteEventId, 0)))
                     }
                 }
                 Resource.Success(Unit)

@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,7 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
 {
     val uiState = viewModel.container.stateFlow.collectAsState()
 
+    val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { event ->
             when(event)
@@ -69,6 +72,12 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
             viewModel.signOut()
         }, onMyEventsClick = {
             viewModel.myEventsClick()
+        },
+        onMyAccountClick = {
+            Toast.makeText(context, "Ekran mojego konta będzie dostępny wkrótce!", Toast.LENGTH_LONG).show()
+        },
+        onMyPreferencesClick = {
+            Toast.makeText(context, "Ekran moje preferencje będzie dostępny wkrótce!", Toast.LENGTH_LONG).show()
         })
 
 
@@ -77,7 +86,13 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
 }
 
 @Composable
-fun OptionsCard(modifier: Modifier = Modifier, onMyEventsClick: () -> Unit, onLogOutClick: () -> Unit)
+fun OptionsCard(
+    modifier: Modifier = Modifier,
+    onMyEventsClick: () -> Unit,
+    onMyAccountClick: () -> Unit,
+    onMyPreferencesClick: () -> Unit,
+    onLogOutClick: () -> Unit
+)
 {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -94,7 +109,7 @@ fun OptionsCard(modifier: Modifier = Modifier, onMyEventsClick: () -> Unit, onLo
                 tittle = "Moje konto",
                 label = "Dokonaj zmian na swoim koncie"
             ) {
-
+                onMyAccountClick()
             }
 
             OptionRow(
@@ -112,7 +127,7 @@ fun OptionsCard(modifier: Modifier = Modifier, onMyEventsClick: () -> Unit, onLo
                 tittle = "Moje preferencje",
                 label = "Dokonaj zmian w swoich preferencjach"
             ) {
-
+                onMyPreferencesClick()
             }
 
             OptionRow(

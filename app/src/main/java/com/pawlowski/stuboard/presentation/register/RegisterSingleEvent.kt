@@ -8,5 +8,6 @@ sealed interface RegisterSingleEvent: SingleEvent
     object NavigateBack: RegisterSingleEvent
     object RegisterSuccess: RegisterSingleEvent
     data class RegisterFailure(val errorMessage: UiText): RegisterSingleEvent
+    data class ShowToast(val message: UiText) : RegisterSingleEvent
 
 }

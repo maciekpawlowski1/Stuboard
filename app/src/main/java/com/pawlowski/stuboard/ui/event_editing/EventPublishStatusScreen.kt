@@ -47,8 +47,7 @@ fun EventPublishStatusScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateBackToMyEvents: () -> Unit = {},
     viewModel: IEventStatusViewModel = hiltViewModel<EventStatusViewModel>()
-)
-{
+) {
 
     BackHandler {
         viewModel.onBackPressed()
@@ -67,7 +66,7 @@ fun EventPublishStatusScreen(
     val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { event ->
-            when(event) {
+            when (event) {
                 is EventStatusSingleEvent.ShowErrorToast -> {
                     Toast.makeText(context, event.text.asString(context), Toast.LENGTH_LONG).show()
                 }
@@ -81,16 +80,20 @@ fun EventPublishStatusScreen(
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState()),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(5.dp))
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart)
         {
             IconButton(onClick = { viewModel.onBackPressed() }) {
-                Icon(painter = painterResource(id = R.drawable.arrow_back2_icon), contentDescription = "")
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_back2_icon),
+                    contentDescription = ""
+                )
             }
             Text(
                 modifier = Modifier.align(Alignment.Center),
@@ -105,14 +108,14 @@ fun EventPublishStatusScreen(
         StatusCard(
             modifier = Modifier
                 .padding(horizontal = 15.dp),
-            statusColor = when(publishStateValue) {
+            statusColor = when (publishStateValue) {
                 EventPublishState.EDITING -> Orange
                 EventPublishState.WAITING_TO_PUBLISH -> Color.Yellow
                 EventPublishState.PUBLISHED -> Green
                 EventPublishState.CANCELED -> Color.Red
                 else -> LightGray
-                                                  },
-            statusText = when(publishStateValue) {
+            },
+            statusText = when (publishStateValue) {
                 EventPublishState.EDITING -> "Wydarzenie jest w trakcie edycji"
                 EventPublishState.WAITING_TO_PUBLISH -> "Wydarzenie czeka na akceptację"
                 EventPublishState.PUBLISHED -> "Wydarzenie jest opublikowane"
@@ -128,8 +131,7 @@ fun EventPublishStatusScreen(
         )
 
         Spacer(modifier = Modifier.height(20.dp))
-        if(isRequestInProgressState.value)
-        {
+        if (isRequestInProgressState.value) {
             CircularProgressIndicator(color = Green, modifier = Modifier.size(40.dp))
         }
         Spacer(modifier = Modifier.height(30.dp))
@@ -140,27 +142,46 @@ fun EventPublishStatusScreen(
             fontSize = 14.sp
         )
         Spacer(modifier = Modifier.height(15.dp))
-        EventCard(eventItemForPreview = eventPreviewState.value?: EventItemForPreview(), isLoading = eventPreviewState.value == null)
+        EventCard(
+            eventItemForPreview = eventPreviewState.value ?: EventItemForPreview(),
+            isLoading = eventPreviewState.value == null
+        )
     }
 }
 
 @Composable
-fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: String, showPublishButton: Boolean, isLoading: Boolean = false, onPublishClick: () -> Unit = {}, isRequestInProgress: () -> Boolean = {false}, showCancelButton: () -> Boolean = {false}, onCancelClick: () -> Unit = {})
-{
-    Card(modifier = modifier
-        .fillMaxWidth()
-        .height(105.dp), shape = RectangleShape, elevation = 7.dp) {
+fun StatusCard(
+    modifier: Modifier = Modifier,
+    statusColor: Color,
+    statusText: String,
+    showPublishButton: Boolean,
+    isLoading: Boolean = false,
+    onPublishClick: () -> Unit = {},
+    isRequestInProgress: () -> Boolean = { false },
+    showCancelButton: () -> Boolean = { false },
+    onCancelClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(105.dp), shape = RectangleShape, elevation = 7.dp
+    ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
         {
-            Row(modifier = Modifier.fillMaxWidth(0.9f), verticalAlignment = Alignment.CenterVertically) {
-                Card(shape = CircleShape, modifier = Modifier
-                    .size(50.dp)
-                    .myLoadingEffect(isLoading), backgroundColor = statusColor) {
+            Row(
+                modifier = Modifier.fillMaxWidth(0.9f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Card(
+                    shape = CircleShape, modifier = Modifier
+                        .size(50.dp)
+                        .myLoadingEffect(isLoading), backgroundColor = statusColor
+                ) {
 
                 }
                 Spacer(modifier = Modifier.width(15.dp))
                 Text(
-                    modifier= Modifier
+                    modifier = Modifier
                         .padding(end = 10.dp)
                         .fillMaxWidth()
                         .myLoadingEffect(isLoading),
@@ -171,15 +192,18 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
                 )
             }
 
-            if(!isLoading && showPublishButton && !isRequestInProgress())
-            {
-                TextButton(modifier = Modifier.align(Alignment.BottomEnd),onClick = { onPublishClick() }) {
+            if (!isLoading && showPublishButton && !isRequestInProgress()) {
+                TextButton(
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                    enabled = !isLoading,
+                    onClick = { onPublishClick() }) {
                     Text(text = "Opublikuj", color = Green)
                 }
-            }
-            else if(!isLoading && showCancelButton() && !isRequestInProgress())
-            {
-                TextButton(modifier = Modifier.align(Alignment.BottomEnd),onClick = { onCancelClick() }) {
+            } else if (!isLoading && showCancelButton() && !isRequestInProgress()) {
+                TextButton(
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                    enabled = !isLoading,
+                    onClick = { onCancelClick() }) {
                     Text(text = "Anuluj wydarzenie", color = Color.Red)
                 }
             }
@@ -190,27 +214,27 @@ fun StatusCard(modifier: Modifier = Modifier, statusColor: Color, statusText: St
 @OptIn(OrbitInternal::class)
 @Preview(showBackground = true)
 @Composable
-fun EventPublishStatusScreenPreview()
-{
+fun EventPublishStatusScreenPreview() {
     EventPublishStatusScreen(viewModel = object : IEventStatusViewModel {
         override fun publishEvent() {}
         override fun onBackPressed() {}
         override fun cancelEvent() {}
 
-        override val container: Container<EventStatusUiState, EventStatusSingleEvent> = object : Container<EventStatusUiState, EventStatusSingleEvent> {
-            override val settings: Container.Settings
-                get() = TODO("Not yet implemented")
-            override val sideEffectFlow: Flow<EventStatusSingleEvent>
-                get() = TODO("Not yet implemented")
-            override val stateFlow: StateFlow<EventStatusUiState> = MutableStateFlow(
-                EventStatusUiState(publishState = EventPublishState.EDITING)
-            )
+        override val container: Container<EventStatusUiState, EventStatusSingleEvent> =
+            object : Container<EventStatusUiState, EventStatusSingleEvent> {
+                override val settings: Container.Settings
+                    get() = TODO("Not yet implemented")
+                override val sideEffectFlow: Flow<EventStatusSingleEvent>
+                    get() = TODO("Not yet implemented")
+                override val stateFlow: StateFlow<EventStatusUiState> = MutableStateFlow(
+                    EventStatusUiState(publishState = EventPublishState.EDITING)
+                )
 
-            override suspend fun orbit(orbitIntent: suspend ContainerContext<EventStatusUiState, EventStatusSingleEvent>.() -> Unit) {
-                TODO("Not yet implemented")
+                override suspend fun orbit(orbitIntent: suspend ContainerContext<EventStatusUiState, EventStatusSingleEvent>.() -> Unit) {
+                    TODO("Not yet implemented")
+                }
+
             }
-
-        }
 
     })
 }

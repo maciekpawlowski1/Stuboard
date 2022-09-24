@@ -74,7 +74,7 @@ class RegisterMviProcessor @Inject constructor(
                             }
                         }
                         else{
-                            TODO()
+                            state
                         }
                     }
                     is RegisterIntent.ClearPasswordsInput -> {
@@ -159,6 +159,13 @@ class RegisterMviProcessor @Inject constructor(
                     RegisterIntent.StopShowingLoading
                 }
 
+            }
+            is RegisterIntent.NextClicked -> {
+                if(state.accountType == AccountType.STUDENT_ORGANISATION)
+                {
+                    triggerSingleEvent(RegisterSingleEvent.ShowToast(UiText.StaticText("Konta organizacji studenckiej będą dostępne wkrótce")))
+                }
+                null
             }
             else -> null
         }

@@ -221,6 +221,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
                 viewModel.login()
                 keyboardController?.hide()
                       },
+            enabled = !isLoadingState.value,
             colors = ButtonDefaults.buttonColors(backgroundColor = Green)) {
             Text(text = "Zaloguj się", color = Color.White)
         }

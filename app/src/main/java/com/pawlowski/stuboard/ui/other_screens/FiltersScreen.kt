@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.other_screens
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -17,6 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -61,6 +63,7 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
@@ -105,7 +108,10 @@ fun FiltersScreen(onNavigateBack: () -> Unit = {}, viewModel: IFiltersViewModel 
                         viewModel.onAction(FiltersScreenAction.AddNewFilter(it))
                     },
                     displaySeeMore = isSearchTextEmptyState.value,
-                    highlightedPart = { searchTextState.value }
+                    highlightedPart = { searchTextState.value },
+                    onSeeMoreClick = {
+                        Toast.makeText(context, "Więcej filtrów będzie dostępne wkrótce!", Toast.LENGTH_LONG).show()
+                    }
                 )
             }
 

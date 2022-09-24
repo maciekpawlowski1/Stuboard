@@ -27,5 +27,5 @@ data class EditEventUiState(
     val site: String = "",
     val facebookSite: String = "",
     val imageUrl: String? = null,
-    val publishingStatus: EventPublishState = EventPublishState.EDITING
+    val publishingStatus: EventPublishState = EventPublishState.EDITING,
 )

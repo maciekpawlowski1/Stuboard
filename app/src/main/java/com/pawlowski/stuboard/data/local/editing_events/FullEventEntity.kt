@@ -25,5 +25,5 @@ data class FullEventEntity(
     val facebookSite: String = "",
     val imageUrl: String?= null,
     val publishingStatus: Int = 0,
-    val remoteEventId: String? = null,
+    val remoteEventId: String,
 )

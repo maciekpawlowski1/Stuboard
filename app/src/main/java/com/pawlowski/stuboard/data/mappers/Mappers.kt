@@ -428,7 +428,7 @@ fun FullEventEntity.isFree(): Boolean
 
 }
 
-fun EditEventUiState.toFullEventEntity(): FullEventEntity
+fun EditEventUiState.toFullEventEntity(remoteEventId: String): FullEventEntity
 {
 
     val selectedFilters = categories.map {
@@ -477,7 +477,8 @@ fun EditEventUiState.toFullEventEntity(): FullEventEntity
         facebookSite = facebookSite,
         filtersJson = categoriesJson,
         imageUrl = imageUrl,
-        publishingStatus = publishingStatus.ordinal
+        publishingStatus = publishingStatus.ordinal,
+        remoteEventId = remoteEventId
     )
 }
 

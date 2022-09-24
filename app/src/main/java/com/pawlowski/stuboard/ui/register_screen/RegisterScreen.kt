@@ -43,6 +43,10 @@ fun RegisterScreen(
                 is RegisterSingleEvent.RegisterFailure -> {
                     Toast.makeText(context, event.errorMessage.asString(context), Toast.LENGTH_LONG).show()
                 }
+                is RegisterSingleEvent.ShowToast -> {
+                    Toast.makeText(context, event.message.asString(context), Toast.LENGTH_LONG).show()
+
+                }
             }
         }
     }
