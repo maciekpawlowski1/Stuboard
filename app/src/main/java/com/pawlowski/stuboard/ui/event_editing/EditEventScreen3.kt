@@ -1,5 +1,6 @@
 package com.pawlowski.stuboard.ui.event_editing
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -60,12 +62,13 @@ fun EditEventScreen3(
                 position = positionOnMap(),
                 markerRes = markerRes()
             )
+            val context = LocalContext.current
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 20.dp), onClick = {
                     //TODO: open location picker dialog
-
+                     Toast.makeText(context, "Opcja wyszukiwania na mapie będzie dostępna wkrótce!", Toast.LENGTH_SHORT).show()
                 }, backgroundColor = Green
             ) {
                 Icon(
