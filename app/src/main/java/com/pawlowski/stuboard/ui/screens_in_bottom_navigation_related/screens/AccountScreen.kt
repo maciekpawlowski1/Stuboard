@@ -21,17 +21,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.pawlowski.stuboard.R
+import com.pawlowski.stuboard.presentation.utils.MviPreviewViewModel
 import com.pawlowski.stuboard.presentation.account.AccountSingleEvent
 import com.pawlowski.stuboard.presentation.account.AccountUiSate
 import com.pawlowski.stuboard.presentation.account.AccountViewModel
 import com.pawlowski.stuboard.presentation.account.IAccountViewModel
 import com.pawlowski.stuboard.ui.theme.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.annotation.OrbitInternal
-import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
 fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEventsScreen: () -> Unit = {}, onNavigateToAdminPanel: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
@@ -277,23 +275,14 @@ fun AccountCard(
 @Composable
 private fun AccountScreenPreview()
 {
-    AccountScreen(viewModel = object : IAccountViewModel {
+    AccountScreen(viewModel = object: MviPreviewViewModel<AccountUiSate, AccountSingleEvent>(),
+        IAccountViewModel {
+        override fun stateForPreview(): StateFlow<AccountUiSate> {
+            return MutableStateFlow(AccountUiSate("Mariusz Kowalski", "kowalski@onet.pl"))
+        }
         override fun signOut() {}
         override fun myEventsClick() {}
         override fun adminPanelClick() {}
-
-        override val container: Container<AccountUiSate, AccountSingleEvent> = object :Container<AccountUiSate, AccountSingleEvent> {
-            override val settings: Container.Settings
-                get() = TODO("Not yet implemented")
-            override val sideEffectFlow: Flow<AccountSingleEvent>
-                get() = TODO("Not yet implemented")
-            override val stateFlow: StateFlow<AccountUiSate> = MutableStateFlow(AccountUiSate("Mariusz Kowalski", "kowalski@onet.pl"))
-
-            override suspend fun orbit(orbitIntent: suspend ContainerContext<AccountUiSate, AccountSingleEvent>.() -> Unit) {
-                TODO("Not yet implemented")
-            }
-
-        }
-
     })
+
 }
