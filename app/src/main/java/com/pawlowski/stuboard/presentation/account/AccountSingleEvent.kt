@@ -3,4 +3,5 @@ package com.pawlowski.stuboard.presentation.account
 sealed interface AccountSingleEvent {
     object NavigateToLogIn: AccountSingleEvent
     object NavigateToMyEventsScreen: AccountSingleEvent
+    object NavigateToAdminPanelScreen: AccountSingleEvent
 }

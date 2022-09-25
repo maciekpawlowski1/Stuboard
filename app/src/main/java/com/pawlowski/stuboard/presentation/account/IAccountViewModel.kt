@@ -5,4 +5,5 @@ import org.orbitmvi.orbit.ContainerHost
 interface IAccountViewModel: ContainerHost<AccountUiSate, AccountSingleEvent> {
     fun signOut()
     fun myEventsClick()
+    fun adminPanelClick()
 }

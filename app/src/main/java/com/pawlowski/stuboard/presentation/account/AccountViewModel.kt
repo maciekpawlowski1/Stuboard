@@ -36,6 +36,10 @@ class AccountViewModel @Inject constructor(
         postSideEffect(AccountSingleEvent.NavigateToMyEventsScreen)
     }
 
+    override fun adminPanelClick() = intent {
+        postSideEffect(AccountSingleEvent.NavigateToAdminPanelScreen)
+    }
+
     override fun signOut() = intent {
         signOutUseCase()
         postSideEffect(AccountSingleEvent.NavigateToLogIn)

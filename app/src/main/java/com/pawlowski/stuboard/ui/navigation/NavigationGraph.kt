@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.pawlowski.stuboard.ui.event_accepting.AdminEventAcceptingScreen
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreen
 import com.pawlowski.stuboard.ui.event_editing.EventPublishStatusScreen
 import com.pawlowski.stuboard.ui.event_editing.MyEventsScreen
@@ -104,6 +105,12 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
                 {
                     launchSingleTop = true
                 }
+            },
+            onNavigateToAdminPanel = {
+                navController.navigate(NavRoutes.ADMIN_EVENTS_ACCEPTING)
+                {
+                    launchSingleTop = true
+                }
             })
         }
 
@@ -158,6 +165,11 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
             onNavigateBackToMyEvents = {
                 navController.popBackStack(route= NavRoutes.MY_EVENTS, inclusive = false)
             })
+        }
+
+        composable(route = NavRoutes.ADMIN_EVENTS_ACCEPTING)
+        {
+            AdminEventAcceptingScreen()
         }
 
     }

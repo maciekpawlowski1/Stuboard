@@ -34,7 +34,7 @@ import org.orbitmvi.orbit.annotation.OrbitInternal
 import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
-fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEventsScreen: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
+fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEventsScreen: () -> Unit = {}, onNavigateToAdminPanel: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
 {
     val uiState = viewModel.container.stateFlow.collectAsState()
 
@@ -48,6 +48,9 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
                 }
                 is AccountSingleEvent.NavigateToMyEventsScreen -> {
                     onNavigateToMyEventsScreen()
+                }
+                AccountSingleEvent.NavigateToAdminPanelScreen -> {
+                    onNavigateToAdminPanel()
                 }
             }
         }
@@ -78,6 +81,9 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
         },
         onMyPreferencesClick = {
             Toast.makeText(context, "Ekran moje preferencje będzie dostępny wkrótce!", Toast.LENGTH_LONG).show()
+        },
+        onAdminPanelClick = {
+            viewModel.adminPanelClick()
         })
 
 
@@ -91,6 +97,7 @@ fun OptionsCard(
     onMyEventsClick: () -> Unit,
     onMyAccountClick: () -> Unit,
     onMyPreferencesClick: () -> Unit,
+    onAdminPanelClick: () -> Unit,
     onLogOutClick: () -> Unit
 )
 {
@@ -119,6 +126,18 @@ fun OptionsCard(
                 label = "Dodawaj własne wydarzenia"
             ) {
                 onMyEventsClick()
+            }
+
+            if(true) //TODO: Check is admin
+            {
+                OptionRow(
+                    padding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
+                    iconId = R.drawable.guitar_icon,
+                    tittle = "Akceptowanie wydarzeń",
+                    label = "Panel adminów"
+                ) {
+                    onAdminPanelClick()
+                }
             }
 
             OptionRow(
@@ -259,13 +278,9 @@ fun AccountCard(
 private fun AccountScreenPreview()
 {
     AccountScreen(viewModel = object : IAccountViewModel {
-        override fun signOut() {
-            TODO("Not yet implemented")
-        }
-
-        override fun myEventsClick() {
-            TODO("Not yet implemented")
-        }
+        override fun signOut() {}
+        override fun myEventsClick() {}
+        override fun adminPanelClick() {}
 
         override val container: Container<AccountUiSate, AccountSingleEvent> = object :Container<AccountUiSate, AccountSingleEvent> {
             override val settings: Container.Settings
