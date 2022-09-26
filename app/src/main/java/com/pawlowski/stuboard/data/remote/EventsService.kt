@@ -36,4 +36,11 @@ interface EventsService {
 
     @DELETE("api/Events/{id}")
     suspend fun deleteEvent(@Path("id") eventId: String, @Header("Authorization") token: String): Response<Unit>
+
+    @GET("api/Events/GetUnpublished")
+    suspend fun getEventsForAdminPanel(
+        @Query("PageNumber") page: Int = 1,
+        @Query("PageSize") pageSize: Int = 30,
+        @Header("Authorization") token: String,
+    ): Response<EventsResponse>
 }

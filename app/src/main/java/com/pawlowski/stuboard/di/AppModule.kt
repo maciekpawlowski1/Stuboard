@@ -279,4 +279,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getIsUserAdminUseCase(accountsRepository: IAccountsRepository) = GetIsUserAdminUseCase(accountsRepository::isUserAdmin)
+
+    @Singleton
+    @Provides
+    fun getEventsForAdminPanelUseCase(eventsRepository: EventsRepository) = GetEventsForAdminPanelUseCase(eventsRepository::getEventsForAdminPanel)
 }

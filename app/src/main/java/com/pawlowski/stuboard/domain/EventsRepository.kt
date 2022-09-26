@@ -25,4 +25,5 @@ interface EventsRepository {
     suspend fun publishEvent(eventId: Int): Resource<Boolean>
     suspend fun cancelEvent(eventId: Int): Resource<Unit>
     suspend fun refreshMyEvents(): Resource<Unit>
+    suspend fun getEventsForAdminPanel(): Flow<List<EventItemForPreview>>
 }

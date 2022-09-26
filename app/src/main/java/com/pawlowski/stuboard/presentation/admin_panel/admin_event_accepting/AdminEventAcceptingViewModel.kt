@@ -1,6 +1,7 @@
 package com.pawlowski.stuboard.presentation.admin_panel.admin_event_accepting
 
 import androidx.lifecycle.ViewModel
+import com.pawlowski.stuboard.presentation.use_cases.GetEventsForAdminPanelUseCase
 import com.pawlowski.stuboard.ui.utils.PreviewUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -12,17 +13,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminEventAcceptingViewModel @Inject constructor(
-
+    private val getEventsForAdminPanelUseCase: GetEventsForAdminPanelUseCase,
 ): IAdminEventAcceptingViewModel, ViewModel() {
     override val container: Container<AdminEventAcceptingUiState, AdminEventAcceptingSingleEvent> = container(
         AdminEventAcceptingUiState.Loading
     )
 
     private fun handleEventsLoad() = intent(registerIdling = false) {
-        delay(2000)
-        reduce {
-            AdminEventAcceptingUiState.Success(PreviewUtils.defaultEventPreviews)
+        getEventsForAdminPanelUseCase().collect {
+            reduce {
+                AdminEventAcceptingUiState.Success(it)
+            }
         }
+
     }
 
     init {

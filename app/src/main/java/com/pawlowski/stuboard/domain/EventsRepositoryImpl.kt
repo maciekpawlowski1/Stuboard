@@ -291,4 +291,33 @@ class EventsRepositoryImpl @Inject constructor(
             Resource.Error(UiText.StaticText(e.localizedMessage?:"Refreshing events error"))
         }
     }
+
+    override suspend fun getEventsForAdminPanel(): Flow<List<EventItemForPreview>> = channelFlow {
+        suspend fun fetchEvents(): List<EventItemForPreview>? {
+            val result = eventsService.getEventsForAdminPanel(token = "Bearer ${authManager.getApiToken()!!}")
+            return if(result.isSuccessful)
+            {
+                result.body()!!.toEventItemForPreviewList()
+            }
+            else
+            {
+                println(result.message())
+                null
+            }
+        }
+        try {
+            fetchEvents()?.let {
+                send(it)
+            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+            ensureActive()
+            fetchEvents()?.let {
+                send(it)
+            }
+        }
+
+    }
 }
