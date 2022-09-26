@@ -275,4 +275,8 @@ class AppModule {
     @Singleton
     @Provides
     fun refreshMyEventsUseCase(eventsRepository: EventsRepository) = RefreshMyEventsUseCase(eventsRepository::refreshMyEvents)
+
+    @Singleton
+    @Provides
+    fun getIsUserAdminUseCase(accountsRepository: IAccountsRepository) = GetIsUserAdminUseCase(accountsRepository::isUserAdmin)
 }

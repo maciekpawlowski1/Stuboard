@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,15 +33,19 @@ import kotlinx.coroutines.flow.StateFlow
 import org.orbitmvi.orbit.annotation.OrbitInternal
 
 @Composable
-fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEventsScreen: () -> Unit = {}, onNavigateToAdminPanel: () -> Unit = {}, viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>())
-{
+fun AccountScreen(
+    onNavigateToLoginScreen: () -> Unit = {},
+    onNavigateToMyEventsScreen: () -> Unit = {},
+    onNavigateToAdminPanel: () -> Unit = {},
+    viewModel: IAccountViewModel = hiltViewModel<AccountViewModel>()
+) {
     val uiState = viewModel.container.stateFlow.collectAsState()
+    val isAdminState = derivedStateOf { uiState.value.isAdmin }
 
     val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { event ->
-            when(event)
-            {
+            when (event) {
                 is AccountSingleEvent.NavigateToLogIn -> {
                     onNavigateToLoginScreen()
                 }
@@ -74,16 +79,26 @@ fun AccountScreen(onNavigateToLoginScreen: () -> Unit = {}, onNavigateToMyEvents
         }, onMyEventsClick = {
             viewModel.myEventsClick()
         },
-        onMyAccountClick = {
-            Toast.makeText(context, "Ekran mojego konta będzie dostępny wkrótce!", Toast.LENGTH_LONG).show()
-        },
-        onMyPreferencesClick = {
-            Toast.makeText(context, "Ekran moje preferencje będzie dostępny wkrótce!", Toast.LENGTH_LONG).show()
-        },
-        onAdminPanelClick = {
-            viewModel.adminPanelClick()
-        })
-
+            onMyAccountClick = {
+                Toast.makeText(
+                    context,
+                    "Ekran mojego konta będzie dostępny wkrótce!",
+                    Toast.LENGTH_LONG
+                ).show()
+            },
+            onMyPreferencesClick = {
+                Toast.makeText(
+                    context,
+                    "Ekran moje preferencje będzie dostępny wkrótce!",
+                    Toast.LENGTH_LONG
+                ).show()
+            },
+            showAdminPanel = {
+                 isAdminState.value == true
+            },
+            onAdminPanelClick = {
+                viewModel.adminPanelClick()
+            })
 
 
     }
@@ -95,13 +110,14 @@ fun OptionsCard(
     onMyEventsClick: () -> Unit,
     onMyAccountClick: () -> Unit,
     onMyPreferencesClick: () -> Unit,
+    showAdminPanel: () -> Boolean,
     onAdminPanelClick: () -> Unit,
     onLogOutClick: () -> Unit
-)
-{
-    Card(modifier = modifier
-        .fillMaxWidth()
-        .wrapContentHeight(),
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         elevation = 10.dp,
     ) {
         Column {
@@ -126,7 +142,7 @@ fun OptionsCard(
                 onMyEventsClick()
             }
 
-            if(true) //TODO: Check is admin
+            if (showAdminPanel())
             {
                 OptionRow(
                     padding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
@@ -162,8 +178,14 @@ fun OptionsCard(
 }
 
 @Composable
-fun OptionRow(modifier: Modifier = Modifier, padding: PaddingValues = PaddingValues(), iconId: Int, tittle: String, label: String, onClick: () -> Unit)
-{
+fun OptionRow(
+    modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(),
+    iconId: Int,
+    tittle: String,
+    label: String,
+    onClick: () -> Unit
+) {
     Row(modifier = modifier
         .clickable { onClick() }
         .padding(padding)
@@ -197,8 +219,7 @@ fun OptionRow(modifier: Modifier = Modifier, padding: PaddingValues = PaddingVal
                 fontWeight = FontWeight.Medium,
                 fontSize = 13.sp
             )
-            if(label.isNotEmpty())
-            {
+            if (label.isNotEmpty()) {
                 Text(
                     text = label,
                     fontFamily = montserratFont,
@@ -220,9 +241,8 @@ fun AccountCard(
     modifier: Modifier = Modifier,
     displayName: String,
     mail: String,
-    profilePhoto: Uri?
-)
-{
+    profilePhoto: Uri?,
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -233,15 +253,17 @@ fun AccountCard(
     {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(modifier = Modifier.width(15.dp))
-            Card(shape = CircleShape,
+            Card(
+                shape = CircleShape,
                 modifier = Modifier.size(53.dp),
                 elevation = 7.dp,
                 backgroundColor = Color.White
             ) {
                 profilePhoto?.let {
                     AsyncImage(model = it, contentDescription = "")
-                }?: kotlin.run {
-                    Icon(painter = painterResource(id = R.drawable.account_circle_icon),
+                } ?: kotlin.run {
+                    Icon(
+                        painter = painterResource(id = R.drawable.account_circle_icon),
                         contentDescription = "",
                         tint = LightGray
                     )
@@ -273,13 +295,13 @@ fun AccountCard(
 @OrbitInternal
 @Preview(showBackground = true)
 @Composable
-private fun AccountScreenPreview()
-{
-    AccountScreen(viewModel = object: MviPreviewViewModel<AccountUiSate, AccountSingleEvent>(),
+private fun AccountScreenPreview() {
+    AccountScreen(viewModel = object : MviPreviewViewModel<AccountUiSate, AccountSingleEvent>(),
         IAccountViewModel {
         override fun stateForPreview(): StateFlow<AccountUiSate> {
             return MutableStateFlow(AccountUiSate("Mariusz Kowalski", "kowalski@onet.pl"))
         }
+
         override fun signOut() {}
         override fun myEventsClick() {}
         override fun adminPanelClick() {}

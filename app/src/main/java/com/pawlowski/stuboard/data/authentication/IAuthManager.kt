@@ -18,4 +18,5 @@ interface IAuthManager {
     fun getCurrentUser(): FirebaseUser?
     fun observeAuthState() : Flow<FirebaseAuth>
     fun signOut()
+    suspend fun getUserRole(): String?
 }

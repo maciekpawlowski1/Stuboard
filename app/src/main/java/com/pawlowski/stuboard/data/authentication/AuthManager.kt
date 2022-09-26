@@ -75,7 +75,7 @@ class AuthManager @Inject constructor(
     }
 
     override suspend fun getApiToken(): String? {
-        return firebaseAuth.currentUser?.getIdToken(true)?.await()?.token
+        return getToken()?.token
     }
 
     override fun getCurrentUser(): FirebaseUser? {
@@ -104,5 +104,18 @@ class AuthManager @Inject constructor(
         firebaseAuth.signOut()
     }
 
+    private suspend fun getToken(): GetTokenResult?
+    {
+        return firebaseAuth.currentUser?.getIdToken(true)?.await()
+    }
 
+    override suspend fun getUserRole(): String? {
+        return try {
+            getToken()!!.claims["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]?.toString()
+        }
+        catch (e: Exception)
+        {
+            null
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.pawlowski.stuboard.presentation.account
 
 import androidx.lifecycle.ViewModel
 import com.pawlowski.stuboard.presentation.use_cases.GetCurrentUserUseCase
+import com.pawlowski.stuboard.presentation.use_cases.GetIsUserAdminUseCase
 import com.pawlowski.stuboard.presentation.use_cases.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.Container
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getIsUserAdminUseCase: GetIsUserAdminUseCase,
     private val signOutUseCase: SignOutUseCase,
 ): IAccountViewModel, ViewModel() {
 
@@ -45,7 +47,15 @@ class AccountViewModel @Inject constructor(
         postSideEffect(AccountSingleEvent.NavigateToLogIn)
     }
 
+    private fun handleIsUserAdmin() = intent {
+        val isAdmin = getIsUserAdminUseCase()
+        reduce {
+            state.copy(isAdmin = isAdmin)
+        }
+    }
+
     init {
         refreshUserData()
+        handleIsUserAdmin()
     }
 }

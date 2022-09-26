@@ -111,4 +111,12 @@ class AccountsRepository @Inject constructor(
         authManager.signOut()
     }
 
+    override suspend fun isUserAdmin(): Boolean? {
+        return withContext(Dispatchers.IO) {
+            authManager.getUserRole()?.let {
+                it  == "Admin"
+            }
+        }
+    }
+
 }

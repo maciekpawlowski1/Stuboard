@@ -18,4 +18,5 @@ interface IAccountsRepository {
     fun firebaseSignInWithGoogle(googleCredential: AuthCredential): Flow<Response<Boolean>>
     fun getCurrentUser(): FirebaseUser?
     fun signOut()
+    suspend fun isUserAdmin(): Boolean?
 }
