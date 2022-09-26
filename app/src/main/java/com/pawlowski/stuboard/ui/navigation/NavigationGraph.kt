@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.pawlowski.stuboard.ui.event_accepting.AdminEventAcceptingScreen
+import com.pawlowski.stuboard.ui.event_accepting.AdminEventDetailsAcceptingScreen
 import com.pawlowski.stuboard.ui.event_editing.EditEventScreen
 import com.pawlowski.stuboard.ui.event_editing.EventPublishStatusScreen
 import com.pawlowski.stuboard.ui.event_editing.MyEventsScreen
@@ -169,8 +170,23 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
 
         composable(route = NavRoutes.ADMIN_EVENTS_ACCEPTING)
         {
-            AdminEventAcceptingScreen()
+            AdminEventAcceptingScreen(onNavigateToEventDetailsAccepting = { eventId ->
+                navController.navigate("${NavRoutes.ADMIN_EVENT_DETAILS_ACCEPTING}/$eventId")
+                {
+                    launchSingleTop = true
+                }
+            })
         }
 
+        composable(route = "${NavRoutes.ADMIN_EVENT_DETAILS_ACCEPTING}/{eventForAcceptId}",
+        arguments = listOf(
+            navArgument("eventForAcceptId")
+            {
+                NavType.StringType
+            }
+        ))
+        {
+            AdminEventDetailsAcceptingScreen()
+        }
     }
 }

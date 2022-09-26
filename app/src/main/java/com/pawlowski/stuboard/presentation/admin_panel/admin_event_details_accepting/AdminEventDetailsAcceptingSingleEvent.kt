@@ -1,0 +1,3 @@
+package com.pawlowski.stuboard.presentation.admin_panel.admin_event_details_accepting
+
+sealed interface AdminEventDetailsAcceptingSingleEvent

@@ -32,7 +32,10 @@ import org.orbitmvi.orbit.annotation.OrbitInternal
 import org.orbitmvi.orbit.syntax.ContainerContext
 
 @Composable
-fun AdminEventAcceptingScreen(viewModel: IAdminEventAcceptingViewModel = hiltViewModel<AdminEventAcceptingViewModel>()) {
+fun AdminEventAcceptingScreen(
+    onNavigateToEventDetailsAccepting: (String) -> Unit = {},
+    viewModel: IAdminEventAcceptingViewModel = hiltViewModel<AdminEventAcceptingViewModel>()
+) {
     val uiState = viewModel.container.stateFlow.collectAsState()
     val isLoadingState = derivedStateOf {
         uiState.value is AdminEventAcceptingUiState.Loading
@@ -79,7 +82,6 @@ fun AdminEventAcceptingScreen(viewModel: IAdminEventAcceptingViewModel = hiltVie
                         ), eventItemForPreview = PreviewUtils.defaultEventPreviews[0],
                         isLoading = true
                     ) {
-                        //TODO: Navigate
                     }
                 }
             }
@@ -91,7 +93,7 @@ fun AdminEventAcceptingScreen(viewModel: IAdminEventAcceptingViewModel = hiltVie
                         horizontal = 6.dp
                     ), eventItemForPreview = it
                 ) {
-                    //TODO: Navigate
+                    onNavigateToEventDetailsAccepting.invoke(it.eventId)
                 }
             }
         }

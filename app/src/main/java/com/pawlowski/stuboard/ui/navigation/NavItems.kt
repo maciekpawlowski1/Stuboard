@@ -21,6 +21,7 @@ object NavRoutes
     const val EDIT_EVENT = "EditEvent"
     const val PUBLISHING_STATUS = "PublishStatus"
     const val ADMIN_EVENTS_ACCEPTING = "AdminEventsAccepting"
+    const val ADMIN_EVENT_DETAILS_ACCEPTING = "AdminEventDetailsAccepting"
 }
 
 data class BasicRoute(val fullRoute: String, val basicRoute: String)
