@@ -2,11 +2,12 @@ package com.pawlowski.stuboard.presentation.event_status
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.pawlowski.stuboard.domain.EventsRepository
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
+import com.pawlowski.stuboard.presentation.use_cases.CancelEventUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEditingEventPreviewUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEventPublishingStatusUseCase
+import com.pawlowski.stuboard.presentation.use_cases.PublishMyEventUseCase
 import com.pawlowski.stuboard.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -22,8 +23,9 @@ import javax.inject.Inject
 class EventStatusViewModel @Inject constructor(
     private val getEventPublishingStatusUseCase: GetEventPublishingStatusUseCase,
     private val getEditingEventPreviewUseCase: GetEditingEventPreviewUseCase,
-    private val eventsRepository: EventsRepository,
-    private val savedStateHandle: SavedStateHandle,
+    private val cancelEventUseCase: CancelEventUseCase,
+    private val publishMyEventUseCase: PublishMyEventUseCase,
+    savedStateHandle: SavedStateHandle,
 ): IEventStatusViewModel, ViewModel() {
     private val eventId: Int = savedStateHandle.get<String>("editEventId")?.toInt()!!
 
@@ -57,7 +59,7 @@ class EventStatusViewModel @Inject constructor(
             reduce {
                 state.copy(isRequestInProgress = true)
             }
-            val result = eventsRepository.publishEvent(eventId)
+            val result = publishMyEventUseCase(eventId)
             reduce {
                 state.copy(isRequestInProgress = false)
             }
@@ -95,7 +97,7 @@ class EventStatusViewModel @Inject constructor(
                 state.copy(isRequestInProgress = true)
             }
 
-            val result = eventsRepository.cancelEvent(eventId)
+            val result = cancelEventUseCase(eventId)
 
             if(result is Resource.Error)
             {

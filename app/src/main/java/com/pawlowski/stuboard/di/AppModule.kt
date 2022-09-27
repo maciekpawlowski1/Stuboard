@@ -287,5 +287,15 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun publishEventUseCase(eventsRepository: EventsRepository) = PublishEventUseCase(eventsRepository::publishEvent)
+    fun acceptEventAsAdminUseCase(eventsRepository: EventsRepository) = AcceptEventAsAdminUseCase(eventsRepository::publishEventFromAdminPanel)
+
+    @Singleton
+    @Provides
+    fun cancelEventUseCase(eventsRepository: EventsRepository) = CancelEventUseCase(eventsRepository::cancelMyEvent)
+
+    @Singleton
+    @Provides
+    fun publishMyEventUseCase(eventsRepository: EventsRepository) = PublishMyEventUseCase(eventsRepository::publishMyEvent)
+
+
 }

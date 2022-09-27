@@ -22,9 +22,10 @@ interface EventsRepository {
     fun getAllEditingEvents(): Flow<List<FullEventEntity>>
     suspend fun getEditingEventStateFromEditingEvent(eventId: Long): EditEventUiState
     fun getEditingEventPreview(eventId: Int): Flow<EventItemForPreview>
-    suspend fun publishEvent(eventId: Int): Resource<Boolean>
-    suspend fun cancelEvent(eventId: Int): Resource<Unit>
+    suspend fun publishMyEvent(eventId: Int): Resource<Unit>
+    suspend fun cancelMyEvent(eventId: Int): Resource<Unit>
     suspend fun refreshMyEvents(): Resource<Unit>
     suspend fun getEventsForAdminPanel(): Flow<List<EventItemForPreview>>
-    suspend fun publishEvent(eventId: String): Resource<Unit>
+    suspend fun publishEventFromAdminPanel(eventId: String): Resource<Unit>
+    suspend fun cancelEventFromAdminPanel(eventId: String): Resource<Unit>
 }

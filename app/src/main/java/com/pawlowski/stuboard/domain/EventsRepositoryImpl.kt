@@ -191,7 +191,7 @@ class EventsRepositoryImpl @Inject constructor(
         return eventsDao.observeEvent(eventId).map { it.toEventItemForPreview() }
     }
 
-    override suspend fun publishEvent(eventId: Int): Resource<Boolean> {
+    override suspend fun publishMyEvent(eventId: Int): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             return@withContext try {
                 val event = eventsDao.getEvent(eventId)
@@ -219,7 +219,7 @@ class EventsRepositoryImpl @Inject constructor(
                     {
                         eventsDao.upsertEvent(newEvent.copy(publishingStatus = 1, remoteEventId = response.body()!!))
                         println("Success of adding event")
-                        Resource.Success(true)
+                        Resource.Success(Unit)
                     }
                     else
                     {
@@ -237,7 +237,7 @@ class EventsRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun publishEvent(eventId: String): Resource<Unit> {
+    override suspend fun publishEventFromAdminPanel(eventId: String): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = eventsService.publishEvent(eventId, "Bearer ${authManager.getApiToken()!!}")
@@ -256,7 +256,24 @@ class EventsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun cancelEvent(eventId: Int): Resource<Unit> {
+    override suspend fun cancelEventFromAdminPanel(eventId: String): Resource<Unit>  {
+        return withContext(Dispatchers.IO) {
+            try {
+                val result = eventsService.deleteEvent(eventId, "Bearer ${authManager.getApiToken()}")
+                if(result.isSuccessful)
+                    Resource.Success(Unit)
+                else
+                    Resource.Error(UiText.StaticText(result.message()))
+            }
+            catch (e: Exception)
+            {
+                ensureActive()
+                Resource.Error(UiText.StaticText(e.localizedMessage?:"Something went wrong"))
+            }
+        }
+    }
+
+    override suspend fun cancelMyEvent(eventId: Int): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             try {
                 val event = eventsDao.getEvent(eventId)

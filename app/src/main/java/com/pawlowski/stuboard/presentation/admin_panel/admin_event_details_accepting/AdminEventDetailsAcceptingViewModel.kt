@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.use_cases.GetEventDetailsUseCase
-import com.pawlowski.stuboard.presentation.use_cases.PublishEventUseCase
+import com.pawlowski.stuboard.presentation.use_cases.AcceptEventAsAdminUseCase
 import com.pawlowski.stuboard.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.Container
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminEventDetailsAcceptingViewModel @Inject constructor(
     private val getEventDetailsUseCase: GetEventDetailsUseCase,
-    private val publishEventUseCase: PublishEventUseCase,
+    private val acceptEventAsAdminUseCase: AcceptEventAsAdminUseCase,
     savedStateHandle: SavedStateHandle,
 ): IAdminEventDetailsAcceptingViewModel, ViewModel() {
     private val eventId = savedStateHandle.get<String>("eventForAcceptId")!!
@@ -48,7 +48,7 @@ class AdminEventDetailsAcceptingViewModel @Inject constructor(
             reduce {
                 (state as AdminEventDetailsAcceptingUiState.Success).copy(isRequestInProgress = true)
             }
-            val result = publishEventUseCase(eventId)
+            val result = acceptEventAsAdminUseCase(eventId)
             if(result is Resource.Success)
             {
                 postSideEffect(AdminEventDetailsAcceptingSingleEvent.NavigateBack)
