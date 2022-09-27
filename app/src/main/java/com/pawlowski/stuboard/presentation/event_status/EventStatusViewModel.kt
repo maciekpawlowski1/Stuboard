@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.my_events.EventPublishState
-import com.pawlowski.stuboard.presentation.use_cases.CancelEventUseCase
+import com.pawlowski.stuboard.presentation.use_cases.CancelMyEventUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEditingEventPreviewUseCase
 import com.pawlowski.stuboard.presentation.use_cases.GetEventPublishingStatusUseCase
 import com.pawlowski.stuboard.presentation.use_cases.PublishMyEventUseCase
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class EventStatusViewModel @Inject constructor(
     private val getEventPublishingStatusUseCase: GetEventPublishingStatusUseCase,
     private val getEditingEventPreviewUseCase: GetEditingEventPreviewUseCase,
-    private val cancelEventUseCase: CancelEventUseCase,
+    private val cancelMyEventUseCase: CancelMyEventUseCase,
     private val publishMyEventUseCase: PublishMyEventUseCase,
     savedStateHandle: SavedStateHandle,
 ): IEventStatusViewModel, ViewModel() {
@@ -97,7 +97,7 @@ class EventStatusViewModel @Inject constructor(
                 state.copy(isRequestInProgress = true)
             }
 
-            val result = cancelEventUseCase(eventId)
+            val result = cancelMyEventUseCase(eventId)
 
             if(result is Resource.Error)
             {

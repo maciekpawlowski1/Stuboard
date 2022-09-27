@@ -261,7 +261,10 @@ class EventsRepositoryImpl @Inject constructor(
             try {
                 val result = eventsService.deleteEvent(eventId, "Bearer ${authManager.getApiToken()}")
                 if(result.isSuccessful)
+                {
+                    inMemoryEventsForAdminPanelCaching.deleteEventFromCache(eventId)
                     Resource.Success(Unit)
+                }
                 else
                     Resource.Error(UiText.StaticText(result.message()))
             }

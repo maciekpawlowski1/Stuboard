@@ -291,11 +291,13 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun cancelEventUseCase(eventsRepository: EventsRepository) = CancelEventUseCase(eventsRepository::cancelMyEvent)
+    fun cancelEventUseCase(eventsRepository: EventsRepository) = CancelMyEventUseCase(eventsRepository::cancelMyEvent)
 
     @Singleton
     @Provides
     fun publishMyEventUseCase(eventsRepository: EventsRepository) = PublishMyEventUseCase(eventsRepository::publishMyEvent)
 
-
+    @Singleton
+    @Provides
+    fun cancelEventFromAdminPanelUseCase(eventsRepository: EventsRepository) = CancelEventFromAdminPanelUseCase(eventsRepository::cancelEventFromAdminPanel)
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.presentation.use_cases.GetEventDetailsUseCase
 import com.pawlowski.stuboard.presentation.use_cases.AcceptEventAsAdminUseCase
+import com.pawlowski.stuboard.presentation.use_cases.CancelEventFromAdminPanelUseCase
 import com.pawlowski.stuboard.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.Container
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class AdminEventDetailsAcceptingViewModel @Inject constructor(
     private val getEventDetailsUseCase: GetEventDetailsUseCase,
     private val acceptEventAsAdminUseCase: AcceptEventAsAdminUseCase,
+    private val cancelEventFromAdminPanelUseCase: CancelEventFromAdminPanelUseCase,
     savedStateHandle: SavedStateHandle,
 ): IAdminEventDetailsAcceptingViewModel, ViewModel() {
     private val eventId = savedStateHandle.get<String>("eventForAcceptId")!!
@@ -27,8 +29,6 @@ class AdminEventDetailsAcceptingViewModel @Inject constructor(
     )
 
     private fun handleEventLoad() = intent(registerIdling = false) {
-        println("Loading event: $eventId")
-
         getEventDetailsUseCase(eventId).collect { result ->
             result?.let {
                 reduce {
@@ -38,17 +38,16 @@ class AdminEventDetailsAcceptingViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
-    override fun acceptEvent() = intent {
-        if(state is AdminEventDetailsAcceptingUiState.Success)
+    private fun handleRequest(request: suspend (String) -> Resource<Unit>) = intent {
+        val currentStartState = state
+        if(currentStartState is AdminEventDetailsAcceptingUiState.Success && !currentStartState.isRequestInProgress)
         {
             reduce {
                 (state as AdminEventDetailsAcceptingUiState.Success).copy(isRequestInProgress = true)
             }
-            val result = acceptEventAsAdminUseCase(eventId)
+            val result = request(eventId)
             if(result is Resource.Success)
             {
                 postSideEffect(AdminEventDetailsAcceptingSingleEvent.NavigateBack)
@@ -66,11 +65,14 @@ class AdminEventDetailsAcceptingViewModel @Inject constructor(
                     currentState
             }
         }
-
     }
 
-    override fun rejectEvent() = intent {
+    override fun acceptEvent() {
+        handleRequest { return@handleRequest acceptEventAsAdminUseCase(eventId) }
+    }
 
+    override fun rejectEvent() {
+        handleRequest { return@handleRequest cancelEventFromAdminPanelUseCase(eventId) }
     }
 
     init {
