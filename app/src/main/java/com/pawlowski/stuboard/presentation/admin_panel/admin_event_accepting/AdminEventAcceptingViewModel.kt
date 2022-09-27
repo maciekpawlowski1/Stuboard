@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
@@ -20,11 +21,14 @@ class AdminEventAcceptingViewModel @Inject constructor(
     )
 
     private fun handleEventsLoad() = intent(registerIdling = false) {
-        getEventsForAdminPanelUseCase().collect {
-            reduce {
-                AdminEventAcceptingUiState.Success(it)
+        repeatOnSubscription {
+            getEventsForAdminPanelUseCase().collect {
+                reduce {
+                    AdminEventAcceptingUiState.Success(it)
+                }
             }
         }
+
 
     }
 

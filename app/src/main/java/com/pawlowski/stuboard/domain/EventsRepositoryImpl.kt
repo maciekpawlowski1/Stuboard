@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.gson.Gson
 import com.pawlowski.stuboard.data.authentication.IAuthManager
+import com.pawlowski.stuboard.data.local.admin_panel.InMemoryEventsForAdminPanelCaching
 import com.pawlowski.stuboard.data.local.editing_events.EditingEventsDao
 import com.pawlowski.stuboard.data.local.editing_events.FullEventEntity
 import com.pawlowski.stuboard.data.mappers.*
@@ -36,6 +37,7 @@ class EventsRepositoryImpl @Inject constructor(
     private val imageUploadManager: IImageUploadManager,
     private val authManager: IAuthManager,
     private val eventsServiceFiltersRequestAdapter: EventsServiceFiltersRequestAdapter,
+    private val inMemoryEventsForAdminPanelCaching: InMemoryEventsForAdminPanelCaching,
 ): EventsRepository {
     override fun getHomeEventTypesSuggestion(): Flow<List<HomeEventTypeSuggestion>> = channelFlow {
         val firstEmit = listOf(
@@ -240,7 +242,10 @@ class EventsRepositoryImpl @Inject constructor(
             try {
                 val response = eventsService.publishEvent(eventId, "Bearer ${authManager.getApiToken()!!}")
                 if(response.isSuccessful)
+                {
+                    inMemoryEventsForAdminPanelCaching.deleteEventFromCache(eventId)
                     Resource.Success(Unit)
+                }
                 else
                     Resource.Error(UiText.StaticText(response.message()))
             }
@@ -309,11 +314,11 @@ class EventsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getEventsForAdminPanel(): Flow<List<EventItemForPreview>> = channelFlow {
-        suspend fun fetchEvents(): List<EventItemForPreview>? {
+        suspend fun fetchEvents(): EventsResponse? {
             val result = eventsService.getEventsForAdminPanel(token = "Bearer ${authManager.getApiToken()!!}")
             return if(result.isSuccessful)
             {
-                result.body()!!.toEventItemForPreviewList()
+                result.body()!!
             }
             else
             {
@@ -321,16 +326,28 @@ class EventsRepositoryImpl @Inject constructor(
                 null
             }
         }
-        try {
-            fetchEvents()?.let {
-                send(it)
+        inMemoryEventsForAdminPanelCaching.eventsState.first()?.let {
+            send(it.map { el -> el.toEventItemForPreview() })
+        }?: kotlin.run {
+            try {
+                fetchEvents()?.let {
+                    inMemoryEventsForAdminPanelCaching.updateEvents(it)
+                }
+            }
+            catch (e: Exception)
+            {
+                e.printStackTrace()
+                ensureActive()
+                fetchEvents()?.let {
+                    inMemoryEventsForAdminPanelCaching.updateEvents(it)
+                }
             }
         }
-        catch (e: Exception)
-        {
-            e.printStackTrace()
-            ensureActive()
-            fetchEvents()?.let {
+
+        inMemoryEventsForAdminPanelCaching.eventsState.collectLatest { emitValue ->
+            emitValue?.map {
+                it.toEventItemForPreview()
+            }?.let {
                 send(it)
             }
         }
