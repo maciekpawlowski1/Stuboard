@@ -235,6 +235,22 @@ class EventsRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun publishEvent(eventId: String): Resource<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = eventsService.publishEvent(eventId, "Bearer ${authManager.getApiToken()!!}")
+                if(response.isSuccessful)
+                    Resource.Success(Unit)
+                else
+                    Resource.Error(UiText.StaticText(response.message()))
+            }
+            catch (e: Exception)
+            {
+                Resource.Error(UiText.StaticText(e.localizedMessage?:"error"))
+            }
+        }
+    }
+
     override suspend fun cancelEvent(eventId: Int): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             try {

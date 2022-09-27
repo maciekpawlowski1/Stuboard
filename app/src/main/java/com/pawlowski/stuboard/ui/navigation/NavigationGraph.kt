@@ -186,7 +186,9 @@ fun NavigationGraph(navController: NavHostController, onNavigateToLoginScreen: (
             }
         ))
         {
-            AdminEventDetailsAcceptingScreen()
+            AdminEventDetailsAcceptingScreen(onNavigateBack = {
+                navController.popBackStack()
+            })
         }
     }
 }

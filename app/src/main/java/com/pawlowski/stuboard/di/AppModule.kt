@@ -273,6 +273,7 @@ class AppModule {
     fun getEditingEventPreviewUseCase(eventsRepository: EventsRepository) = GetEditingEventPreviewUseCase(eventsRepository::getEditingEventPreview)
 
     @Singleton
+
     @Provides
     fun refreshMyEventsUseCase(eventsRepository: EventsRepository) = RefreshMyEventsUseCase(eventsRepository::refreshMyEvents)
 
@@ -283,4 +284,8 @@ class AppModule {
     @Singleton
     @Provides
     fun getEventsForAdminPanelUseCase(eventsRepository: EventsRepository) = GetEventsForAdminPanelUseCase(eventsRepository::getEventsForAdminPanel)
+
+    @Singleton
+    @Provides
+    fun publishEventUseCase(eventsRepository: EventsRepository) = PublishEventUseCase(eventsRepository::publishEvent)
 }

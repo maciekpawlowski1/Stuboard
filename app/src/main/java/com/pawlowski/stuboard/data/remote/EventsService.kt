@@ -43,4 +43,7 @@ interface EventsService {
         @Query("PageSize") pageSize: Int = 30,
         @Header("Authorization") token: String,
     ): Response<EventsResponse>
+
+    @POST("api/Events/PublishEvent")
+    suspend fun publishEvent(@Body eventId: String, @Header("Authorization") token: String): Response<Unit>
 }

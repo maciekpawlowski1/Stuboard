@@ -1,8 +1,9 @@
 package com.pawlowski.stuboard.presentation.admin_panel.admin_event_details_accepting
 
-import com.pawlowski.stuboard.presentation.admin_panel.admin_event_accepting.AdminEventAcceptingSingleEvent
 import org.orbitmvi.orbit.ContainerHost
 
-interface IAdminEventDetailsAcceptingViewModel: ContainerHost<AdminEventDetailsAcceptingUiState, AdminEventAcceptingSingleEvent> {
+interface IAdminEventDetailsAcceptingViewModel: ContainerHost<AdminEventDetailsAcceptingUiState, AdminEventDetailsAcceptingSingleEvent> {
 
+    fun acceptEvent()
+    fun rejectEvent()
 }
