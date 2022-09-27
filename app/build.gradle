@@ -148,7 +148,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
     //Firebase coroutines support
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3'
 
     //Google sign in
     implementation "com.google.android.gms:play-services-auth:20.3.0"
