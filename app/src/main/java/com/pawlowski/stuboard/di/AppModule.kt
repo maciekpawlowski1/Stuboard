@@ -3,6 +3,7 @@ package com.pawlowski.stuboard.di
 import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
+import android.content.SharedPreferences
 import android.location.Geocoder
 import androidx.room.Room
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -175,6 +176,9 @@ class AppModule {
         return firebaseStorageManager
     }
 
+    @Singleton
+    @Provides
+    fun sharedPreferences(appContext: Context): SharedPreferences = appContext.getSharedPreferences("StuboardPreferences", Context.MODE_PRIVATE)
 
     @Singleton
     @Provides
@@ -300,4 +304,8 @@ class AppModule {
     @Singleton
     @Provides
     fun cancelEventFromAdminPanelUseCase(eventsRepository: EventsRepository) = CancelEventFromAdminPanelUseCase(eventsRepository::cancelEventFromAdminPanel)
+
+    @Singleton
+    @Provides
+    fun logInAnonymouslyUseCase(accountsRepository: IAccountsRepository) = LogInAnonymouslyUseCase(accountsRepository::signInAnnonymously)
 }

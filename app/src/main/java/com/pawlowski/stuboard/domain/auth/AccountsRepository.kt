@@ -4,6 +4,7 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
+import com.pawlowski.stuboard.data.authentication.AnonymousSignInManager
 import com.pawlowski.stuboard.data.authentication.IAuthManager
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.domain.models.Response
@@ -26,15 +27,23 @@ class AccountsRepository @Inject constructor(
     private val signInRequest: BeginSignInRequest,
     @Named("SIGN_UP")
     private val signUpRequest: BeginSignInRequest,
+    private val anonymousSignInManager: AnonymousSignInManager,
 ): IAccountsRepository {
 
 
     override fun getLogInState(): AppLoginState {
         return if(authManager.isSignedIn())
             AppLoginState.LoggedIn
-        //TODO: Add if logged anonymously
+        else if(anonymousSignInManager.isSignedInAnonymously())
+            AppLoginState.LoggedInAnonymously
         else {
             AppLoginState.NotLoggedIn
+        }
+    }
+
+    override suspend fun signInAnnonymously() {
+        withContext(Dispatchers.IO) {
+            anonymousSignInManager.signInAnonymously()
         }
     }
 
@@ -43,7 +52,7 @@ class AccountsRepository @Inject constructor(
             val user = it.currentUser
             if(user != null)
                 emit(AppLoginState.LoggedIn)
-            else if(false) //TODO: Add if logged anonymously
+            else if(anonymousSignInManager.isSignedInAnonymously())
                 emit(AppLoginState.LoggedInAnonymously)
             else
                 emit(AppLoginState.NotLoggedIn)
@@ -52,7 +61,10 @@ class AccountsRepository @Inject constructor(
 
     override suspend fun logInWithEmailAndPassword(email: String, password: String): Resource<FirebaseUser> {
         return withContext(Dispatchers.IO) {
-            authManager.signInWithPassword(email, password)
+            val result = authManager.signInWithPassword(email, password)
+            if(result is Resource.Success)
+                anonymousSignInManager.signOutAnonymouslyIfAlreadySignedIn()
+            result
         }
     }
 
@@ -61,7 +73,10 @@ class AccountsRepository @Inject constructor(
         password: String
     ): Resource<FirebaseUser> {
         return withContext(Dispatchers.IO) {
-            authManager.registerWithPassword(email, password)
+            val result = authManager.registerWithPassword(email, password)
+            if(result is Resource.Success)
+                anonymousSignInManager.signOutAnonymouslyIfAlreadySignedIn()
+            result
         }
     }
 
@@ -108,6 +123,7 @@ class AccountsRepository @Inject constructor(
     }
 
     override fun signOut() {
+        anonymousSignInManager.signOutAnonymouslyIfAlreadySignedIn()
         authManager.signOut()
     }
 

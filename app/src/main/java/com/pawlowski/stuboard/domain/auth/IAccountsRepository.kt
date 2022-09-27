@@ -19,4 +19,5 @@ interface IAccountsRepository {
     fun getCurrentUser(): FirebaseUser?
     fun signOut()
     suspend fun isUserAdmin(): Boolean?
+    suspend fun signInAnnonymously()
 }

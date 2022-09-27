@@ -257,7 +257,7 @@ fun LoginScreen(navigationCallbacks: LoginNavigationCallbacks = LoginNavigationC
         HorizontalDividerWithLabelInTheMiddle()
         Spacer(modifier = Modifier.height(10.dp))
         ContinueAnonymousButton(onClick = {
-            Toast.makeText(context, "Logowanie anonimowe będzie dostępne wkrótce!", Toast.LENGTH_LONG).show()
+            viewModel.logInAnonymously()
         })
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -385,6 +385,10 @@ fun LoginScreenPreview()
         }
 
         override fun signInFromIntent(intent: Intent) {
+            TODO("Not yet implemented")
+        }
+
+        override fun logInAnonymously() {
             TODO("Not yet implemented")
         }
 

@@ -11,4 +11,5 @@ interface ILoginMviViewModel: ContainerHost<LoginUiState, LoginSingleEvent> {
     fun openRegisterScreen()
     fun oneTapSignIn()
     fun signInFromIntent(intent: Intent)
+    fun logInAnonymously()
 }

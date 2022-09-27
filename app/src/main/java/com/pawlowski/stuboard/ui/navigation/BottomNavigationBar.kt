@@ -1,6 +1,5 @@
 package com.pawlowski.stuboard.ui.navigation
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -16,12 +15,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.pawlowski.stuboard.ui.theme.GrayGreen
+import com.pawlowski.stuboard.presentation.activity.AppLoginState
 import com.pawlowski.stuboard.ui.theme.Green
 import com.pawlowski.stuboard.ui.theme.MidGrey
 
 @Composable
-fun BottomNavigationBar(navController: NavController)
+fun BottomNavigationBar(
+    navController: NavController,
+)
 {
     val items = listOf(
         BottomNavItems.Home,

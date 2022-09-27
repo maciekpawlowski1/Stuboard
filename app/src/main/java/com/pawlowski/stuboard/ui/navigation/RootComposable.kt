@@ -13,11 +13,15 @@ import com.pawlowski.stuboard.R
 import com.pawlowski.stuboard.ui.theme.Green
 
 @Composable
-fun RootComposable(onNavigateToLoginScreen: () -> Unit)
+fun RootComposable(
+    onNavigateToLoginScreen: () -> Unit,
+)
 {
     val navController = rememberNavController()
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
+        bottomBar = { BottomNavigationBar(
+            navController = navController,
+        ) },
         floatingActionButton = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route

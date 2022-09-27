@@ -31,6 +31,8 @@ class AccountViewModel @Inject constructor(
                 reduce {
                     state.copy(displayName = displayName?:"", mail= email?:"", profilePhoto = profilePhoto)
                 }
+            }?: kotlin.run {
+                postSideEffect(AccountSingleEvent.NavigateToLogIn)
             }
         }
 
@@ -53,6 +55,7 @@ class AccountViewModel @Inject constructor(
             state.copy(isAdmin = isAdmin)
         }
     }
+
 
     init {
         refreshUserData()

@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.google.firebase.FirebaseApp
 import com.pawlowski.stuboard.presentation.activity.MainViewModel
 import com.pawlowski.stuboard.ui.navigation.LoginRootComposable
 import com.pawlowski.stuboard.ui.theme.StuboardTheme

@@ -9,6 +9,7 @@ import com.google.firebase.auth.GoogleAuthProvider.getCredential
 import com.pawlowski.stuboard.domain.models.Resource
 import com.pawlowski.stuboard.domain.models.Response
 import com.pawlowski.stuboard.presentation.use_cases.FirebaseSignInWithGoogleUseCase
+import com.pawlowski.stuboard.presentation.use_cases.LogInAnonymouslyUseCase
 import com.pawlowski.stuboard.presentation.use_cases.LogInWithEmailAndPasswordUseCase
 import com.pawlowski.stuboard.presentation.use_cases.OneTapSignInWithGoogleUseCase
 import com.pawlowski.stuboard.presentation.utils.UiText
@@ -25,6 +26,7 @@ class LoginMviViewModel @Inject constructor(
     private val oneTapClient: SignInClient,
     private val oneTapSignInWithGoogleUseCase: OneTapSignInWithGoogleUseCase,
     private val firebaseSignInWithGoogleUseCase: FirebaseSignInWithGoogleUseCase,
+    private val logInAnonymouslyUseCase: LogInAnonymouslyUseCase,
 ): ILoginMviViewModel, ViewModel() {
 
     override val container = container<LoginUiState, LoginSingleEvent>(LoginUiState())
@@ -67,6 +69,13 @@ class LoginMviViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun logInAnonymously() = intent {
+        reduce { state.copy(isLoading = true) }
+        logInAnonymouslyUseCase()
+        reduce { state.copy(isLoading = false) }
+        postSideEffect(LoginSingleEvent.LoginSuccess)
     }
 
     override fun openRegisterScreen() = intent {
