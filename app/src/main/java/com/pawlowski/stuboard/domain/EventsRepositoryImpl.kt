@@ -140,7 +140,7 @@ class EventsRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsForMapScreen(filters: List<FilterModel>): Resource<List<EventItemForPreviewWithLocation>> {
         return try {
-            println(authManager.getApiToken())
+            //println(authManager.getApiToken())
 
             val result = eventsServiceFiltersRequestAdapter.loadItems(
                 page = 1,
@@ -372,5 +372,12 @@ class EventsRepositoryImpl @Inject constructor(
             }
         }
 
+    }
+
+    override suspend fun deleteEditingEvents(eventsIds: List<Int>)
+    {
+        withContext(Dispatchers.IO) {
+            eventsDao.deleteEvents(eventsIds)
+        }
     }
 }

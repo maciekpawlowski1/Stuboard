@@ -1,17 +1,13 @@
 package com.pawlowski.stuboard.ui.screens_in_bottom_navigation_related.screens
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -296,19 +292,36 @@ fun CategoryCard(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventCard(
     modifier: Modifier = Modifier,
     eventItemForPreview: EventItemForPreview,
     isLoading: Boolean = false,
-    onCardClick: () -> Unit = {}
+    showAsSelected: () -> Boolean = {false},
+    onCardLongClick:() -> Unit = {},
+    onCardClick: () -> Unit = {},
 ) {
+    val cardBackgroundColor = if(showAsSelected())
+        LightGreen
+    else
+        MaterialTheme.colors.surface
+
     Card(
         modifier = modifier
             .width(166.dp)
             .height(177.dp)
-            .clickable(enabled = !isLoading) { onCardClick.invoke() },
-        elevation = 5.dp
+            .combinedClickable(
+                enabled = !isLoading,
+                onLongClick= {
+                    onCardLongClick()
+                },
+                onClick = {
+                    onCardClick.invoke()
+                }
+            ),
+        elevation = 5.dp,
+        backgroundColor = animateColorAsState(targetValue = cardBackgroundColor).value,
     ) {
         Column(
             modifier = Modifier.padding(top = 10.dp),

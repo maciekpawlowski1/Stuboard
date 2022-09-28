@@ -22,6 +22,9 @@ interface EditingEventsDao {
     @Delete
     suspend fun deleteEvent(event: FullEventEntity)
 
+    @Query("DELETE FROM editing_events WHERE id IN (:eventsIds) AND publishingStatus = 0")
+    suspend fun deleteEvents(eventsIds: List<Int>)
+
     @Transaction
     suspend fun runTransaction(action: suspend () -> Unit)
     {

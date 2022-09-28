@@ -308,4 +308,8 @@ class AppModule {
     @Singleton
     @Provides
     fun logInAnonymouslyUseCase(accountsRepository: IAccountsRepository) = LogInAnonymouslyUseCase(accountsRepository::signInAnnonymously)
+
+    @Singleton
+    @Provides
+    fun deleteManyEditingEventsUseCase(eventsRepository: EventsRepository) = DeleteManyEditingEventsUseCase(eventsRepository::deleteEditingEvents)
 }
