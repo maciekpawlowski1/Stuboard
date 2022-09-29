@@ -4,4 +4,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface IEventDetailsViewModel {
     val uiState: StateFlow<EventDetailsUiState>
+    fun deleteClick() = run { }
 }

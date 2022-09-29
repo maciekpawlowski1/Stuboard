@@ -4,5 +4,6 @@ import com.pawlowski.stuboard.ui.models.EventItemWithDetails
 
 data class EventDetailsUiState(
     val isRefreshing: Boolean = false,
-    val eventDetails: EventItemWithDetails? = null
+    val eventDetails: EventItemWithDetails? = null,
+    val showDeleteButton: Boolean = false
 )

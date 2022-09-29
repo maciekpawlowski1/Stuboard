@@ -114,7 +114,7 @@ fun MyEventsScreen(
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd)
             {
                 Row {
-                    if(isSomethingSelectedState.value)
+                    if(isSomethingSelectedState.value && !isLoadingState.value)
                     {
                         IconButton(onClick = { viewModel.deleteSelectedEvents() }) {
                             Icon(
@@ -123,7 +123,6 @@ fun MyEventsScreen(
                                 tint = Color.Red
                             )
                         }
-                        Spacer(modifier = Modifier.width(5.dp))
                     }
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(

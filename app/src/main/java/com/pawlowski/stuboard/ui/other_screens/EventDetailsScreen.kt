@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +55,9 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
     val displayLoadingEffectState = derivedStateOf {
         uiState.value.eventDetails == null
     }
+    val showDeleteButtonState = derivedStateOf {
+        uiState.value.showDeleteButton
+    }
     //TODO: Create swipe refresh
     val displaySwipeRefreshState = derivedStateOf {
         uiState.value.isRefreshing
@@ -67,19 +71,38 @@ fun EventDetailsScreen(viewModel: IEventDetailsViewModel = hiltViewModel<EventDe
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
             //Screen images will be in 1.5:1 proportion (width:height)
-            AsyncImage(modifier = Modifier
-                .fillMaxWidth()
-                .height((screenWidth / 1.5).dp)
-                .myLoadingEffect(displayLoadingEffectState.value),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(eventItemWithDetails.imageUrl)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(id = R.drawable.image_placeholder),
-                error = painterResource(id = R.drawable.image_placeholder),
-                contentDescription = "",
-                contentScale = ContentScale.FillBounds
-            )
+            Box {
+                AsyncImage(modifier = Modifier
+                    .fillMaxWidth()
+                    .height((screenWidth / 1.5).dp)
+                    .myLoadingEffect(displayLoadingEffectState.value),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(eventItemWithDetails.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(id = R.drawable.image_placeholder),
+                    error = painterResource(id = R.drawable.image_placeholder),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillBounds
+                )
+                if(showDeleteButtonState.value) {
+                    Button(
+                        modifier = Modifier.padding(top = 10.dp, end = 10.dp).size(45.dp).align(TopEnd),
+                        onClick = { viewModel.deleteClick() },
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White
+                        ),
+                        contentPadding = PaddingValues(1.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.delete_icon),
+                            contentDescription = "",
+                            tint = Color.Red
+                        )
+                    }
+                }
+            }
             Text(
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 15.dp)
