@@ -300,9 +300,9 @@ class EditEventViewModel @Inject constructor(
             }
 
         }?: kotlin.run {
-            val id = saveEditingEventUseCase(EditEventUiState())
+            val id = saveEditingEventUseCase(EditEventUiState(country = "Polska", city = "Kraków"))
             reduce {
-                state.copy(eventId = id.toInt())
+                state.copy(eventId = id.toInt(), country = "Polska", city = "Kraków")
             }
         }
     }
