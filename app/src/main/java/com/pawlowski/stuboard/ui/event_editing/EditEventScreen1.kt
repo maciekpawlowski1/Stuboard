@@ -202,7 +202,7 @@ fun EditEventScreen1(
                 modifier = Modifier
                     .clickable {
                         MaterialDialog(context).show {
-                            dateTimePicker(requireFutureDateTime = true) { _, datetime ->
+                            dateTimePicker(show24HoursView = true, requireFutureDateTime = true) { _, datetime ->
                                 onToTimeChange(datetime.time.time)
                             }
                         }
