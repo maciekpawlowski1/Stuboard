@@ -41,7 +41,7 @@ fun MyGoogleMap(
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
             val hasPermission = locationPermissionState.status.isGranted
 
-            if(!hasPermission && locationPermissionState.status !is PermissionStatus.Denied)
+            if(!hasPermission/* && locationPermissionState.status !is PermissionStatus.Denied*/)
             {
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(key1 = lifecycleOwner, effect = {
@@ -108,16 +108,22 @@ fun MyGoogleMap(
         //TODO: Check why sometimes it completes, sometimes stops
         LaunchedEffect(key1 = moveCameraToMarkersBound, key2= markersPositions) {
             if(moveCameraToMarkersBound && markers.isNotEmpty()){
-                val builder = LatLngBounds.Builder()
-                markers.forEach {
-                    builder.include(it.position)
-                }
+                try {
+                    val builder = LatLngBounds.Builder()
+                    markers.forEach {
+                        builder.include(it.position)
+                    }
 
-                //Wait for map to be ready if it's not
-                while (!isMapLoaded.value)
-                    delay(5)
-                //Animate to marker bounds
-                cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
+                    //Wait for map to be ready if it's not
+                    while (!isMapLoaded.value)
+                        delay(5)
+                    //Animate to marker bounds
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
+                }
+                catch (e: Exception)
+                {
+
+                }
             }
 
 
